@@ -5,6 +5,8 @@
 --
 --TODO: 
 -- 		+ Fix h_slider() when backwards = true
+-- 		+ Statusbar toolsips
+-- 		+ Useful info display
 -------------------------------------------------------------------------------
 
 mouse_down = 0

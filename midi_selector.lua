@@ -80,10 +80,10 @@ function main()
 	fill_background()
 	-- Get Kestrokes
 	char = gfx.getchar()
-	
+
 	-- Deal with key stokes
 	-- If char == ESC then close window`
-	if char == 27 then 
+	if char == 27 or char == -1 or char == 116 then 
 		reaper.atexit(reaper.JS_Window_SetFocus(last_window))
 		return
 	-- Otherwise keep window open
