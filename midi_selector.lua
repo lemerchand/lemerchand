@@ -30,24 +30,39 @@ reaperDoFile('cf.lua')
 ------------------------------
 -- Global Variables --
 ------------------------------
-function default_vars()
+note_midi_n = {0,1,2,3,4,5,6,7,8,9,10,11}			--Covers all 12 notes (pitch%12)
+note_names = {'C','C#', 'D', 'D#', 'E',				--Note names for notes_list
+			'F','F#', 'G', 'G#', 'A', 
+			'A#','B'}
 
-	test_toggle = 1									--For testing, lawl
+--test_toggle = 1									--For testing, lawl
+time_selection = 0									--Act on all notes or those in time selection
+
+function default_vel()
 	min_vel = 0
 	max_vel = 127
+end
+
+function default_note_range()
 	min_note = 'C6'									--Lowest Note to be acted upon
 	max_note = 'D1'									--Highest note to be acted upon
-	time_selection = 0								--Act on all notes or those in time selection
-	beats = {0,0,0,0,0,0,0,0}						--Beat boolean, eg, 1st & 3rd, 6th and 8th
-	notes_list = {1,1,1,1,1,1,1,1,1,1,1,1}			--C-G# Boolean
-	note_midi_n = {0,1,2,3,4,5,6,7,8,9,10,11}		--Mini note numbers -- corresponds to note_names
-													--uses modulus to determine note name regardless of range
-	note_names = {'C','C#', 'D', 'D#', 'E',			--Note names for notes_list
-				'F','F#', 'G', 'G#', 'A', 
-				'A#','B'}
-
-
 end
+						
+function default_beats()
+	beats = {0,0,0,0,0,0,0,0}						--Beat boolean, eg, 1st & 3rd, 6th and 8th
+end
+
+function default_pitch()
+	notes_list = {1,1,1,1,1,1,1,1,1,1,1,1}			--C-G# Boolean
+end
+												
+function default_vars()
+	default_vel()
+	default_note_range()
+	default_beats()
+	default_pitch()
+end
+
 default_vars()
 
 
@@ -124,11 +139,17 @@ function main()
 
 	note_btn_pos = 0
 	for i = 1,6 do
-		if small_toggle(note_btn_pos + (i*31), pitch_frame_y+40, note_names[i], notes_list[i]) == 1 then notes_list[i] = math.abs(notes_list[i] - 1) end
+		btn = small_toggle(note_btn_pos + (i*31), pitch_frame_y+40, note_names[i], notes_list[i])
+		if btn == 1 then notes_list[i] = math.abs(notes_list[i] - 1) 
+		elseif btn == 2 then default_pitch()
+		end
 	end
 	beat_btn_pos = 0
 	for i = 1,6 do
-		if small_toggle(note_btn_pos + (i*31), pitch_frame_y+65, note_names[i+6], notes_list[i+6]) == 1 then notes_list[i+6] = math.abs(notes_list[i+6] - 1) end
+		btn= small_toggle(note_btn_pos + (i*31), pitch_frame_y+65, note_names[i+6], notes_list[i+6])
+		if btn == 1 then notes_list[i+6] = math.abs(notes_list[i+6] - 1)
+		elseif btn ==2 then default_pitch()
+	 end
 	end	
 	
 	--Makes sure there is always at least one note selected
@@ -151,14 +172,21 @@ function main()
 	label(time_frame_x+2,time_frame_y-label_offset, "Beats")
 	frame(time_frame_x,time_frame_y, time_frame_w, time_frame_h)
 
-	beat_btn_pos = 0
+	beat_btn_pos = 31
 
 	for i = 1,4 do
-		if small_toggle(beat_btn_pos + (i*31), time_frame_y+btn_offset_y, i, beats[i]) == 1 then beats[i] = math.abs(beats[i] - 1) end
+		btn = small_toggle(beat_btn_pos + (i*31), time_frame_y+btn_offset_y, i, beats[i]) 
+		if btn == 1 then beats[i] = math.abs(beats[i] - 1) 
+		elseif btn == 2 then default_beats()
+		end
+
 	end
-	beat_btn_pos = 0
+	beat_btn_pos = 31
 	for i = 1,4 do
-		if small_toggle(beat_btn_pos + (i*31), time_frame_y+35, i+4, beats[i+4]) == 1 then beats[i+4] = math.abs(beats[i+4] - 1) end
+		btn = small_toggle(beat_btn_pos + (i*31), time_frame_y+35, i+4, beats[i+4])
+		if btn == 1 then beats[i+4] = math.abs(beats[i+4] - 1)
+		elseif btn == 2 then default_beats()
+		end
 	end	
 
 	--------------------------
