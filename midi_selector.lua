@@ -7,14 +7,16 @@
 --		+ Add the ability to select from: 
 --					- Selected Notes 			- Capture Note (Note Range)
 --					- Time Selection 			- Length
+
+--		+ Reset per section 
+--		+ Detector for beats---what if it's not perfectly on the grid?
+-- 		+  Fix inclusive select for Notes
+--
+-- RECENT CHANGES:
+-- 		+ Note number selection now works!
 --		+ Make a value slider that fills from the right to the left
 --		+ Add Note small_toggles()s
 --		+ Selector for Hi/low note
---		+ Reset per frame
---		+ Detector for beats---what if it's not perfectly on the grid?
---
---
--- RECENT CHANGES:
 --		+ Made UI element positions relative to the frames for easy adjustments
 --		+ Created small_toggle() (tbu as a checkbox)
 --
@@ -159,8 +161,9 @@ function main()
 	elseif btn_exc_select == 2 then	select_notes(false, min_vel, max_vel)
 	elseif btn_clear == 1 then select_notes(true, -1, -1)
 	elseif btn_clear == 2 then
-		select_notes(true, -1, -1)
 		default_vars()
+		select_notes(true, -1, -1)
+		
 	end
 
 end
