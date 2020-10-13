@@ -122,8 +122,6 @@ function main()
 		-- If needed
 	end	
 
-	w = reaper.JS_Window_Find("MIDI Tool", true)
-	if w then reaper.JS_Window_AttachTopmostPin(w) end
 
 end
 t= reaper.time_precise()

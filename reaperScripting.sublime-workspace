@@ -120,19 +120,10 @@
 	"buffers":
 	[
 		{
-			"file": "testZone.lua",
-			"settings":
-			{
-				"buffer_size": 1365,
-				"encoding": "UTF-8",
-				"line_ending": "Windows"
-			}
-		},
-		{
 			"file": "ui.lua",
 			"settings":
 			{
-				"buffer_size": 6382,
+				"buffer_size": 8288,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
@@ -224,17 +215,18 @@
 	},
 	"expanded_folders":
 	[
-		"/C/Users/Robert/AppData/Roaming/REAPER/Scripts/Mein"
+		"/C/Users/Robert/AppData/Roaming/REAPER/Scripts/lemerchand"
 	],
 	"file_history":
 	[
+		"/C/Users/Robert/AppData/Roaming/REAPER/Scripts/lemerchand/testZone.lua",
 		"/C/Users/Robert/Desktop/kyliecode.py",
 		"/C/Users/Robert/AppData/Roaming/REAPER/Scripts/Mein/reaperScripting.sublime-project",
 		"/C/Users/Robert/AppData/Roaming/Sublime Text 3/Packages/User/Side Bar.sublime-settings"
 	],
 	"find":
 	{
-		"height": 41.0
+		"height": 28.0
 	},
 	"find_in_files":
 	{
@@ -294,47 +286,19 @@
 			[
 				{
 					"buffer": 0,
-					"file": "testZone.lua",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1365,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								923,
-								923
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Lua/Lua.sublime-syntax"
-						},
-						"translation.x": 0.0,
-						"translation.y": 484.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 0,
-					"type": "text"
-				},
-				{
-					"buffer": 1,
 					"file": "ui.lua",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 6382,
+						"buffer_size": 8288,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								6324,
-								6324
+								0,
+								0
 							]
 						],
 						"settings":
@@ -346,11 +310,11 @@
 						"translation.y": 3965.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 0,
 					"type": "text"
 				},
 				{
-					"buffer": 2,
+					"buffer": 1,
 					"file": "backupcode.lua",
 					"semi_transient": false,
 					"settings":
@@ -375,7 +339,7 @@
 						"translation.y": 1714.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 3,
+					"stack_index": 2,
 					"type": "text"
 				}
 			]
@@ -385,7 +349,7 @@
 			"sheets":
 			[
 				{
-					"buffer": 3,
+					"buffer": 2,
 					"semi_transient": false,
 					"settings":
 					{
@@ -410,7 +374,7 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 2,
+					"stack_index": 1,
 					"type": "text"
 				}
 			]
@@ -466,7 +430,7 @@
 	"project": "reaperScripting.sublime-project",
 	"replace":
 	{
-		"height": 73.0
+		"height": 52.0
 	},
 	"save_all_on_build": true,
 	"select_file":

@@ -23,6 +23,11 @@ var_init()
 ----------------------
 --Window Mngmt--------
 ----------------------
+--Get current midi window so it can refocus on it when script terminates
+
+last_window = reaper.JS_Window_GetFocus()
+
+
 --Open window at mouse position--
 mousex, mousey = reaper.GetMousePosition()
 gfx.init("MIDI Tool", 248, 630, false, mousex+50, mousey-125)
@@ -43,7 +48,9 @@ function main()
 	
 	-- Deal with key stokes
 	-- If char == ESC then close window`
-	if char == 27 then return
+	if char == 27 then 
+		reaper.atexit(reaper.JS_Window_SetFocus(last_window))
+		return
 	-- Otherwise keep window open
 	else reaper.defer(main) end
 
@@ -83,7 +90,7 @@ function main()
 
 	beat_btn_pos = 0
 	for i = 1,4 do
-		if toggle(beat_btn_pos + (i*43), 350, i, beats[i]) == 1 then	beats[i] = math.abs(beats[i] - 1) end
+		if toggle(beat_btn_pos + (i*43), 350, i, beats[i]) == 1 then beats[i] = math.abs(beats[i] - 1) end
 	end
 	beat_btn_pos = 0
 	for i = 1,4 do
