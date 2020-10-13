@@ -39,7 +39,7 @@ function default_vars()
 	max_note = 'D1'									--Highest note to be acted upon
 	time_selection = 0								--Act on all notes or those in time selection
 	beats = {0,0,0,0,0,0,0,0}						--Beat boolean, eg, 1st & 3rd, 6th and 8th
-	notes_list = {0,0,0,0,0,0,0,0,0,0,0,0}			--C-G# Boolean
+	notes_list = {1,1,1,1,1,1,1,1,1,1,1,1}			--C-G# Boolean
 	note_midi_n = {0,1,2,3,4,5,6,7,8,9,10,11}		--Mini note numbers -- corresponds to note_names
 													--uses modulus to determine note name regardless of range
 	note_names = {'C','C#', 'D', 'D#', 'E',			--Note names for notes_list
@@ -99,6 +99,7 @@ function main()
 	else reaper.defer(main) end
 
 
+
 	----------------------
 	--Create GUI----------
 	----------------------
@@ -120,6 +121,7 @@ function main()
 	text(pitch_frame_x+110, pitch_frame_y+13, "High Note:")
 	max_note = option_text(pitch_frame_x+178,pitch_frame_y+btn_offset_y, max_note, 1)
 
+
 	note_btn_pos = 0
 	for i = 1,6 do
 		if small_toggle(note_btn_pos + (i*31), pitch_frame_y+40, note_names[i], notes_list[i]) == 1 then notes_list[i] = math.abs(notes_list[i] - 1) end
@@ -128,6 +130,12 @@ function main()
 	for i = 1,6 do
 		if small_toggle(note_btn_pos + (i*31), pitch_frame_y+65, note_names[i+6], notes_list[i+6]) == 1 then notes_list[i+6] = math.abs(notes_list[i+6] - 1) end
 	end	
+	
+	--Makes sure there is always at least one note selected
+	c=0
+	for b = 1, 12 do c = c + notes_list[b] end
+	if c == 0 then notes_list[1] = 1 end
+	
 
 
 
@@ -163,7 +171,6 @@ function main()
 	elseif btn_clear == 2 then
 		default_vars()
 		select_notes(true, -1, -1)
-		
 	end
 
 end
