@@ -10,6 +10,8 @@
 --		+ Make a value slider that fills from the right to the left
 --		+ Add Note small_toggles()s
 --		+ Selector for Hi/low note
+--		+ Reset per frame
+--		+ Detector for beats---what if it's not perfectly on the grid?
 --
 --
 -- RECENT CHANGES:
@@ -28,15 +30,20 @@ reaperDoFile('cf.lua')
 ------------------------------
 function default_vars()
 
+	test_toggle = 1									--For testing, lawl
 	min_vel = 0
 	max_vel = 127
-	min_note = 'C6'								--Lowest Note to be acted upon
-	max_note = 'D1'								--Highest note to be acted upon
-	time_selection = false						--Act on all notes or those in time selection
-	beats = {0,0,0,0,0,0,0,0}					--Beat boolean, eg, 1st & 3rd, 6th and 8th
-	notes = {0,0,0,0,0,0,0,0,0,0,0,0}			--C-G# Boolean
+	min_note = 'C6'									--Lowest Note to be acted upon
+	max_note = 'D1'									--Highest note to be acted upon
+	time_selection = 0								--Act on all notes or those in time selection
+	beats = {0,0,0,0,0,0,0,0}						--Beat boolean, eg, 1st & 3rd, 6th and 8th
+	notes_list = {0,0,0,0,0,0,0,0,0,0,0,0}			--C-G# Boolean
+	note_midi_n = {0,1,2,3,4,5,6,7,8,9,10,11}		--Mini note numbers -- corresponds to note_names
+													--uses modulus to determine note name regardless of range
+	note_names = {'C','C#', 'D', 'D#', 'E',			--Note names for notes_list
+				'F','F#', 'G', 'G#', 'A', 
+				'A#','B'}
 
-	test_toggle = 1								--For testing, lawl
 
 end
 default_vars()
@@ -67,9 +74,9 @@ label_offset = 20
 btn_offset_x = 15
 btn_offset_y = 10
 gen_frame_x, gen_frame_y, gen_frame_w, gen_frame_h = 10, 28, 227, 90
-pitch_frame_x, pitch_frame_y, pitch_frame_w, pitch_frame_h = 10, gen_frame_y + gen_frame_h + frame_offset, 227, 40
+pitch_frame_x, pitch_frame_y, pitch_frame_w, pitch_frame_h = 10, gen_frame_y + gen_frame_h + frame_offset, 227, 100
 vel_frame_x, vel_frame_y, vel_frame_w, vel_frame_h = 10, pitch_frame_y + pitch_frame_h+frame_offset, 227 , 85
-time_frame_x, time_frame_y, time_frame_w, time_frame_h = 10, vel_frame_y + vel_frame_h+frame_offset, 227, 88
+time_frame_x, time_frame_y, time_frame_w, time_frame_h = 10, vel_frame_y + vel_frame_h+frame_offset, 227, 65
 
 ----------------------
 --MAIN PROGRAM--------
@@ -111,11 +118,23 @@ function main()
 	text(pitch_frame_x+110, pitch_frame_y+13, "High Note:")
 	max_note = option_text(pitch_frame_x+178,pitch_frame_y+btn_offset_y, max_note, 1)
 
+	note_btn_pos = 0
+	for i = 1,6 do
+		if small_toggle(note_btn_pos + (i*31), pitch_frame_y+40, note_names[i], notes_list[i]) == 1 then notes_list[i] = math.abs(notes_list[i] - 1) end
+	end
+	beat_btn_pos = 0
+	for i = 1,6 do
+		if small_toggle(note_btn_pos + (i*31), pitch_frame_y+65, note_names[i+6], notes_list[i+6]) == 1 then notes_list[i+6] = math.abs(notes_list[i+6] - 1) end
+	end	
+
+
+
+
 	--Velocity Frame
 	frame(vel_frame_x, vel_frame_y, vel_frame_w, vel_frame_h)
 	label(vel_frame_x+2,vel_frame_y-label_offset,"Velocity")
-	min_vel = h_slider(vel_frame_x+35,vel_frame_y+btn_offset_y,"Min Vel",min_vel, 0, 127)
-	max_vel = h_slider(vel_frame_x+35,vel_frame_y+btn_offset_y+35,"Max Vel",max_vel,0, 127)
+	min_vel = h_slider(vel_frame_x+35,vel_frame_y+btn_offset_y,"Min",min_vel, 0, 127)
+	max_vel = h_slider(vel_frame_x+35,vel_frame_y+btn_offset_y+35,"Max",max_vel,0, 127, true)
 
 
 	--Time Frame
@@ -123,14 +142,14 @@ function main()
 	frame(time_frame_x,time_frame_y, time_frame_w, time_frame_h)
 
 	beat_btn_pos = 0
+
 	for i = 1,4 do
-		if toggle(beat_btn_pos + (i*43), time_frame_y+btn_offset_y, i, beats[i]) == 1 then beats[i] = math.abs(beats[i] - 1) end
+		if small_toggle(beat_btn_pos + (i*31), time_frame_y+btn_offset_y, i, beats[i]) == 1 then beats[i] = math.abs(beats[i] - 1) end
 	end
 	beat_btn_pos = 0
 	for i = 1,4 do
-		if toggle(beat_btn_pos + (i*43), time_frame_y+(btn_offset_y*4.5), i+4, beats[i+4]) == 1 then beats[i+4] = math.abs(beats[i+4] - 1) end
-	end
-
+		if small_toggle(beat_btn_pos + (i*31), time_frame_y+35, i+4, beats[i+4]) == 1 then beats[i+4] = math.abs(beats[i+4] - 1) end
+	end	
 
 	--------------------------
 	--Deal with interactions--

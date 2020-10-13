@@ -1,4 +1,4 @@
 A Collection of Reascripts I'm working on
 
 
-And some other thangs
+Currently creating a MIDI Selector tool.

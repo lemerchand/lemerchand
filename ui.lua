@@ -4,9 +4,11 @@
 -- Modified: 2020.10.13
 --
 --TODO: 
--- 		+ Fix h_slider() when backwards = true
 -- 		+ Statusbar toolsips
 -- 		+ Useful info display
+--
+--RECENT:
+--		+ Added backwards functionality to slider!
 -------------------------------------------------------------------------------
 
 mouse_down = 0
@@ -79,9 +81,9 @@ function small_toggle(x,y,text, state)
 
 	if state == 1 then
 		gfx.set(.5,.26,.36,1)
-		gfx.rect(x,y, w+8,h+5, true)
+		gfx.rect(x,y+1, w+6,h+3, true)
 		gfx.r, gfx.g, gfx.b = .5, .5, .5
-		gfx.rect(x+1,y+1, w+6, h+3, false)
+		gfx.rect(x,y, w+7, h+4, false)
 
 		-- Set text
 		
@@ -90,9 +92,9 @@ function small_toggle(x,y,text, state)
 		gfx.drawstr(text)
 	else
 		gfx.set(.25,.25,.25,1)
-		gfx.rect(x,y, w+8, h+5)
+		gfx.rect(x+1,y+1, w+6, h+3)
 		gfx.r, gfx.g, gfx.b = .5, .5, .5
-		gfx.rect(x+1,y+1, w+6, h+3, false)
+		gfx.rect(x,y, w+7, h+4, false)
 
 		-- Set text
 		gfx.r, gfx.g, gfx.b = .7, .7, .7
@@ -103,9 +105,9 @@ function small_toggle(x,y,text, state)
 	if gfx.mouse_x > x and gfx.mouse_x < x + w+8 and gfx.mouse_y > y and gfx.mouse_y < y+h+6 and  gfx.mouse_cap == 1  then
 		-- Create button graphic
 		gfx.set(.22,.22,.24,1)
-		gfx.rect(x,y, w+8, h+5)
+		gfx.rect(x+1,y+1, w+6, h+3)
 		gfx.r, gfx.g, gfx.b = .5, .5, .5
-		gfx.rect(x+1,y+1, w+6, h+3, false)
+		gfx.rect(x,y, w+7, h+4, false)
 
 		-- Set text
 		gfx.r, gfx.g, gfx.b = .7, .7, .7
@@ -117,9 +119,9 @@ function small_toggle(x,y,text, state)
 	elseif gfx.mouse_x > x and gfx.mouse_x < x + w+8 and gfx.mouse_y > y and gfx.mouse_y < y+h+6 and mouse_down == 1 then
 		-- Create button graphic
 		gfx.set(.3,.3,.3,.6)
-		gfx.rect(x,y, w+8, h+5)
+		gfx.rect(x+1,y+1, w+6, h+4)
 		gfx.r, gfx.g, gfx.b = .5, .5, .5
-		gfx.rect(x+1,y+1, w+6, h+5, false)
+		gfx.rect(x,y, w+7, h+4, false)
 
 		-- Set text
 		gfx.r, gfx.g, gfx.b = .7, .7, .7
@@ -130,9 +132,9 @@ function small_toggle(x,y,text, state)
 	elseif gfx.mouse_x > x and gfx.mouse_x < x + w+8 and gfx.mouse_y > y and gfx.mouse_y < y+h+6  then
 		-- Create button graphic
 		gfx.set(.3,.3,.3,.6)
-		gfx.rect(x,y, w+8, h+5)
+		gfx.rect(x+1,y+1, w+6, h+3)
 		gfx.r, gfx.g, gfx.b = .5, .5, .5
-		gfx.rect(x+1,y+1, w+6, h+3, false)
+		gfx.rect(x,y, w+7, h+4, false)
 
 		-- Set text
 		gfx.r, gfx.g, gfx.b = .7, .7, .7
@@ -374,19 +376,23 @@ function h_slider(x,y, text, value, min_value, max_value, backwards)
 	percent = value / max_value * 100
 	fill = percent*1.46
 
-	-- Create UI element
-	gfx.set(.31,.21,.7,1)
-	gfx.x, gfxy = x,y
-	gfx.rect(x,y,150,28,false)
-	gfx.rect(x+1,y+1,148,26,false)
-
-	--Fill in value based on percent
-	gfx.set(.23,.19,.57,1)
-	
 	if backwards == true then 
-		gfx.rect(fill-4,y+4, fill,20,true)
+		gfx.set(.31,.21,.7,1)
+		gfx.x, gfxy = x,y
+		gfx.rect(x,y,150,28,false)
+		gfx.rect(x+1,y+1,148,26,false)
+		gfx.set(.23,.19,.57,1)
+		gfx.rect(x+4,y+4, 146-4,20,true)
+		gfx.set(.2,.2,.2,1)
+		gfx.rect(x+4,y+4, fill-4,20,true)
 
 	else
+
+		gfx.set(.31,.21,.7,1)
+		gfx.x, gfxy = x,y
+		gfx.rect(x,y,150,28,false)
+		gfx.rect(x+1,y+1,148,26,false)
+		gfx.set(.23,.19,.57,1)
 		gfx.rect(x+4,y+4, fill-4,20,true)
 	end
 
