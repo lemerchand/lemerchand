@@ -1,0 +1,512 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"js_mo",
+				"reaper.JS_Mouse_GetState"
+			],
+			[
+				"body",
+				"body_mass_index"
+			],
+			[
+				"rect",
+				"gfx.rect"
+			],
+			[
+				"conso",
+				"reaper.ShowConsoleMsg"
+			],
+			[
+				"clea",
+				"reaper.ClearConsole"
+			],
+			[
+				"midiev",
+				"reaper.MIDI_CountEvts"
+			],
+			[
+				"GetSele",
+				"reaper.GetSelectedMediaItem"
+			],
+			[
+				"user",
+				"user_input"
+			],
+			[
+				"temper",
+				"temperatures_enterered"
+			],
+			[
+				"measur",
+				"gfx.measurestr"
+			],
+			[
+				"meas",
+				"gfx.measurestr"
+			],
+			[
+				"mouse",
+				"reaper.GetMousePosition"
+			],
+			[
+				"setfont",
+				"gfx.setfont"
+			],
+			[
+				"draw",
+				"gfx.drawstr"
+			],
+			[
+				"getch",
+				"gfx.getchar"
+			],
+			[
+				"init",
+				"gfx.init"
+			],
+			[
+				"midi",
+				"reaper.MIDI_CountEvts"
+			],
+			[
+				"midiso",
+				"reaper.MIDI_Sort"
+			],
+			[
+				"cursos",
+				"reaper.GetCursorPosition"
+			],
+			[
+				"br_conte",
+				"reaper.BR_GetMouseCursorContext_MIDI"
+			],
+			[
+				"setcur",
+				"reaper.SetEditCurPos"
+			],
+			[
+				"timemap",
+				"reaper.TimeMap2_timeToBeats"
+			],
+			[
+				"getcur",
+				"reaper.GetCursorPosition"
+			],
+			[
+				"getc",
+				"reaper.GetCursorPosition"
+			],
+			[
+				"selec",
+				"reaper.SetMediaItemSelected"
+			],
+			[
+				"getactive",
+				"reaper.MIDIEditor_GetActive"
+			],
+			[
+				"getsele",
+				"reaper.GetSelectedMediaItem"
+			],
+			[
+				"show",
+				"reaper.ShowMessageBox"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "testZone.lua",
+			"settings":
+			{
+				"buffer_size": 1365,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "ui.lua",
+			"settings":
+			{
+				"buffer_size": 6382,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"contents": "mousex, mousey = reaper.GetMousePosition()\ngfx.init(\"MIDI Tool\", 250, 250, false, mousex-125, mousey-125)\n\ntest_values = {0,1,2,3,4,5,6}\ncurrent_value = 0\nt = 0\nt2 = 600000\n\nlocal function time_check(a,b)\n\t\n\tgfx.drawstr(a)\n\tif a+b < reaper.time_precise() then return true\n\telse return false\n\tend\n\nend\n\nlocal function btn_test()\n\tgfx.x, gfx.y = 15, 175\n\titem = reaper.GetSelectedMediaItem(0, 0)\n\ttake = reaper.GetActiveTake(item)\n\tgfx.drawstr(\"Total Notes: \" .. reaper.MIDI_CountEvts(take))\nend\n\nlocal function select(beat1, beat2)\n\titem = reaper.GetSelectedMediaItem(0, 0)\n\ttake = reaper.GetActiveTake(item)\n\tnotes = reaper.MIDI_CountEvts(take)\n\n\n\tfor i = 0, notes -1 do\n\t\t retval, selected, muted, startppqpos, endppqpos, chan, pitch, vel = reaper.MIDI_GetNote(take, i)\n\t\t if startppqpos == beat1 or startppqpos == beat2 then\n\t\t \treaper.MIDI_SetNote(take, i, 1, 0, -1, -1, 1, -1, vel+20, True)\n\t\t else\n\t\t \treaper.MIDI_SetNote(take, i, 0, 0, -1, -1, 1, -1, -1, True)\n\t\t end\n\treaper.MIDI_Sort(take)\n\tend\nend\n\nlocal function value_slider(x,y,text, values)\n\tgfx.x, gfx.y = x,y\n\t\n\t--gfx.drawstr(\"Values: \" .. time_check)\n\tgfx.drawstr(\"Current Value: \" .. current_value+1)\n\tif gfx.mouse_y >= y and gfx.mouse_y <= y+15 and gfx.mouse_wheel > 0 then\n\t\tif (current_value + 1) >= #values then\n\t\t\tif time_check(t, t2) then current_value = values[1] end\n\t\t\tt = reaper.time_precise()\n\t\telse\n\t\t\tif time_check(t,t2) then current_value = current_value + 1 end\n\t\t\tt = reaper.time_precise()\n\t\tend\n\telseif gfx.mouse_y >= y and gfx.mouse_y <= y+15 and gfx.mouse_wheel < 0 then\n\t\tif (current_value - 1) <= 0  then\n\t\t\tif time_check(t,t2) then current_value = #values end\n\t\t\tt = reaper.time_precise()\n\t\telse\n\t\t\tif time_check(t,t2) then current_value = current_value - 1 end\n\t\t\tt = reaper.time_precise()\n\t\tend\n\tend\n\n\tgfx.mouse_wheel = 0\nend\n\nlocal function button(x,y,text)\n\t-- Creates a button at x and y with text.\n\t-- Returns 1 if left mouse clicks within the button and 0 if not\n\t-- Convert text length into pixels\n\tlocal button_width, button_height = gfx.measurestr(text)\n\t\n\t-- Create button graphic\n\tgfx.set(.2,.2,.2,1)\n\tgfx.rect(x,y, button_width+29, 30)\n\tgfx.r, gfx.g, gfx.b = .4, .4, .4\n\tgfx.rect(x+1,y+1, button_width+29, 30, false)\n\n\t-- Set text\n\tgfx.setfont(1, arial,20)\n\tgfx.x, gfx.y = x+15,y+7\n\tgfx.drawstr(text, 1)\n\n\t-- Detect left mouse click\n\tif gfx.mouse_x > x and gfx.mouse_x < x + button_width+29 and gfx.mouse_y > y and gfx.mouse_y < y+30 and  gfx.mouse_cap == 1 then\n\t\treturn 1\n\telse\n\t\treturn 0\n\tend\nend\n\n\nfunction main()\n\t-- Get Kestrokes\n\tchar = gfx.getchar()\n\t-- If char == ESC then close window`\n\tif char == 27 then\n\t\treturn 0\n\t-- Otherwise keep window open\n\telse\n\t\treaper.defer(main)\n\tend\n\n\t-- Declare buttons\n\tt = button(15,55,\"Count Notes\")\n\tt2 = button(15,15,\"Select 1 and 3\")\n\tt3 = button(15,95,\"Select 2 and 4\")\n\t\n\tvalue_slider(15,200, \"Current Value:\", test_values, current_value)\t\n\n\n\t-- Check to see if button was pressed\n\tif t == 1 then\n\t\tbtn_test()\n\telseif t2 == 1 then \n\t\tselect(0,1920)\n\telseif t3 == 1 then\n\t\tselect(960,2880)\n\t-- If no button was pressed...\n\telse\n\t\t-- If needed\n\tend\t\n\n\tw = reaper.JS_Window_Find(\"MIDI Tool\", true)\n\tif w then reaper.JS_Window_AttachTopmostPin(w) end\n\nend\nt= reaper.time_precise()\nmain()\n",
+			"file": "backupcode.lua",
+			"file_size": 3365,
+			"file_write_time": 132466813056318339,
+			"settings":
+			{
+				"buffer_size": 3235,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"contents": "val = 0\nvalues = 100\nx = 20\n\n50/100 = .5\n\n\t",
+			"settings":
+			{
+				"buffer_size": 43,
+				"line_ending": "Windows",
+				"name": "val = 0"
+			}
+		}
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+		[
+			[
+				[
+					"Packages/Python/Python.sublime-build",
+					""
+				],
+				[
+					"Packages/Python/Python.sublime-build",
+					"Syntax Check"
+				]
+			],
+			[
+				"Packages/Python/Python.sublime-build",
+				""
+			]
+		]
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"install",
+				"Package Control: Install Package"
+			],
+			[
+				"color",
+				"UI: Select Color Scheme"
+			],
+			[
+				"theme",
+				"UI: Select Theme"
+			]
+		],
+		"width": 0.0
+	},
+	"console":
+	{
+		"height": 158.0,
+		"history":
+		[
+			"lua",
+			"HippoEducationMonthly",
+			"HippoEducationMonthly = 1200",
+			"300*4",
+			"*4",
+			"20*15"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/C/Users/Robert/AppData/Roaming/REAPER/Scripts/Mein"
+	],
+	"file_history":
+	[
+		"/C/Users/Robert/Desktop/kyliecode.py",
+		"/C/Users/Robert/AppData/Roaming/REAPER/Scripts/Mein/reaperScripting.sublime-project",
+		"/C/Users/Robert/AppData/Roaming/Sublime Text 3/Packages/User/Side Bar.sublime-settings"
+	],
+	"find":
+	{
+		"height": 41.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"fixedsys",
+			"Terminal",
+			"Lucida Sans Unicode",
+			"Lucida Console",
+			"Monospace",
+			"Lucida",
+			"Consolas",
+			"terminal",
+			"Terminal",
+			"fixedsys",
+			"Arial",
+			"father"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"Lucinda Console",
+			"fixedsys",
+			"Terminal",
+			"Lucida Sans Unicode",
+			"Lucida Console",
+			"",
+			"Lucida Monospace",
+			"Lucida",
+			"Consolas",
+			"terminal",
+			"Terminal",
+			"fixedsys"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 0,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "testZone.lua",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1365,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								923,
+								923
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Lua/Lua.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 484.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "ui.lua",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 6382,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								6324,
+								6324
+							]
+						],
+						"settings":
+						{
+							"auto_name": "",
+							"syntax": "Packages/Lua/Lua.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 3965.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "backupcode.lua",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3235,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3234,
+								2504
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Lua/Lua.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 1714.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				}
+			]
+		},
+		{
+			"selected": 0,
+			"sheets":
+			[
+				{
+					"buffer": 3,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 43,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								43,
+								43
+							]
+						],
+						"settings":
+						{
+							"auto_name": "val = 0",
+							"default_dir": "C:\\Users\\Robert\\AppData\\Roaming\\REAPER\\Scripts\\Mein",
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 28.0
+	},
+	"input":
+	{
+		"height": 0.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			],
+			[
+				1,
+				0,
+				2,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			0.760451977401,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.exec":
+	{
+		"height": 127.0
+	},
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "",
+	"project": "reaperScripting.sublime-project",
+	"replace":
+	{
+		"height": 73.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": false,
+	"show_open_files": true,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 150.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}
