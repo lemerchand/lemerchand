@@ -3,16 +3,21 @@ function reaperDoFile(file) local info = debug.getinfo(1,'S'); script_path = inf
 reaperDoFile('ui.lua')
 reaperDoFile('cf.lua')
 
-----------------------
--- Global Variables --
-----------------------
-min_vel = 0
-max_vel = 127
-min_note = 'C6'
-max_note = 'D1'
-time_selection = 0
-beats = {0,0,0,0,0,0,0,0}
+------------------------------
+-- Default Global Variables --
+------------------------------
+function var_init()
 
+	min_vel = 0
+	max_vel = 127
+	min_note = 'C6'
+	max_note = 'D1'
+	time_selection = 0
+	beats = {0,0,0,0,0,0,0,0}
+
+end
+
+var_init()
 
 
 ----------------------
@@ -56,7 +61,7 @@ function main()
 	btn_cut = button(130,80, "   Delete  ")
 
 	--Pitch
-	frame(10,150,227,90)
+	frame(10,150,227,40)
 	label(12,130,"Pitch")
 	--low_note = h_slider(20,160,"Min Vel",low_note, 0, 127)
 	--hi_note = 
@@ -66,23 +71,23 @@ function main()
 	max_note = option_text(192,160, max_note)
 
 	--Velocity
-	frame(10,270,227,90)
-	label(12,250,"Velocity")
-	min_vel = h_slider(45,284,"Min Vel",min_vel, 0, 127)
-	max_vel = h_slider(45,320,"Max Vel",max_vel,0, 127)
+	frame(10,220,227,90)
+	label(12,200,"Velocity")
+	min_vel = h_slider(45,234,"Min Vel",min_vel, 0, 127)
+	max_vel = h_slider(45,270,"Max Vel",max_vel,0, 127)
 
 
 	--Time
-	label(12,370, "Beats")
-	frame(10,390, 227,88)
+	label(12,320, "Beats")
+	frame(10,340, 227,88)
 
 	beat_btn_pos = 0
-	for i = 1,3 do
-		if toggle(20 + beat_btn_pos + (i*43), 400, i, beats[i]) == 1 then	beats[i] = math.abs(beats[i] - 1) end
+	for i = 1,4 do
+		if toggle(beat_btn_pos + (i*43), 350, i, beats[i]) == 1 then	beats[i] = math.abs(beats[i] - 1) end
 	end
 	beat_btn_pos = 0
-	for i = 1,3 do
-		if toggle(20 + beat_btn_pos + (i*43), 440, i+4, beats[i+4]) == 1 then beats[i+4] = math.abs(beats[i+4] - 1) end
+	for i = 1,4 do
+		if toggle(beat_btn_pos + (i*43), 390, i+4, beats[i+4]) == 1 then beats[i+4] = math.abs(beats[i+4] - 1) end
 	end
 
 
@@ -90,17 +95,14 @@ function main()
 	--Deal with interactions--
 	--------------------------
 
-	if btn_exc_select == 1 then
-		select_notes(true, min_vel, max_vel)
-	elseif btn_exc_select == 2 then
-		select_notes(false, min_vel, max_vel)
-	elseif btn_clear == 1 or btn_clear == 2 then select_notes(true, -1, -1)
+	if btn_exc_select == 1 then	select_notes(true, min_vel, max_vel)
+	elseif btn_exc_select == 2 then	select_notes(false, min_vel, max_vel)
+	elseif btn_clear == 1 then select_notes(true, -1, -1)
+	elseif btn_clear == 2 then
+		select_notes(true, -1, -1)
+		var_init()
 	end
 
-
-
-	
 end
-
 
 main()

@@ -1,3 +1,8 @@
+-----------------------------------
+--TODO: 
+-- 		+ Fix h_slider() when backwards = true
+-----------------------------------
+
 mouse_down = 0
 
 function fill_background()
@@ -274,7 +279,7 @@ function frame(x,y,w,h)
 
 end
 
-function h_slider(x,y, text, value, min_value, max_value)
+function h_slider(x,y, text, value, min_value, max_value, backwards)
 
 	--Catch lower than min and higher than max values 
 	if value < min_value then value = min_value elseif value > max_value then value = max_value end
@@ -291,7 +296,13 @@ function h_slider(x,y, text, value, min_value, max_value)
 
 	--Fill in value based on percent
 	gfx.set(.23,.19,.57,1)
-	gfx.rect(x+4,y+4, fill-4,20,true)
+	
+	if backwards == true then 
+		gfx.rect(fill-4,y+4, fill,20,true)
+
+	else
+		gfx.rect(x+4,y+4, fill-4,20,true)
+	end
 
 	--Draw text
 	gfx.x, gfx.y = x+10, y+7
