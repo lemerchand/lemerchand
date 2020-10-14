@@ -44,8 +44,8 @@ function default_vel()
 end
 
 function default_note_range()
-	min_note = '--'									--Lowest Note to be acted upon
-	max_note = '--'									--Highest note to be acted upon
+	min_note = 'C0'									--Lowest Note to be acted upon
+	max_note = 'G10'								--Highest note to be acted upon
 end
 						
 function default_beats()
@@ -131,6 +131,12 @@ function main()
 	frame(pitch_frame_x, pitch_frame_y, pitch_frame_w, pitch_frame_h)
 	label(pitch_frame_x+2,pitch_frame_y-label_offset,"Pitch")
  
+
+	--make sure there is a low/max note
+	if min_note == -1 then min_note = "C0" end
+	if max_note == -1 then max_note = "G9" end
+
+
 	text(pitch_frame_x+10, pitch_frame_y+13,"Low Note:")
 	min_note = option_text(pitch_frame_x+75,pitch_frame_y+btn_offset_y, min_note, 1)
 	text(pitch_frame_x+110, pitch_frame_y+13, "High Note:")

@@ -15,7 +15,7 @@ mouse_down = 0
 
 function mouseover(x,y,w,h)
 
-	if gfx.mouse_x >=x and gfx.mouse_x <=w+x and gfx.mouse_y >= y and gfx.mouse_y <= h+y then return true end
+	if gfx.mouse_x >=x and gfx.mouse_x <=w+x+8 and gfx.mouse_y >= y and gfx.mouse_y <= h+y+2 then return true end
 	return false
 
 end
@@ -80,7 +80,7 @@ function option_text(x,y,text, r, g, b)
 		retval, retvals_csv, v = reaper.GetUserInputs( "Enter a value", 1, "", "C4")
 		return string.upper(retvals_csv)
 	elseif mouseover(x,y,w,h) and gfx.mouse_cap == 2 then
-		return "--"
+		return -1
 	end
 
 	return text
