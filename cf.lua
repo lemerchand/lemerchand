@@ -1,3 +1,9 @@
+function update_active()
+	item = reaper.GetSelectedMediaItem(0, 0)
+	take = reaper.GetActiveTake(item)
+	notes = reaper.MIDI_CountEvts(take)
+end
+
 function notes_list_not_empty()
 	
 	for i = 1, 12 do
@@ -17,9 +23,8 @@ function is_note_in(n)
 end
 
 function select_notes(clear, min_vel, max_vel)
-	item = reaper.GetSelectedMediaItem(0, 0)
-	take = reaper.GetActiveTake(item)
-	notes = reaper.MIDI_CountEvts(take)
+
+	update_active()
 
 	if clear then reaper.MIDI_SelectAll(take, false) end
 

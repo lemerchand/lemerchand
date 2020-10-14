@@ -13,6 +13,14 @@
 
 mouse_down = 0
 
+function mouseover(x,y,w,h)
+
+	if gfx.mouse_x >=x and gfx.mouse_x <=w+x and gfx.mouse_y >= y and gfx.mouse_y <= h+y then return true end
+	return false
+
+end
+
+
 function fill_background()
 	local r, g, b, a = .19,.19,.19, 1
 	local w, h = gfx.w, gfx.h
@@ -65,6 +73,15 @@ function option_text(x,y,text, r, g, b)
 
 	gfx.x, gfx.y = x+4, y+2
 	gfx.drawstr(text)
+
+	--Detect a click and respond
+	if mouseover(x,y,w,h) and gfx.mouse_cap == 1 then 
+		
+		retval, retvals_csv, v = reaper.GetUserInputs( "Enter a value", 1, "", "C4")
+		return string.upper(retvals_csv)
+	elseif mouseover(x,y,w,h) and gfx.mouse_cap == 2 then
+		return "--"
+	end
 
 	return text
 end
@@ -348,28 +365,6 @@ function frame(x,y,w,h)
 	-- Make thicker
 	gfx.r, gfx.g, gfx.b = .4,.4,.4
 	gfx.roundrect(x+1, y+1, w-1, h-1, 4, true)
-
-
-
-------------------------------------------
----OG Frame
------------------------------------------
-	-- gfx.a = 1
-	-- -- Background
-	-- gfx.r, gfx.g, gfx.b = .22,.22,.22
-	-- gfx.rect(x+2, y+2, w-5, h-5, 1)
-
-	-- -- -- Main frame
-	-- -- gfx.r, gfx.g, gfx.b = .65,.65,.65
-	-- -- gfx.rect(x-1, y-1, w, h, 0)
-
-	-- -- -- Shadow 1
-	-- -- gfx.r, gfx.g, gfx.b = .54,.54,.54
-	-- -- gfx.rect(x, y, w-2, h-2, 0)
-
-	-- -- -- Shadow 2
-	-- -- gfx.r, gfx.g, gfx.b = .3,.3,.3
-	-- -- gfx.rect(x+1, y+1, w-4, h-4, 0)
 
 end
 

@@ -44,8 +44,8 @@ function default_vel()
 end
 
 function default_note_range()
-	min_note = 'C6'									--Lowest Note to be acted upon
-	max_note = 'D1'									--Highest note to be acted upon
+	min_note = '--'									--Lowest Note to be acted upon
+	max_note = '--'									--Highest note to be acted upon
 end
 						
 function default_beats()
@@ -199,6 +199,7 @@ function main()
 	elseif btn_clear == 2 then
 		default_vars()
 		select_notes(true, -1, -1)
+
 	end
 
 end
