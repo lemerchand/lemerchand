@@ -78,15 +78,17 @@ function option_text(x,y,text, help_text)
 	gfx.x, gfx.y = x+4, y+2
 	gfx.drawstr(text)
 
-	if mouseover(x,y,w,h) then status(help_text) end
+	if mouseover(x,y,w,h) then
+		status(help_text)
 
-	--Detect a click and respond
-	if mouseover(x,y,w,h) and gfx.mouse_cap == 1 then 
-		
-		retval, retvals_csv, v = reaper.GetUserInputs( "Enter a value", 1, "", "C4")
-		return string.upper(retvals_csv)
-	elseif mouseover(x,y,w,h) and gfx.mouse_cap == 2 then
-		return -1
+		--Detect a click and respond
+		if mouseover(x,y,w,h) and gfx.mouse_cap == 1 then 
+			
+			retval, retvals_csv, v = reaper.GetUserInputs( "Enter a value", 1, "", "C4")
+			return string.upper(retvals_csv)
+		elseif mouseover(x,y,w,h) and gfx.mouse_cap == 2 then
+			return -1
+		end
 	end
 
 	return text
@@ -423,6 +425,8 @@ function h_slider(x,y, text, value, min_value, max_value, backwards, help_text)
 	if gfx.mouse_x >= x and gfx.mouse_x < x + 148 and gfx.mouse_y > y and gfx.mouse_y < y+28 then 
 		status(help_text)
 	end
+
+
 	-- If the mouse is inside the slider and the left button is clicked
 	if gfx.mouse_x >= x and gfx.mouse_x < x + 148 and gfx.mouse_y > y and gfx.mouse_y < y+28 and  gfx.mouse_cap == 1 then
 		
