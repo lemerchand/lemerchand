@@ -51,7 +51,7 @@ function default_note_range()
 end
 						
 function default_beats()
-	beats = {1,1,1,1,1,1,1,1}						--Beat boolean, eg, 1st & 3rd, 6th and 8th
+	beats = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}		--Beat boolean, eg, 1st & 3rd, 6th and 8th
 end
 
 function default_pitch()
@@ -210,10 +210,6 @@ function main()
 		end
 	end	
 
-	--Makes sure there is always at least one beat selected
-	c=0
-	for b = 1, 8 do c = c + beats[b] end
-	if c == 0 then beats[1] = 1 end
 
 
 	--Info Frame
