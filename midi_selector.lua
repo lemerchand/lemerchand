@@ -94,7 +94,7 @@ gen_frame_x, gen_frame_y, gen_frame_w, gen_frame_h = 10, 28, 227, 90
 pitch_frame_x, pitch_frame_y, pitch_frame_w, pitch_frame_h = 10, gen_frame_y + gen_frame_h + frame_offset, 227, 100
 vel_frame_x, vel_frame_y, vel_frame_w, vel_frame_h = 10, pitch_frame_y + pitch_frame_h+frame_offset, 227 , 85
 time_frame_x, time_frame_y, time_frame_w, time_frame_h = 10, vel_frame_y + vel_frame_h+frame_offset, 227, 65
-
+info_frame_x, info_frame_y, info_frame_w, info_frame_h = 10, time_frame_y + time_frame_h+frame_offset, 227,40
 ----------------------
 --MAIN PROGRAM--------
 ----------------------
@@ -195,14 +195,20 @@ function main()
 		end
 	end	
 
+
+	--Info Frame
+	label(info_frame_x+2, info_frame_y-label_offset, "Info")
+	frame(info_frame_x, info_frame_y, info_frame_w, info_frame_h)
+
+
 	--------------------------
 	--Deal with interactions--
 	--------------------------
 
-	if btn_exc_select == 1 then	select_notes(true, min_vel, max_vel)
-	elseif btn_exc_select == 2 then	select_notes(false, min_vel, max_vel)
-	elseif btn_clear == 1 then select_notes(true, -1, -1)
-	elseif btn_clear == 2 then
+	if btn_exc_select == 1 or char == 13 then select_notes(true, min_vel, max_vel)
+	elseif btn_exc_select == 2 or gfx.mouse_cap == 8 and char == 13 then select_notes(false, min_vel, max_vel)
+	elseif btn_clear == 1 or char == 08 then select_notes(true, -1, -1)
+	elseif btn_clear == 2 or gfx.mouse_cap == 8 and char == 08 then
 		default_vars()
 		select_notes(true, -1, -1)
 
