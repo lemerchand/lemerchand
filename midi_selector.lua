@@ -35,6 +35,16 @@ note_names = {'C','C#', 'D', 'D#', 'E',				--Note names for notes_list
 			'F','F#', 'G', 'G#', 'A', 
 			'A#','B'}
 
+
+--Patterns for beats
+beats_down = 			{1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0}
+beats_up =				{0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0}
+beats_off_eight =		{0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0}
+beats_eights = 			{1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0}
+beats_all =				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
+beats_sixteens_off =	{0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1}
+
+
 --test_toggle = 1									--For testing, lawl
 time_selection = 0									--Act on all notes or those in time selection
 
@@ -108,7 +118,7 @@ btn_offset_y = 10
 gen_frame_x, gen_frame_y, gen_frame_w, gen_frame_h = 10, 28, 227, 90
 pitch_frame_x, pitch_frame_y, pitch_frame_w, pitch_frame_h = 10, gen_frame_y + gen_frame_h + frame_offset, 227, 100
 vel_frame_x, vel_frame_y, vel_frame_w, vel_frame_h = 10, pitch_frame_y + pitch_frame_h+frame_offset, 227 , 85
-time_frame_x, time_frame_y, time_frame_w, time_frame_h = 10, vel_frame_y + vel_frame_h+frame_offset, 227, 65
+time_frame_x, time_frame_y, time_frame_w, time_frame_h = 10, vel_frame_y + vel_frame_h+frame_offset, 227, 115
 info_frame_x, info_frame_y, info_frame_w, info_frame_h = 10, time_frame_y + time_frame_h+frame_offset, 227,50
 ----------------------
 --MAIN PROGRAM--------
@@ -192,7 +202,9 @@ function main()
 	label(time_frame_x+2,time_frame_y-label_offset, "Beats")
 	frame(time_frame_x,time_frame_y, time_frame_w, time_frame_h)
 
-	beat_btn_pos = 31
+
+	------------------Beat buttons
+	beat_btn_pos = 70
 
 	for i = 1,4 do
 		btn = small_toggle(beat_btn_pos + (i*31), time_frame_y+btn_offset_y, i, beats[i], ht_beat_select) 
@@ -202,7 +214,7 @@ function main()
 
 	end
 
-	beat_btn_pos = 31
+	beat_btn_pos = 70
 	for i = 1,4 do
 		btn = small_toggle(beat_btn_pos + (i*31), time_frame_y+35, i+4, beats[i+4], ht_beat_select)
 		if btn == 1 then beats[i+4] = math.abs(beats[i+4] - 1)
@@ -210,6 +222,29 @@ function main()
 		end
 	end	
 
+	beat_btn_pos = 70
+
+	for i = 1,4 do
+		btn = small_toggle(beat_btn_pos + (i*31), time_frame_y+60, i+8, beats[i+8], ht_beat_select) 
+		if btn == 1 then beats[i+8] = math.abs(beats[i+8] - 1) 
+		elseif btn == 2 then default_beats()
+		end
+
+	end
+
+	beat_btn_pos = 70
+	for i = 1,4 do
+		btn = small_toggle(beat_btn_pos + (i*31), time_frame_y+85, i+12, beats[i+12], ht_beat_select)
+		if btn == 1 then beats[i+12] = math.abs(beats[i+12] - 1)
+		elseif btn == 2 then default_beats()
+		end
+	end	
+
+	--Beat Pattern Buttons
+
+	btn_beats_qtr = button(time_frame_x+btn_offset_x,time_frame_y+btn_offset_y+1,"Down",0,"h")
+	btn_beats_eights = button(time_frame_x+btn_offset_x,time_frame_y+44,"  8th  ",3,"g")
+	btn_beats_sixteens = button(time_frame_x+btn_offset_x,time_frame_y+77," 16th ",2,"h")
 
 
 	--Info Frame
@@ -228,6 +263,21 @@ function main()
 		default_vars()
 		select_notes(true, -1, -1)
 	elseif btn_clear == 1 or char == 08 then select_notes(true, -1, -1)
+
+	elseif btn_beats_qtr == 1 then 
+		beats = beats_down
+	elseif btn_beats_qtr == 2 then
+		beats = beats_up 
+	elseif btn_beats_eights == 1 then 
+		beats = beats_eights
+	elseif btn_beats_eights == 2 then
+		beats = beats_off_eight
+	elseif btn_beats_sixteens == 1 then 
+		beats = beats_all
+	elseif btn_beats_sixteens == 2 then
+		beats = beats_sixteens_off
+	 
+
 	end
 
 end
