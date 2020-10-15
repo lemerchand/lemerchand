@@ -38,8 +38,7 @@ note_names = {'C','C#', 'D', 'D#', 'E',				--Note names for notes_list
 --test_toggle = 1									--For testing, lawl
 time_selection = 0									--Act on all notes or those in time selection
 
-selected_notes = 0
-notes = 0
+beats_as_ppq = {}
 
 function default_vel()
 	min_vel = 0
@@ -52,7 +51,7 @@ function default_note_range()
 end
 						
 function default_beats()
-	beats = {0,0,0,0,0,0,0,0}						--Beat boolean, eg, 1st & 3rd, 6th and 8th
+	beats = {1,1,1,1,1,1,1,1}						--Beat boolean, eg, 1st & 3rd, 6th and 8th
 end
 
 function default_pitch()
@@ -68,6 +67,19 @@ end
 
 default_vars()
 
+----------------------------------------------------------
+--Help Text----------Line break before end of this heading
+----------------------------------------------------------
+ht_select =				"Select notes based on settings.\nRight click for inclcusive select."
+ht_clear = 				"Clear Selection. \nRight-click for global reset."
+ht_delete = 			'Delete Selected notes.'
+ht_time_selection = 	"When enabeled only notes within\nthe time selection are selected."
+ht_range_low = 			"Set minimum velocity.\nRight-click to reset."
+ht_range_hi = 			"Set maximum velocity.\nRight-click to reset."
+ht_pitch_select = 		"Toggled pitches."
+ht_min_vel =  			"Sets the lowest selectable pitch.\nRight-click to reset."
+ht_max_vel =			"Set the highest selectable pitch.\nRight-click to reset."
+ht_beat_select = 		"Include/exclude specific beats.\nRight-click to reset."
 
 
 ----------------------
@@ -121,14 +133,16 @@ function main()
 	----------------------
 	--Create GUI----------
 	----------------------
-	--update_active()
+
 	--General Frame
+
+
 	frame(gen_frame_x, gen_frame_y, gen_frame_w, gen_frame_h)
 	label(gen_frame_x+2,gen_frame_y-label_offset,"General")
-	btn_exc_select = button(gen_frame_x + btn_offset_x, gen_frame_y+btn_offset_y,"   Select  ",-1, "Left-click to select notes.\nRight click for inclcusive select.")
-	btn_clear = button(gen_frame_x+btn_offset_x,gen_frame_y+52, "  Clear    ",2,"Clear Selection. \nRight-click to clear & reset filter.")
-	if toggle(gen_frame_x+120,gen_frame_y+btn_offset_y,"Selection", time_selection, "When highlighted only select notes\nin the time selection.") == 1 then time_selection = math.abs(time_selection  -1) end	
-	btn_cut = button(gen_frame_x+120,gen_frame_y+52, "   Delete  ",0,'Delete Selected notes.')
+	btn_exc_select = button(gen_frame_x + btn_offset_x, gen_frame_y+btn_offset_y,"   Select  ",-1, ht_select)
+	btn_clear = button(gen_frame_x+btn_offset_x,gen_frame_y+52, "  Clear    ",2,ht_clear)
+	if toggle(gen_frame_x+120,gen_frame_y+btn_offset_y,"Selection", time_selection, ht_time_selection) == 1 then time_selection = math.abs(time_selection  -1) end	
+	btn_cut = button(gen_frame_x+120,gen_frame_y+52, "   Delete  ",0, ht_delete)
 
 	--Pitch Frame
 	frame(pitch_frame_x, pitch_frame_y, pitch_frame_w, pitch_frame_h)
@@ -141,21 +155,21 @@ function main()
 
 
 	text(pitch_frame_x+10, pitch_frame_y+13,"Low Note:")
-	min_note = option_text(pitch_frame_x+75,pitch_frame_y+btn_offset_y, min_note, 1)
+	min_note = option_text(pitch_frame_x+75,pitch_frame_y+btn_offset_y, min_note, ht_range_low)
 	text(pitch_frame_x+110, pitch_frame_y+13, "High Note:")
-	max_note = option_text(pitch_frame_x+178,pitch_frame_y+btn_offset_y, max_note, 1)
+	max_note = option_text(pitch_frame_x+178,pitch_frame_y+btn_offset_y, max_note, ht_range_hi)
 
 
 	note_btn_pos = 0
 	for i = 1,6 do
-		btn = small_toggle(note_btn_pos + (i*31), pitch_frame_y+40, note_names[i], notes_list[i])
+		btn = small_toggle(note_btn_pos + (i*31), pitch_frame_y+40, note_names[i], notes_list[i], ht_pitch_select)
 		if btn == 1 then notes_list[i] = math.abs(notes_list[i] - 1) 
 		elseif btn == 2 then default_pitch()
 		end
 	end
 	beat_btn_pos = 0
 	for i = 1,6 do
-		btn= small_toggle(note_btn_pos + (i*31), pitch_frame_y+65, note_names[i+6], notes_list[i+6])
+		btn= small_toggle(note_btn_pos + (i*31), pitch_frame_y+65, note_names[i+6], notes_list[i+6], ht_pitch_select)
 		if btn == 1 then notes_list[i+6] = math.abs(notes_list[i+6] - 1)
 		elseif btn ==2 then default_pitch()
 	 end
@@ -170,8 +184,8 @@ function main()
 	--Velocity Frame
 	frame(vel_frame_x, vel_frame_y, vel_frame_w, vel_frame_h)
 	label(vel_frame_x+2,vel_frame_y-label_offset,"Velocity")
-	min_vel = h_slider(vel_frame_x+35,vel_frame_y+btn_offset_y,"Min",min_vel, 0, 127, false, "Set minimum velocity.\nRight-click to reset.")
-	max_vel = h_slider(vel_frame_x+35,vel_frame_y+btn_offset_y+35,"Max",max_vel,0, 127, true,"Set maximum velocity.\nRight-click to reset.")
+	min_vel = h_slider(vel_frame_x+35,vel_frame_y+btn_offset_y,"Min",min_vel, 0, 127, false, ht_range_low)
+	max_vel = h_slider(vel_frame_x+35,vel_frame_y+btn_offset_y+35,"Max",max_vel,0, 127, true,ht_range_hi)
 
 
 	--Time Frame
@@ -181,7 +195,7 @@ function main()
 	beat_btn_pos = 31
 
 	for i = 1,4 do
-		btn = small_toggle(beat_btn_pos + (i*31), time_frame_y+btn_offset_y, i, beats[i]) 
+		btn = small_toggle(beat_btn_pos + (i*31), time_frame_y+btn_offset_y, i, beats[i], ht_beat_select) 
 		if btn == 1 then beats[i] = math.abs(beats[i] - 1) 
 		elseif btn == 2 then default_beats()
 		end
@@ -190,11 +204,16 @@ function main()
 
 	beat_btn_pos = 31
 	for i = 1,4 do
-		btn = small_toggle(beat_btn_pos + (i*31), time_frame_y+35, i+4, beats[i+4])
+		btn = small_toggle(beat_btn_pos + (i*31), time_frame_y+35, i+4, beats[i+4], ht_beat_select)
 		if btn == 1 then beats[i+4] = math.abs(beats[i+4] - 1)
 		elseif btn == 2 then default_beats()
 		end
 	end	
+
+	--Makes sure there is always at least one beat selected
+	c=0
+	for b = 1, 8 do c = c + beats[b] end
+	if c == 0 then beats[1] = 1 end
 
 
 	--Info Frame

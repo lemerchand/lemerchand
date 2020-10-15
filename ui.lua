@@ -7,6 +7,7 @@
 -- 		+ Statusbar toolsips
 -- 		+ Useful info display
 --		+ Replace long code with mouseover()
+--			- Be sure it's optimized to make the least amount of calls and use status()
 --
 --RECENT:
 --		+ Addded Right click return for small_toggles
@@ -60,7 +61,7 @@ function text(x,y,text, r, g, b)
 	gfx.drawstr(text)
 end
 
-function option_text(x,y,text, r, g, b)
+function option_text(x,y,text, help_text)
 	gfx.setfont(3,"Lucinda Console",16,'')
 	gfx.x, gfx.y = x, y
 	gfx.a = 1
@@ -71,14 +72,13 @@ function option_text(x,y,text, r, g, b)
 	gfx.set(.25,.25,.25)
 	gfx.rect(x+1,y+1,w+6,h+3, true)
 
-	if r and g and b then 
-		gfx.r, gfx.g, gfx.b = r, g, b
-	else
-		gfx.r, gfx.g, gfx.b = .8,.8,.8
-	end
+	gfx.r, gfx.g, gfx.b = .8,.8,.8
+	
 
 	gfx.x, gfx.y = x+4, y+2
 	gfx.drawstr(text)
+
+	if mouseover(x,y,w,h) then status(help_text) end
 
 	--Detect a click and respond
 	if mouseover(x,y,w,h) and gfx.mouse_cap == 1 then 
@@ -93,13 +93,15 @@ function option_text(x,y,text, r, g, b)
 end
 
 
-function small_toggle(x,y,text, state)
+function small_toggle(x,y,text, state, help_text)
 	-- Creates a toggle button at x and y with text.
 	-- 
 	-- Set font size then measure the width of the text. Makes the button bigger than the text
 	gfx.setfont(4, "Lucinda Console",16, '')
 	w,h = 19,18
 	
+	if mouseover(x,y,w,h) then status(help_text) end
+
 	-- Create button graphic
 
 	if state == 1 then
@@ -191,7 +193,8 @@ function button(x,y,text, offset, help_text)
 	gfx.setfont(1, "Lucinda Console",18, 'b')
 	local button_width, button_height = gfx.measurestr(text)
 	if offset then button_width = button_width + offset end
-	-- Create button graphic
+
+		-- Create button graphic
 	gfx.set(.25,.25,.25,1)
 	gfx.rect(x,y, button_width+29, 30)
 	gfx.r, gfx.g, gfx.b = .5, .5, .5
@@ -216,8 +219,8 @@ function button(x,y,text, offset, help_text)
 		gfx.r, gfx.g, gfx.b = .7, .7, .7
 		gfx.x, gfx.y = x+13,y+6
 		gfx.drawstr(text, 1)
-		if help_text then status(help_text) end
 		mouse_down = 1
+		if help_text then status(help_text) end
 		return 0
 	-- Detect just a hover
 	elseif gfx.mouse_x > x and gfx.mouse_x < x + button_width+29 and gfx.mouse_y > y and gfx.mouse_y < y+30  and mouse_down == 1 then
@@ -231,8 +234,8 @@ function button(x,y,text, offset, help_text)
 		gfx.r, gfx.g, gfx.b = .7, .7, .7
 		gfx.x, gfx.y = x+13,y+6
 		gfx.drawstr(text, 1)
-		if help_text then status(help_text) end
 		mouse_down = 0
+		if help_text then status(help_text) end
 		return 1
 
 
@@ -248,8 +251,8 @@ function button(x,y,text, offset, help_text)
 		gfx.r, gfx.g, gfx.b = .7, .7, .7
 		gfx.x, gfx.y = x+13,y+6
 		gfx.drawstr(text, 1)
-		if help_text then status(help_text) end
 		mouse_down = 2
+		if help_text then status(help_text) end
 		return 0
 
 	-- Detect just a hover
@@ -264,8 +267,8 @@ function button(x,y,text, offset, help_text)
 		gfx.r, gfx.g, gfx.b = .7, .7, .7
 		gfx.x, gfx.y = x+13,y+6
 		gfx.drawstr(text, 1)
-		if help_text then status(help_text) end
 		mouse_down = 0
+		if help_text then status(help_text) end
 		return 2
 
 

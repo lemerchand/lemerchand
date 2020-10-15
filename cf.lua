@@ -1,3 +1,7 @@
+function matches_selected_beats(startppqpos)
+	
+end
+
 function note_to_midi(str)
 
 	--separate the octave and note name
@@ -16,7 +20,7 @@ function update_active()
 	item = reaper.GetSelectedMediaItem(0, 0)
 	take = reaper.GetActiveTake(item)
 	notes = reaper.MIDI_CountEvts(take)
-	
+
 end
 
 function notes_list_not_empty()
