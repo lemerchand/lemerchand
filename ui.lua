@@ -4,12 +4,11 @@
 -- Modified: 2020.10.14
 --
 --TODO: 
--- 		+ Statusbar toolsips
--- 		+ Useful info display
 --		+ Replace long code with mouseover()
---			- Be sure it's optimized to make the least amount of calls and use status()
+--		+ Optimize for simplicity, elegance, and modularity
 --
 --RECENT:
+-- 		+ Statusbar tooltips
 --		+ Addded Right click return for small_toggles
 --		+ Added backwards functionality to slider!
 --		+ Added Mouseover() function 

@@ -1,7 +1,7 @@
 -------------------------------------------------------------------------------
 --					MIDI Note Selection TOOL v.2
 -------------------------------------------------------------------------------
---  Modified: 2020.10.14
+--  Modified: 2020.10.15 at 15:55
 --
 --	TODO: 
 --		+ Add the ability to select from: 
@@ -10,16 +10,14 @@
 
 --		+ Detector for beats---what if it's not perfectly on the grid?
 -- 		+ Fix inclusive select for Notes
+-- 		+ Scales?
+-- 		+ Make Beat presets persistant by saving to and reading from a file
+-- 		+ Delete button functionality
 --
 -- RECENT CHANGES:
+-- 		+ Preset buttons for beat selector 
+-- 		+ Created beat patterns for beat buttons
 --		+ Right-click resets section
--- 		+ Note number selection now works!
---		+ Make a value slider that fills from the right to the left
---		+ Add Note small_toggles()s
---		+ Selector for Hi/low note
---		+ Made UI element positions relative to the frames for easy adjustments
---		+ Created small_toggle() (tbu as a checkbox)
---
 ------------------------------------------------------------------------------
 
 --Load UI Library
@@ -37,12 +35,12 @@ note_names = {'C','C#', 'D', 'D#', 'E',				--Note names for notes_list
 
 
 --Patterns for beats
-beats_down = 			{1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0}
-beats_up =				{0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0}
-beats_off_eight =		{0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0}
-beats_eights = 			{1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0}
-beats_all =				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
-beats_sixteens_off =	{0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1}
+beats_a1 = 				{1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0}
+beats_a2 =				{0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0}
+beats_b2 =				{0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0}
+beats_b1 = 				{1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0}
+beats_c1 =				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
+beats_c2 =				{0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1}
 
 
 --test_toggle = 1									--For testing, lawl
@@ -90,6 +88,7 @@ ht_pitch_select = 		"Toggled pitches."
 ht_min_vel =  			"Sets the lowest selectable pitch.\nRight-click to reset."
 ht_max_vel =			"Set the highest selectable pitch.\nRight-click to reset."
 ht_beat_select = 		"Include/exclude specific beats.\nRight-click to reset."
+ht_btn_beats =			"Sets and stores beat patterns.\nRight click for an additional preset."
 
 
 ----------------------
@@ -242,9 +241,9 @@ function main()
 
 	--Beat Pattern Buttons
 
-	btn_beats_qtr = button(time_frame_x+btn_offset_x,time_frame_y+btn_offset_y+1,"Down",0,"h")
-	btn_beats_eights = button(time_frame_x+btn_offset_x,time_frame_y+44,"  8th  ",3,"g")
-	btn_beats_sixteens = button(time_frame_x+btn_offset_x,time_frame_y+77," 16th ",2,"h")
+	btn_beats_a = button(time_frame_x+btn_offset_x,time_frame_y+btn_offset_y+1,"A",0,ht_btn_beats)
+	btn_beats_b = button(time_frame_x+btn_offset_x,time_frame_y+44,"B",1,ht_btn_beats)
+	btn_beats_c = button(time_frame_x+btn_offset_x,time_frame_y+77,"C",0,ht_btn_beats)
 
 
 	--Info Frame
@@ -264,18 +263,18 @@ function main()
 		select_notes(true, -1, -1)
 	elseif btn_clear == 1 or char == 08 then select_notes(true, -1, -1)
 
-	elseif btn_beats_qtr == 1 then 
-		beats = beats_down
-	elseif btn_beats_qtr == 2 then
-		beats = beats_up 
-	elseif btn_beats_eights == 1 then 
-		beats = beats_eights
-	elseif btn_beats_eights == 2 then
-		beats = beats_off_eight
-	elseif btn_beats_sixteens == 1 then 
-		beats = beats_all
-	elseif btn_beats_sixteens == 2 then
-		beats = beats_sixteens_off
+	elseif btn_beats_a == 1 then 
+		beats = beats_a1
+	elseif btn_beats_a == 2 then
+		beats = beats_a2 
+	elseif btn_beats_b == 1 then 
+		beats = beats_b1
+	elseif btn_beats_b == 2 then
+		beats = beats_b2
+	elseif btn_beats_c == 1 then 
+		beats = beats_c1
+	elseif btn_beats_c == 2 then
+		beats = beats_c2
 	 
 
 	end
