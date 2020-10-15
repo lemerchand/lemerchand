@@ -10,15 +10,13 @@ function note_to_midi(str)
 	end
 
 	cons(midi_n-1, true)
-
-
-
 end
 
 function update_active()
 	item = reaper.GetSelectedMediaItem(0, 0)
 	take = reaper.GetActiveTake(item)
 	notes = reaper.MIDI_CountEvts(take)
+	
 end
 
 function notes_list_not_empty()
@@ -43,7 +41,7 @@ function select_notes(clear, min_vel, max_vel)
 
 	--Make sure we are working on the active midi item
 	update_active()
-
+	selected_notes = 0
 	--If clear is flagged we first clear the selection
 
 	if clear then reaper.MIDI_SelectAll(take, false) end

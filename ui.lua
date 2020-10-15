@@ -1,17 +1,23 @@
 -------------------------------------------------------------------------------
 --					User Interface Library
 -------------------------------------------------------------------------------
--- Modified: 2020.10.13
+-- Modified: 2020.10.14
 --
 --TODO: 
 -- 		+ Statusbar toolsips
 -- 		+ Useful info display
+--		+ Replace long code with mouseover()
 --
 --RECENT:
+--		+ Addded Right click return for small_toggles
 --		+ Added backwards functionality to slider!
+--		+ Added Mouseover() function 
 -------------------------------------------------------------------------------
 
 mouse_down = 0
+
+
+
 
 function mouseover(x,y,w,h)
 
@@ -178,7 +184,7 @@ function cons(text, p)
 	reaper.ShowConsoleMsg(text)
 end
 
-function button(x,y,text, offset)
+function button(x,y,text, offset, help_text)
 	-- Creates a button at x and y with text.
 	-- Returns 1 if left mouse clicks within the button and 0 if not
 	-- Convert text length into pixels
@@ -210,6 +216,7 @@ function button(x,y,text, offset)
 		gfx.r, gfx.g, gfx.b = .7, .7, .7
 		gfx.x, gfx.y = x+13,y+6
 		gfx.drawstr(text, 1)
+		if help_text then status(help_text) end
 		mouse_down = 1
 		return 0
 	-- Detect just a hover
@@ -224,6 +231,7 @@ function button(x,y,text, offset)
 		gfx.r, gfx.g, gfx.b = .7, .7, .7
 		gfx.x, gfx.y = x+13,y+6
 		gfx.drawstr(text, 1)
+		if help_text then status(help_text) end
 		mouse_down = 0
 		return 1
 
@@ -240,6 +248,7 @@ function button(x,y,text, offset)
 		gfx.r, gfx.g, gfx.b = .7, .7, .7
 		gfx.x, gfx.y = x+13,y+6
 		gfx.drawstr(text, 1)
+		if help_text then status(help_text) end
 		mouse_down = 2
 		return 0
 
@@ -255,6 +264,7 @@ function button(x,y,text, offset)
 		gfx.r, gfx.g, gfx.b = .7, .7, .7
 		gfx.x, gfx.y = x+13,y+6
 		gfx.drawstr(text, 1)
+		if help_text then status(help_text) end
 		mouse_down = 0
 		return 2
 
@@ -270,6 +280,7 @@ function button(x,y,text, offset)
 		gfx.r, gfx.g, gfx.b = .7, .7, .7
 		gfx.x, gfx.y = x+13,y+6
 		gfx.drawstr(text, 1)
+		if help_text then status(help_text) end
 		return 0
 
 	-- Anything else
@@ -279,7 +290,7 @@ function button(x,y,text, offset)
 end
 
 
-function toggle(x,y,text, state)
+function toggle(x,y,text, state, help_text)
 	-- Creates a toggle button at x and y with text.
 	-- 
 	-- Set font size then measure the width of the text. Makes the button bigger than the text
@@ -322,6 +333,7 @@ function toggle(x,y,text, state)
 		gfx.r, gfx.g, gfx.b = .7, .7, .7
 		gfx.x, gfx.y = x+13,y+6
 		gfx.drawstr(text, 1)
+		if help_text then status(help_text) end
 		mouse_down = 1
 		return 0
 	-- Detect just a hover
@@ -336,6 +348,7 @@ function toggle(x,y,text, state)
 		gfx.r, gfx.g, gfx.b = .7, .7, .7
 		gfx.x, gfx.y = x+13,y+6
 		gfx.drawstr(text, 1)
+		if help_text then status(help_text) end
 		mouse_down = 0
 		return 1
 	elseif gfx.mouse_x > x and gfx.mouse_x < x + button_width+29 and gfx.mouse_y > y and gfx.mouse_y < y+30  then
@@ -349,6 +362,7 @@ function toggle(x,y,text, state)
 		gfx.r, gfx.g, gfx.b = .7, .7, .7
 		gfx.x, gfx.y = x+13,y+6
 		gfx.drawstr(text, 1)
+		if help_text then status(help_text) end
 		return 0
 	-- Anything else
 	else
@@ -368,7 +382,7 @@ function frame(x,y,w,h)
 
 end
 
-function h_slider(x,y, text, value, min_value, max_value, backwards)
+function h_slider(x,y, text, value, min_value, max_value, backwards, help_text)
 
 	--Catch lower than min and higher than max values 
 	if value < min_value then value = min_value elseif value > max_value then value = max_value end
@@ -403,6 +417,9 @@ function h_slider(x,y, text, value, min_value, max_value, backwards)
 	gfx.setfont(3, "Lucida Consolde", 16)
 	gfx.drawstr(text .. ": " .. value .. " / " .. max_value)
 
+	if gfx.mouse_x >= x and gfx.mouse_x < x + 148 and gfx.mouse_y > y and gfx.mouse_y < y+28 then 
+		status(help_text)
+	end
 	-- If the mouse is inside the slider and the left button is clicked
 	if gfx.mouse_x >= x and gfx.mouse_x < x + 148 and gfx.mouse_y > y and gfx.mouse_y < y+28 and  gfx.mouse_cap == 1 then
 		
@@ -422,4 +439,8 @@ function h_slider(x,y, text, value, min_value, max_value, backwards)
 
 
 
+end
+
+function status(str)
+	text(20,info_frame_y+5, str)
 end

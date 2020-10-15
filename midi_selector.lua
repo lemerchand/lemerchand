@@ -1,18 +1,18 @@
 -------------------------------------------------------------------------------
 --					MIDI Note Selection TOOL v.2
 -------------------------------------------------------------------------------
---  Modified: 2020.10.13
+--  Modified: 2020.10.14
 --
 --	TODO: 
 --		+ Add the ability to select from: 
 --					- Selected Notes 			- Capture Note (Note Range)
 --					- Time Selection 			- Length
 
---		+ Reset per section 
 --		+ Detector for beats---what if it's not perfectly on the grid?
--- 		+  Fix inclusive select for Notes
+-- 		+ Fix inclusive select for Notes
 --
 -- RECENT CHANGES:
+--		+ Right-click resets section
 -- 		+ Note number selection now works!
 --		+ Make a value slider that fills from the right to the left
 --		+ Add Note small_toggles()s
@@ -37,6 +37,9 @@ note_names = {'C','C#', 'D', 'D#', 'E',				--Note names for notes_list
 
 --test_toggle = 1									--For testing, lawl
 time_selection = 0									--Act on all notes or those in time selection
+
+selected_notes = 0
+notes = 0
 
 function default_vel()
 	min_vel = 0
@@ -94,7 +97,7 @@ gen_frame_x, gen_frame_y, gen_frame_w, gen_frame_h = 10, 28, 227, 90
 pitch_frame_x, pitch_frame_y, pitch_frame_w, pitch_frame_h = 10, gen_frame_y + gen_frame_h + frame_offset, 227, 100
 vel_frame_x, vel_frame_y, vel_frame_w, vel_frame_h = 10, pitch_frame_y + pitch_frame_h+frame_offset, 227 , 85
 time_frame_x, time_frame_y, time_frame_w, time_frame_h = 10, vel_frame_y + vel_frame_h+frame_offset, 227, 65
-info_frame_x, info_frame_y, info_frame_w, info_frame_h = 10, time_frame_y + time_frame_h+frame_offset, 227,40
+info_frame_x, info_frame_y, info_frame_w, info_frame_h = 10, time_frame_y + time_frame_h+frame_offset, 227,50
 ----------------------
 --MAIN PROGRAM--------
 ----------------------
@@ -118,14 +121,14 @@ function main()
 	----------------------
 	--Create GUI----------
 	----------------------
-		
+	--update_active()
 	--General Frame
 	frame(gen_frame_x, gen_frame_y, gen_frame_w, gen_frame_h)
 	label(gen_frame_x+2,gen_frame_y-label_offset,"General")
-	btn_exc_select = button(gen_frame_x + btn_offset_x, gen_frame_y+btn_offset_y,"   Select  ")
-	btn_clear = button(gen_frame_x+btn_offset_x,gen_frame_y+52, "  Clear    ",2)
-	if toggle(gen_frame_x+120,gen_frame_y+btn_offset_y,"Selection", time_selection) == 1 then time_selection = math.abs(time_selection  -1) end	
-	btn_cut = button(gen_frame_x+120,gen_frame_y+52, "   Delete  ")
+	btn_exc_select = button(gen_frame_x + btn_offset_x, gen_frame_y+btn_offset_y,"   Select  ",-1, "Left-click to select notes.\nRight click for inclcusive select.")
+	btn_clear = button(gen_frame_x+btn_offset_x,gen_frame_y+52, "  Clear    ",2,"Clear Selection. \nRight-click to clear & reset filter.")
+	if toggle(gen_frame_x+120,gen_frame_y+btn_offset_y,"Selection", time_selection, "When highlighted only select notes\nin the time selection.") == 1 then time_selection = math.abs(time_selection  -1) end	
+	btn_cut = button(gen_frame_x+120,gen_frame_y+52, "   Delete  ",0,'Delete Selected notes.')
 
 	--Pitch Frame
 	frame(pitch_frame_x, pitch_frame_y, pitch_frame_w, pitch_frame_h)
@@ -164,14 +167,11 @@ function main()
 	if c == 0 then notes_list[1] = 1 end
 	
 
-
-
-
 	--Velocity Frame
 	frame(vel_frame_x, vel_frame_y, vel_frame_w, vel_frame_h)
 	label(vel_frame_x+2,vel_frame_y-label_offset,"Velocity")
-	min_vel = h_slider(vel_frame_x+35,vel_frame_y+btn_offset_y,"Min",min_vel, 0, 127)
-	max_vel = h_slider(vel_frame_x+35,vel_frame_y+btn_offset_y+35,"Max",max_vel,0, 127, true)
+	min_vel = h_slider(vel_frame_x+35,vel_frame_y+btn_offset_y,"Min",min_vel, 0, 127, false, "Set minimum velocity.\nRight-click to reset.")
+	max_vel = h_slider(vel_frame_x+35,vel_frame_y+btn_offset_y+35,"Max",max_vel,0, 127, true,"Set maximum velocity.\nRight-click to reset.")
 
 
 	--Time Frame
@@ -187,6 +187,7 @@ function main()
 		end
 
 	end
+
 	beat_btn_pos = 31
 	for i = 1,4 do
 		btn = small_toggle(beat_btn_pos + (i*31), time_frame_y+35, i+4, beats[i+4])
@@ -199,6 +200,7 @@ function main()
 	--Info Frame
 	label(info_frame_x+2, info_frame_y-label_offset, "Info")
 	frame(info_frame_x, info_frame_y, info_frame_w, info_frame_h)
+	
 
 
 	--------------------------
@@ -207,11 +209,10 @@ function main()
 
 	if btn_exc_select == 1 or char == 13 then select_notes(true, min_vel, max_vel)
 	elseif btn_exc_select == 2 or gfx.mouse_cap == 8 and char == 13 then select_notes(false, min_vel, max_vel)
-	elseif btn_clear == 1 or char == 08 then select_notes(true, -1, -1)
 	elseif btn_clear == 2 or gfx.mouse_cap == 8 and char == 08 then
 		default_vars()
 		select_notes(true, -1, -1)
-
+	elseif btn_clear == 1 or char == 08 then select_notes(true, -1, -1)
 	end
 
 end
