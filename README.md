@@ -11,7 +11,8 @@ Select any note within a take or time selection (latter feature coming soon) bas
 
 **Cool Features:**
 
-		- Right-click any UI element to reset any individual section (eg., 'Pitch,' 'Velocity,' 'Beats')
+		- Right-click any UI element to reset individual 
+		sections (eg., 'Pitch,' 'Velocity,' 'Beats')
 		- Right-click (or type SHIFT - BACKSPACE) the 'Clear' button to unselect all notes and reset ALL filters
 		- Load one of 6 preset beat patterns using the 'A,' 'B,' and 'C' buttons (Right-click for a second preset)
 			          - Modifications to a preset persist until the srcipt closes
