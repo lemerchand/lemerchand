@@ -1,7 +1,7 @@
 -------------------------------------------------------------------------------
 --					User Interface Library
 -------------------------------------------------------------------------------
--- Modified: 2020.10.14
+-- Modified: 2020.10.17 7:30am
 --
 --TODO: 
 --		+ Replace long code with mouseover()
@@ -422,6 +422,7 @@ function h_slider(x,y, text, value, min_value, max_value, backwards, help_text)
 	gfx.drawstr(text .. ": " .. value .. " / " .. max_value)
 
 	if gfx.mouse_x >= x and gfx.mouse_x < x + 148 and gfx.mouse_y > y and gfx.mouse_y < y+28 then 
+		if  gfx.mouse_cap == 2 then return -1 end
 		status(help_text)
 	end
 

@@ -1,23 +1,28 @@
 -------------------------------------------------------------------------------
---					MIDI Note Selection TOOL v.2
+--					MIDI Note Selection TOOL v.7
 -------------------------------------------------------------------------------
---  Modified: 2020.10.15 at 15:55
+--  Modified: 2020.10.17 at 730am
 --
 --	TODO: 
 --		+ Add the ability to select from: 
 --					- Selected Notes 			- Capture Note (Note Range)
 --					- Time Selection 			- Length
-
---		+ Detector for beats---what if it's not perfectly on the grid?
 -- 		+ Fix inclusive select for Notes
 -- 		+ Scales?
 -- 		+ Make Beat presets persistant by saving to and reading from a file
 -- 		+ Delete button functionality
 --
 -- RECENT CHANGES:
+--		+ Helptext on mousehover
+--		+ Beat selector works and detects selected beat up to +/- 30 ppq
 -- 		+ Preset buttons for beat selector 
 -- 		+ Created beat patterns for beat buttons
 --		+ Right-click resets section
+--
+--
+--- KNOWN ISSUES:
+--		+ Bad values for pitch range aren't checked for
+--		+ Inclusive select don't b wurk
 ------------------------------------------------------------------------------
 
 --Load UI Library
@@ -42,6 +47,8 @@ beats_b1 = 				{1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0}
 beats_c1 =				{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
 beats_c2 =				{0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1}
 
+--PPQ values for 16th notes
+beats_in_ppq = {0,240,480,720,960,1200,1440,1680,1920,2160,2400,2640,2880,3120,3360,3600}
 
 --test_toggle = 1									--For testing, lawl
 time_selection = 0									--Act on all notes or those in time selection
@@ -78,17 +85,17 @@ default_vars()
 ----------------------------------------------------------
 --Help Text----------Line break before end of this heading
 ----------------------------------------------------------
-ht_select =				"Select notes based on settings.\nRight click for inclcusive select."
-ht_clear = 				"Clear Selection. \nRight-click for global reset."
-ht_delete = 			'Delete Selected notes.'
-ht_time_selection = 	"When enabeled only notes within\nthe time selection are selected."
+ht_select =				"Select notes based on settings.\nRight-click for inclusive select\nHotkey: (Shift+) Enter"
+ht_clear = 				"Clear Selection. \nRight-click for global reset.\nHotkeys: (Shift+) Backspace"
+ht_delete = 			'Delete Selected notes.\n(Not implemented yet)'
+ht_time_selection = 	"When enabeled only notes within\nthe time selection are selected.\n(Not implemented yet)"
 ht_range_low = 			"Set minimum velocity.\nRight-click to reset."
 ht_range_hi = 			"Set maximum velocity.\nRight-click to reset."
-ht_pitch_select = 		"Toggled pitches."
+ht_pitch_select = 		"Toggled pitches.\nRight-click to reset."
 ht_min_vel =  			"Sets the lowest selectable pitch.\nRight-click to reset."
 ht_max_vel =			"Set the highest selectable pitch.\nRight-click to reset."
 ht_beat_select = 		"Include/exclude specific beats.\nRight-click to reset."
-ht_btn_beats =			"Sets and stores beat patterns.\nRight click for an additional preset."
+ht_btn_beats =			"Recalls beat patterns.\nRight click for an additional preset."
 
 
 ----------------------
@@ -118,10 +125,12 @@ gen_frame_x, gen_frame_y, gen_frame_w, gen_frame_h = 10, 28, 227, 90
 pitch_frame_x, pitch_frame_y, pitch_frame_w, pitch_frame_h = 10, gen_frame_y + gen_frame_h + frame_offset, 227, 100
 vel_frame_x, vel_frame_y, vel_frame_w, vel_frame_h = 10, pitch_frame_y + pitch_frame_h+frame_offset, 227 , 85
 time_frame_x, time_frame_y, time_frame_w, time_frame_h = 10, vel_frame_y + vel_frame_h+frame_offset, 227, 115
-info_frame_x, info_frame_y, info_frame_w, info_frame_h = 10, time_frame_y + time_frame_h+frame_offset, 227,50
+info_frame_x, info_frame_y, info_frame_w, info_frame_h = 10, time_frame_y + time_frame_h+frame_offset, 227,60
 ----------------------
 --MAIN PROGRAM--------
 ----------------------
+
+reaper.Undo_BeginBlock()
 
 function main()
 
@@ -158,9 +167,9 @@ function main()
 	label(pitch_frame_x+2,pitch_frame_y-label_offset,"Pitch")
  
 
-	--make sure there is a low/max note
+	--make sure there is a correct low/max note
 	if min_note == -1 then min_note = "C0" end
-	if max_note == -1 then max_note = "G9" end
+	if max_note == -1 then max_note = "G10" end
 
 
 	text(pitch_frame_x+10, pitch_frame_y+13,"Low Note:")
@@ -193,8 +202,10 @@ function main()
 	--Velocity Frame
 	frame(vel_frame_x, vel_frame_y, vel_frame_w, vel_frame_h)
 	label(vel_frame_x+2,vel_frame_y-label_offset,"Velocity")
+
 	min_vel = h_slider(vel_frame_x+35,vel_frame_y+btn_offset_y,"Min",min_vel, 0, 127, false, ht_range_low)
 	max_vel = h_slider(vel_frame_x+35,vel_frame_y+btn_offset_y+35,"Max",max_vel,0, 127, true,ht_range_hi)
+	if min_vel == -1 or max_vel == -1 then default_vel() end
 
 
 	--Time Frame
@@ -282,3 +293,4 @@ function main()
 end
 
 main()
+reaper.Undo_EndBlock("Selected notes via MIDI Selector Tool", -1)
