@@ -11,16 +11,15 @@ Select any note within a take or time selection (latter feature coming soon) bas
 
 **Cool Features:**
 
-		- Right-click any UI element to reset individual 
-		sections (eg., 'Pitch,' 'Velocity,' 'Beats')
-		- Right-click (or type SHIFT - BACKSPACE) the 'Clear' button to unselect all notes and reset ALL filters
-		- Load one of 6 preset beat patterns using the 'A,' 'B,' and 'C' buttons (Right-click for a second preset)
-			          - Modifications to a preset persist until the srcipt closes
+		- Right-click anything to reset just THAT section
+		- Right-click 'Clear' button for global reset 
+		- 'A,' 'B,' and 'C' buttons load beat presets
+			    - Modifications to a preset persist until global reset or script closes
 		- Help-text on mouse hover
 
 **Known Issues**
 
-		- Entering an invalid note range isn't checked so make sure you give it a good value until I fix it
+		- Entering an invalid note range isn't error-handled
 		- Inclusive select only works with velocity
 		- Delete and Time selection are not yet implemented
 		- My code is messy
