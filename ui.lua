@@ -6,6 +6,7 @@
 --TODO: 
 --		+ Replace long code with mouseover()
 --		+ Optimize for simplicity, elegance, and modularity
+-- 		+ Ctrl + Left click exclusive select on toggle buttons
 --
 --RECENT:
 -- 		+ Statusbar tooltips
