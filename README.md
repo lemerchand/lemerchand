@@ -22,6 +22,7 @@ Select any note within a take or time selection (latter feature coming soon) bas
 		- Entering an invalid note range isn't error-handled
 		- Inclusive select only works with velocity
 		- Delete and Time selection are not yet implemented
+		- Works based off active take and not the current midi window
 		- My code is messy
 
 **Some things I want to add:**
