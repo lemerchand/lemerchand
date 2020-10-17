@@ -31,3 +31,9 @@ Select any note within a take or time selection (latter feature coming soon) bas
 		- The ability to select notes only in time-selection, or already selected
 		- Pitch presets based on scales
 		- Info on selected notes displayed (eg., how many notes were selected)
+
+**Installation:**
+
+Place ui.lua, cf.lua, and midi_selector.lua into a folder called "lemerchand" inside your "Scripts" directory in the REAPER resources path. Go into your MIDI editor and run "Action List." Search for "Midi Selector" and bind it to a key of your choice ("T" if you have it available.)
+
+Make sure the midi item you want to use the script on is selected and then run the script in the midi editor window.
