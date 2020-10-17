@@ -2,6 +2,7 @@
 ## MIDI Selection Tool v.75b*
 
 Select any note within a take or time selection (latter feature coming soon) based on a number of parameters including:
+		-
 		- Note Range
 		- Pitch
 		- Velocity 
