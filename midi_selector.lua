@@ -108,7 +108,7 @@ last_window = reaper.JS_Window_GetFocus()
 
 --Open window at mouse position--
 mousex, mousey = reaper.GetMousePosition()
-gfx.init("MIDI Tool", 248, 630, false, mousex+50, mousey-125)
+gfx.init("MIDI Tool", 248, 630, false, mousex+150, mousey-125)
 -- Keep on top
 w = reaper.JS_Window_Find("MIDI Tool", true)
 if w then reaper.JS_Window_AttachTopmostPin(w) end
