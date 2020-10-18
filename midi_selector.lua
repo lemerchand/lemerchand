@@ -72,6 +72,7 @@ end
 function default_pitch()
 	notes_list = {1,1,1,1,1,1,1,1,1,1,1,1}			--C-G# Boolean
 end
+
 												
 function default_vars()
 	default_vel()
@@ -80,6 +81,9 @@ function default_vars()
 	default_pitch()
 end
 
+function clear_pitch()
+	notes_list = {0,0,0,0,0,0,0,0,0,0,0,0}
+end
 default_vars()
 
 ----------------------------------------------------------
@@ -126,6 +130,8 @@ pitch_frame_x, pitch_frame_y, pitch_frame_w, pitch_frame_h = 10, gen_frame_y + g
 vel_frame_x, vel_frame_y, vel_frame_w, vel_frame_h = 10, pitch_frame_y + pitch_frame_h+frame_offset, 227 , 85
 time_frame_x, time_frame_y, time_frame_w, time_frame_h = 10, vel_frame_y + vel_frame_h+frame_offset, 227, 115
 info_frame_x, info_frame_y, info_frame_w, info_frame_h = 10, time_frame_y + time_frame_h+frame_offset, 227,60
+
+
 ----------------------
 --MAIN PROGRAM--------
 ----------------------
@@ -145,7 +151,6 @@ function main()
 		return
 	-- Otherwise keep window open
 	else reaper.defer(main) end
-
 
 
 	----------------------
@@ -183,6 +188,9 @@ function main()
 		btn = small_toggle(note_btn_pos + (i*31), pitch_frame_y+40, note_names[i], notes_list[i], ht_pitch_select)
 		if btn == 1 then notes_list[i] = math.abs(notes_list[i] - 1) 
 		elseif btn == 2 then default_pitch()
+		elseif btn == 5 then 
+			clear_pitch()
+			notes_list[i] = 1
 		end
 	end
 	beat_btn_pos = 0
@@ -190,6 +198,9 @@ function main()
 		btn= small_toggle(note_btn_pos + (i*31), pitch_frame_y+65, note_names[i+6], notes_list[i+6], ht_pitch_select)
 		if btn == 1 then notes_list[i+6] = math.abs(notes_list[i+6] - 1)
 		elseif btn ==2 then default_pitch()
+		elseif btn == 5 then 
+			clear_pitch()
+			notes_list[i+6] = 1
 	 end
 	end	
 	
@@ -220,6 +231,9 @@ function main()
 		btn = small_toggle(beat_btn_pos + (i*31), time_frame_y+btn_offset_y, i, beats[i], ht_beat_select) 
 		if btn == 1 then beats[i] = math.abs(beats[i] - 1) 
 		elseif btn == 2 then default_beats()
+		elseif btn == 5 then 
+			default_beats()
+			beats[i] = 1
 		end
 
 	end
@@ -229,6 +243,9 @@ function main()
 		btn = small_toggle(beat_btn_pos + (i*31), time_frame_y+35, i+4, beats[i+4], ht_beat_select)
 		if btn == 1 then beats[i+4] = math.abs(beats[i+4] - 1)
 		elseif btn == 2 then default_beats()
+		elseif btn == 5 then 
+			default_beats()
+			beats[i+4] = 1
 		end
 	end	
 
@@ -238,8 +255,10 @@ function main()
 		btn = small_toggle(beat_btn_pos + (i*31), time_frame_y+60, i+8, beats[i+8], ht_beat_select) 
 		if btn == 1 then beats[i+8] = math.abs(beats[i+8] - 1) 
 		elseif btn == 2 then default_beats()
+		elseif btn == 5 then 
+			default_beats()
+			beats[i+8] = 1
 		end
-
 	end
 
 	beat_btn_pos = 70
@@ -247,6 +266,9 @@ function main()
 		btn = small_toggle(beat_btn_pos + (i*31), time_frame_y+85, i+12, beats[i+12], ht_beat_select)
 		if btn == 1 then beats[i+12] = math.abs(beats[i+12] - 1)
 		elseif btn == 2 then default_beats()
+		elseif btn == 5 then 
+			default_beats()
+			beats[i+12] = 1
 		end
 	end	
 
@@ -289,6 +311,18 @@ function main()
 	 
 
 	end
+
+	-----------------------------
+	--For Debugging
+	-----------------------------
+
+	--cons("Mouse_cap: " .. gfx.mouse_cap, true)
+
+
+
+
+
+
 
 end
 

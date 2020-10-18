@@ -131,7 +131,13 @@ function small_toggle(x,y,text, state, help_text)
 	-- Detect left mouse click on hover
 	if gfx.mouse_x > x and gfx.mouse_x < x + w+8 and gfx.mouse_y > y and gfx.mouse_y < y+h+6 and  gfx.mouse_cap >= 1  then
 		
-		if gfx.mouse_cap == 2 then return 2 end
+		if gfx.mouse_cap == 2 then return 2
+		elseif gfx.mouse_cap == 4 then return 4
+		elseif gfx.mouse_cap == 5 then return 5 
+		elseif gfx.mouse_cap == 8 then return 8
+		elseif gfx.mouse_cap == 16 then return 16
+
+		end
 
 		-- Create button graphic
 		gfx.set(.22,.22,.24,1)
@@ -148,7 +154,12 @@ function small_toggle(x,y,text, state, help_text)
 	-- Detect just a hover
 	elseif gfx.mouse_x > x and gfx.mouse_x < x + w+8 and gfx.mouse_y > y and gfx.mouse_y < y+h+6 and mouse_down == 1 then
 		
-		if gfx.mouse_cap == 2 then return 2 end
+		if gfx.mouse_cap == 2 then return 2
+		elseif gfx.mouse_cap == 4 then return 4
+		elseif gfx.mouse_cap == 5 then return 5 
+		elseif gfx.mouse_cap == 8 then return 8
+		elseif gfx.mouse_cap == 16 then return 16
+		end
 
 		-- Create button graphic
 		gfx.set(.3,.3,.3,.6)
