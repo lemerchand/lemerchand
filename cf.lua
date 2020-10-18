@@ -26,8 +26,12 @@ function note_to_midi(str)
 end
 
 function update_active()
-	item = reaper.GetSelectedMediaItem(0, 0)
-	take = reaper.GetActiveTake(item)
+	-- item = reaper.GetSelectedMediaItem(0, 0)
+	-- take = reaper.GetActiveTake(item)
+	
+
+	active_midi_editor = reaper.MIDIEditor_GetActive()
+	take = reaper.MIDIEditor_GetTake(active_midi_editor)
 	notes = reaper.MIDI_CountEvts(take)
 
 end
