@@ -1,6 +1,11 @@
 
 ## MIDI Selection Tool v.75b*
 
+
+**NEW!**
+		- Ctrl+LC on a toggle button to exclusive-select it
+		- Script acts on currently focused midi window
+
 Select any note within a take or time selection (latter feature coming soon) based on a number of parameters including:
 		
 		- Note Range
