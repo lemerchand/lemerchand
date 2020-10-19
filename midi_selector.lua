@@ -96,10 +96,10 @@ ht_delete = 			'Delete Selected notes.\n(Not implemented yet)'
 ht_time_selection = 	"When enabeled only notes within\nthe time selection are selected."
 ht_range_low = 			"Set minimum velocity.\nRight-click to reset."
 ht_range_hi = 			"Set maximum velocity.\nRight-click to reset."
-ht_pitch_select = 		"Toggled pitches.\nRight-click to reset."
+ht_pitch_select = 		"Toggled pitches.\nRight-click to reset.\nCtrl+Left-click: exclusive select."
 ht_min_vel =  			"Sets the lowest selectable pitch.\nRight-click to reset."
 ht_max_vel =			"Set the highest selectable pitch.\nRight-click to reset."
-ht_beat_select = 		"Include/exclude specific beats.\nRight-click to reset."
+ht_beat_select = 		"Include/exclude specific beats.\nRight-click to reset.\nCtrl+Left-click: exclusive select."
 ht_btn_beats =			"Recalls beat patterns.\nRight click for an additional preset."
 
 
