@@ -42,7 +42,7 @@ function main()
 		 for ii = 0, notes-1 do
 			retval, selected, muted, startppqpos, endppqpos, chan, pitch, vel = reaper.MIDI_GetNote( take, ii )
 			if pitch == noteRow and mouse_time_pos >= startppqpos and mouse_time_pos <= endppqpos then
-				new_endppqpos = endppqpos + (5*val)
+				new_endppqpos = endppqpos + (val*8)
 				reaper.MIDI_SetNote(take, ii, false, false, startppqpos, new_endppqpos, chanIn, pitchIn, velIn, true)
 			end
 		 end
@@ -51,7 +51,7 @@ function main()
 		for i = 0, notes-1 do
 			retval, selected, muted, startppqpos, endppqpos, chan, pitch, vel = reaper.MIDI_GetNote( take, i )
 			if selected then 
-				new_endppqpos = endppqpos + (5*val)
+				new_endppqpos = endppqpos + (val*8)
 				reaper.MIDI_SetNote(take, i, true, false, startppqpos, new_endppqpos, chanIn, pitchIn, velIn, true)
 			end
 		end
@@ -62,6 +62,7 @@ function main()
 	-----------------------------
 	--Debugging Stuff
 	--cons(noteRow .. "\n" .. mouse_time_pos .. "\n" .. selected_notes, true)
+	--cons(val)
 	-----------------------------
 
 	--Run main() until the mousewheel is no longer used
