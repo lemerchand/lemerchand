@@ -150,6 +150,8 @@ function small_toggle(x,y,text, state, help_text)
 		gfx.x, gfx.y = x+4,y+4
 		gfx.drawstr(text)
 		mouse_down = 1
+		
+
 		return 0
 	-- Detect just a hover
 	elseif gfx.mouse_x > x and gfx.mouse_x < x + w+8 and gfx.mouse_y > y and gfx.mouse_y < y+h+6 and mouse_down == 1 then
@@ -433,14 +435,14 @@ function h_slider(x,y, text, value, min_value, max_value, backwards, help_text)
 	gfx.setfont(3, "Lucida Consolde", 16)
 	gfx.drawstr(text .. ": " .. value .. " / " .. max_value)
 
-	if gfx.mouse_x >= x and gfx.mouse_x < x + 148 and gfx.mouse_y > y and gfx.mouse_y < y+28 then 
+	if gfx.mouse_x >= x-10 and gfx.mouse_x < x + 148 and gfx.mouse_y > y and gfx.mouse_y < y+28 then 
 		if  gfx.mouse_cap == 2 then return -1 end
 		status(help_text)
 	end
 
 
 	-- If the mouse is inside the slider and the left button is clicked
-	if gfx.mouse_x >= x and gfx.mouse_x < x + 148 and gfx.mouse_y > y and gfx.mouse_y < y+28 and  gfx.mouse_cap == 1 then
+	if gfx.mouse_x >= x-10 and gfx.mouse_x < x + 148 and gfx.mouse_y > y and gfx.mouse_y < y+28 and  gfx.mouse_cap == 1 then
 		
 		
 		if math.ceil(value) > max_value then

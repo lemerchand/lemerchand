@@ -1,18 +1,19 @@
 -------------------------------------------------------------------------------
 --					MIDI Note Selection TOOL v.7
 -------------------------------------------------------------------------------
---  Modified: 2020.10.17 at 730am
+--  Modified: 2020.10.19 at 7am
 --
 --	TODO: 
 --		+ Add the ability to select from: 
 --					- Selected Notes 			- Capture Note (Note Range)
---					- Time Selection 			- Length
+--		 			- Length
 -- 		+ Fix inclusive select for Notes
 -- 		+ Scales?
 -- 		+ Make Beat presets persistant by saving to and reading from a file
 -- 		+ Delete button functionality
 --
 -- RECENT CHANGES:
+-- 		+ Time selection toggle
 --		+ Helptext on mousehover
 --		+ Beat selector works and detects selected beat up to +/- 30 ppq
 -- 		+ Preset buttons for beat selector 
@@ -92,7 +93,7 @@ default_vars()
 ht_select =				"Select notes based on settings.\nRight-click for inclusive select\nHotkey: (Shift+) Enter"
 ht_clear = 				"Clear Selection. \nRight-click for global reset.\nHotkeys: (Shift+) Backspace"
 ht_delete = 			'Delete Selected notes.\n(Not implemented yet)'
-ht_time_selection = 	"When enabeled only notes within\nthe time selection are selected.\n(Not implemented yet)"
+ht_time_selection = 	"When enabeled only notes within\nthe time selection are selected."
 ht_range_low = 			"Set minimum velocity.\nRight-click to reset."
 ht_range_hi = 			"Set maximum velocity.\nRight-click to reset."
 ht_pitch_select = 		"Toggled pitches.\nRight-click to reset."
@@ -163,7 +164,7 @@ function main()
 	frame(gen_frame_x, gen_frame_y, gen_frame_w, gen_frame_h)
 	label(gen_frame_x+2,gen_frame_y-label_offset,"General")
 	btn_exc_select = button(gen_frame_x + btn_offset_x, gen_frame_y+btn_offset_y,"   Select  ",-1, ht_select)
-	btn_clear = button(gen_frame_x+btn_offset_x,gen_frame_y+52, "  Clear    ",2,ht_clear)
+	btn_clear = button(gen_frame_x+btn_offset_x,gen_frame_y+52, "   Clear   ",2,ht_clear)
 	if toggle(gen_frame_x+120,gen_frame_y+btn_offset_y,"Selection", time_selection, ht_time_selection) == 1 then time_selection = math.abs(time_selection  -1) end	
 	btn_cut = button(gen_frame_x+120,gen_frame_y+52, "   Delete  ",0, ht_delete)
 
@@ -315,8 +316,13 @@ function main()
 	-----------------------------
 	--For Debugging
 	-----------------------------
-
-	--cons("Mouse_cap: " .. gfx.mouse_cap, true)
+	-- update_active()
+	-- ts_start, ts_end = reaper.GetSet_LoopTimeRange(false, false, 0, 0, false)
+	-- ts_start_ppq  = reaper.MIDI_GetPPQPosFromProjTime( take, ts_start )
+	-- cons("Mouse_cap: " .. gfx.mouse_cap ..
+	-- 	"\nTime Selection Start: " .. ts_start ..
+	-- 	"\nTime Selection End: " .. ts_end ..
+	-- 	"\nTStart PPQ: " .. ts_start_ppq, true )
 
 
 

@@ -1,3 +1,12 @@
+function is_note_in_time_selection(n)
+	ts_start, ts_end = reaper.GetSet_LoopTimeRange(false, false, 0, 0, false)
+	ts_start_ppq  = reaper.MIDI_GetPPQPosFromProjTime( take, ts_start )
+	ts_end_ppq = reaper.MIDI_GetPPQPosFromProjTime( take, ts_end )
+
+	if n >= ts_start_ppq and n <= ts_end_ppq then return true else return false end
+
+end
+
 function matches_selected_beats(startppqpos)
 	threshold = 30
 
@@ -76,6 +85,9 @@ function select_notes(clear, min_vel, max_vel)
 	--If they are witin the velocity and note range then select them (according to the parameters of the pitch frame)
 	for i = 0, notes-1 do
 		retval, selected, muted, startppqpos, endppqpos, chan, pitch, vel = reaper.MIDI_GetNote(take, i)
+
+		if time_selection == 1 and is_note_in_time_selection(startppqpos) == false then goto pass end
+
 		if vel >= min_vel and vel <= max_vel and pitch >= note_to_midi(min_note) and pitch <= note_to_midi(max_note) then 
 			if there_are_beats_selected and matches_selected_beats(startppqpos) == false then goto pass end
 	

@@ -3,10 +3,12 @@
 
 
 **NEW!**
+		- Toggle "Selection" to exclude notes outside of time selection
+		- Better handling of velocity slider
 		- Ctrl+LC on a toggle button to exclusive-select it
 		- Script acts on currently focused midi window
 
-Select any note within a take or time selection (latter feature coming soon) based on a number of parameters including:
+Select any note within a take or time selection based on a number of parameters including:
 		
 		- Note Range
 		- Pitch
@@ -26,14 +28,13 @@ Select any note within a take or time selection (latter feature coming soon) bas
 
 		- Entering an invalid note range isn't error-handled
 		- Inclusive select only works with velocity
-		- Delete and Time selection are not yet implemented
-		- Works based off active take and not the current midi window
+		- Delete button is dumb and should be something else
 		- My code is messy
 
 **Some things I want to add:**
 
 		- The ability to store user-defined beat presets in a file 
-		- The ability to select notes only in time-selection, or already selected
+		- Inclusive selection
 		- Pitch presets based on scales
 		- Info on selected notes displayed (eg., how many notes were selected)
 
