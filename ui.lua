@@ -442,7 +442,7 @@ function h_slider(x,y, text, value, min_value, max_value, backwards, help_text)
 
 
 	-- If the mouse is inside the slider and the left button is clicked
-	if gfx.mouse_x >= x-10 and gfx.mouse_x < x + 148 and gfx.mouse_y > y and gfx.mouse_y < y+28 and  gfx.mouse_cap == 1 then
+	if gfx.mouse_x >= x-10 and gfx.mouse_x < x + 158 and gfx.mouse_y > y and gfx.mouse_y < y+28 and  gfx.mouse_cap == 1 then
 		
 		
 		if math.ceil(value) > max_value then
