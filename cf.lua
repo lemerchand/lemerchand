@@ -35,9 +35,6 @@ function note_to_midi(str)
 end
 
 function update_active()
-	-- item = reaper.GetSelectedMediaItem(0, 0)
-	-- take = reaper.GetActiveTake(item)
-	
 
 	active_midi_editor = reaper.MIDIEditor_GetActive()
 	take = reaper.MIDIEditor_GetTake(active_midi_editor)
@@ -103,3 +100,8 @@ function select_notes(clear, min_vel, max_vel)
 	reaper.MIDI_Sort(take)
 end
 
+
+function cons(text, p)
+	if p == true then reaper.ClearConsole() end
+	reaper.ShowConsoleMsg(text)
+end

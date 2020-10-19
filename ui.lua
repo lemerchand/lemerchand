@@ -196,10 +196,6 @@ function small_toggle(x,y,text, state, help_text)
 end
 
 
-function cons(text, p)
-	if p == true then reaper.ClearConsole() end
-	reaper.ShowConsoleMsg(text)
-end
 
 function button(x,y,text, offset, help_text)
 	-- Creates a button at x and y with text.
