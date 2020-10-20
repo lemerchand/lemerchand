@@ -295,7 +295,7 @@ function main()
 		default_vars()
 		select_notes(true, -1, -1, false)
 	elseif btn_clear == 1 or char == 08 then select_notes(true, -1,-1, false)
-
+	elseif btn_sample == 1 then set_from_selected()
 	elseif btn_beats_a == 1 then 
 		beats = beats_a1
 	elseif btn_beats_a == 2 then

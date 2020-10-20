@@ -20,6 +20,13 @@ function matches_selected_beats(startppqpos)
 	return false
 end
 
+function midi_to_note(n)
+
+	return tostring(note_names[note_midi_n[(n%12)+2]]) .. "4"
+
+end
+
+
 function note_to_midi(str)
 
 	--separate the octave and note name
@@ -99,6 +106,36 @@ function select_notes(clear, min_vel, max_vel, time_selection_select)
 
 	reaper.MIDI_Sort(take)
 end
+
+function set_from_selected()
+	update_active()
+	retval, selected, muted, startppqpos, endppqpos, chan, pitch, vel = reaper.MIDI_GetNote(take, 0)
+	min_vel = vel
+	max_vel = vel
+	temp_min_note = pitch
+	temp_max_note = pitch
+
+	for i = 0, notes-1 do
+		retval, selected, muted, startppqpos, endppqpos, chan, pitch, vel = reaper.MIDI_GetNote(take, i)
+		if selected then
+			if vel < min_vel then min_vel = vel
+			elseif vel > max_vel then max_vel = vel
+			elseif pitch < temp_min_note then 
+				cons("here")
+				temp_min_note = pitch
+				
+			elseif pitch > temp_max_note then 
+				temp_max_note = pitch
+			end
+		end
+	end
+	min_note = midi_to_note(temp_min_note)
+	max_note = midi_to_note(temp_max_note)
+
+	cons(temp_min_note .. "         " .. midi_to_note(pitch%12), false)
+
+end
+
 
 
 function cons(text, p)
