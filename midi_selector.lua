@@ -87,7 +87,7 @@ default_vars()
 ----------------------------------------------------------
 --Help Text----------Line break before end of this heading
 ----------------------------------------------------------
-ht_select =				"Select notes based on settings.\nR-click restricts to time selection.\nHotkey: (Shift+) Enter"
+ht_select =				"Select notes based on settings.\nR-click restricts to time selection.\nShift+L-click to invert filter."
 ht_clear = 				"Clear Selection. \nR-click for global reset.\nHotkeys: (Shift+) Backspace"
 ht_capture = 			'Set parameters from selected notes.\nOr Shift+L-Click a parameter.'
 ht_range_low = 			"Set minimum velocity.\nR-click to reset."

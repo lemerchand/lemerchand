@@ -14,6 +14,7 @@ A tool for quickly selecting midi notes in REAPER. Filters for events such as:
 
 **What's New!?**
 
+		- Shift + L-click "Select" to invert the filter
 		- Click "Capture" to set parameters from selected notes (global)
 		- Shift + L-Click to set individual parameters from selected notes
 		- Right-click "Select" to restrict selected notes to  time selection

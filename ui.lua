@@ -217,7 +217,7 @@ function button(x,y,text, offset, help_text)
 
 
 	-- Detect left mouse click on hover
-	if gfx.mouse_x > x and gfx.mouse_x < x + button_width+29 and gfx.mouse_y > y and gfx.mouse_y < y+30 and  gfx.mouse_cap == 1 then
+	if gfx.mouse_x > x and gfx.mouse_x < x + button_width+29 and gfx.mouse_y > y and gfx.mouse_y < y+30 and  gfx.mouse_cap >= 1 then
 		-- Create button graphic
 		gfx.set(.22,.22,.24,1)
 		gfx.rect(x,y, button_width+29, 30)
@@ -228,8 +228,22 @@ function button(x,y,text, offset, help_text)
 		gfx.r, gfx.g, gfx.b = .7, .7, .7
 		gfx.x, gfx.y = x+13,y+6
 		gfx.drawstr(text, 1)
-		mouse_down = 1
+
 		if help_text then status(help_text) end
+
+		if gfx.mouse_cap == 2 then return 2
+		elseif gfx.mouse_cap == 4 then return 4
+		elseif gfx.mouse_cap == 5 then return 5 
+		elseif gfx.mouse_cap == 8 then return 8
+		elseif gfx.mouse_cap == 9 then return 9
+		elseif gfx.mouse_cap == 16 then return 16
+
+		end
+
+
+
+		mouse_down = 1
+		
 		return 0
 	-- Detect just a hover
 	elseif gfx.mouse_x > x and gfx.mouse_x < x + button_width+29 and gfx.mouse_y > y and gfx.mouse_y < y+30  and mouse_down == 1 then
@@ -243,8 +257,18 @@ function button(x,y,text, offset, help_text)
 		gfx.r, gfx.g, gfx.b = .7, .7, .7
 		gfx.x, gfx.y = x+13,y+6
 		gfx.drawstr(text, 1)
-		mouse_down = 0
+
 		if help_text then status(help_text) end
+
+		if gfx.mouse_cap == 2 then return 2
+		elseif gfx.mouse_cap == 4 then return 4
+		elseif gfx.mouse_cap == 5 then return 5 
+		elseif gfx.mouse_cap == 8 then return 8
+		elseif gfx.mouse_cap == 9 then return 9
+		elseif gfx.mouse_cap == 16 then return 16
+		end
+
+		mouse_down = 0
 		return 1
 
 
