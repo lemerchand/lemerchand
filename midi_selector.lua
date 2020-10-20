@@ -216,7 +216,11 @@ function main()
 
 	min_vel = h_slider(vel_frame_x+35,vel_frame_y+btn_offset_y,"Min",min_vel, 0, 127, false, ht_range_low)
 	max_vel = h_slider(vel_frame_x+35,vel_frame_y+btn_offset_y+35,"Max",max_vel,0, 127, true,ht_range_hi)
-	if min_vel == -1 or max_vel == -1 then default_vel() end
+	if min_vel == -1 or max_vel == -1 then default_vel()
+	elseif min_vel >= max_vel then min_vel = max_vel-1
+	
+
+	end
 
 
 	--Time Frame
