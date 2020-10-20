@@ -51,8 +51,7 @@ beats_c2 =				{0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1}
 --PPQ values for 16th notes
 beats_in_ppq = {0,240,480,720,960,1200,1440,1680,1920,2160,2400,2640,2880,3120,3360,3600}
 
---test_toggle = 1									--For testing, lawl
-time_selection = 0									--Act on all notes or those in time selection
+
 
 beats_as_ppq = {}
 
@@ -90,17 +89,17 @@ default_vars()
 ----------------------------------------------------------
 --Help Text----------Line break before end of this heading
 ----------------------------------------------------------
-ht_select =				"Select notes based on settings.\nRight-click for inclusive select\nHotkey: (Shift+) Enter"
-ht_clear = 				"Clear Selection. \nRight-click for global reset.\nHotkeys: (Shift+) Backspace"
-ht_delete = 			'Delete Selected notes.\n(Not implemented yet)'
+ht_select =				"Select notes based on settings.\nR-click restricts to time selection.\nHotkey: (Shift+) Enter"
+ht_clear = 				"Clear Selection. \nR-click for global reset.\nHotkeys: (Shift+) Backspace"
+ht_sample = 			'Sets parameters from selection.\n(Not implemented yet)'
 ht_time_selection = 	"When enabeled only notes within\nthe time selection are selected."
-ht_range_low = 			"Set minimum velocity.\nRight-click to reset."
-ht_range_hi = 			"Set maximum velocity.\nRight-click to reset."
-ht_pitch_select = 		"Toggled pitches.\nRight-click to reset.\nCtrl+Left-click: exclusive select."
-ht_min_vel =  			"Sets the lowest selectable pitch.\nRight-click to reset."
-ht_max_vel =			"Set the highest selectable pitch.\nRight-click to reset."
-ht_beat_select = 		"Include/exclude specific beats.\nRight-click to reset.\nCtrl+Left-click: exclusive select."
-ht_btn_beats =			"Recalls beat patterns.\nRight click for an additional preset."
+ht_range_low = 			"Set minimum velocity.\nR-click to reset."
+ht_range_hi = 			"Set maximum velocity.\nR-click to reset."
+ht_pitch_select = 		"Toggled pitches.\nR-click to reset.\nCtrl+L-click: exclusive select."
+ht_min_vel =  			"Sets the lowest selectable pitch.\nR-click to reset."
+ht_max_vel =			"Set the highest selectable pitch.\nR-click to reset."
+ht_beat_select = 		"Include/exclude specific beats.\nR-click to reset.\nCtrl+L-click: exclusive select."
+ht_btn_beats =			"Recalls beat patterns.\nR-click for an additional preset."
 
 
 ----------------------
@@ -163,10 +162,10 @@ function main()
 
 	frame(gen_frame_x, gen_frame_y, gen_frame_w, gen_frame_h)
 	label(gen_frame_x+2,gen_frame_y-label_offset,"General")
-	btn_exc_select = button(gen_frame_x + btn_offset_x, gen_frame_y+btn_offset_y,"   Select  ",-1, ht_select)
+	btn_select = button(gen_frame_x + btn_offset_x, gen_frame_y+btn_offset_y,"   Select  ",-1, ht_select)
 	btn_clear = button(gen_frame_x+btn_offset_x,gen_frame_y+52, "   Clear   ",2,ht_clear)
-	if toggle(gen_frame_x+120,gen_frame_y+btn_offset_y,"Selection", time_selection, ht_time_selection) == 1 then time_selection = math.abs(time_selection  -1) end	
-	btn_cut = button(gen_frame_x+120,gen_frame_y+52, "   Delete  ",0, ht_delete)
+	btn_sample =button(gen_frame_x+120,gen_frame_y+btn_offset_y,"  Sample ", 0, ht_sample)
+	btn_cut = button(gen_frame_x+120,gen_frame_y+52, "   Delete  ",0, ht_cut)
 
 	--Pitch Frame
 	frame(pitch_frame_x, pitch_frame_y, pitch_frame_w, pitch_frame_h)
@@ -290,12 +289,12 @@ function main()
 	--Deal with interactions--
 	--------------------------
 
-	if btn_exc_select == 1 or char == 13 then select_notes(true, min_vel, max_vel)
-	elseif btn_exc_select == 2 or gfx.mouse_cap == 8 and char == 13 then select_notes(false, min_vel, max_vel)
+	if btn_select == 1 or char == 13 then select_notes(true, min_vel, max_vel, false)
+	elseif btn_select == 2 or gfx.mouse_cap == 8 and char == 13 then select_notes(false, min_vel, max_vel, true)
 	elseif btn_clear == 2 or gfx.mouse_cap == 8 and char == 08 then
 		default_vars()
-		select_notes(true, -1, -1)
-	elseif btn_clear == 1 or char == 08 then select_notes(true, -1, -1)
+		select_notes(true, -1, -1, false)
+	elseif btn_clear == 1 or char == 08 then select_notes(true, -1,-1, false)
 
 	elseif btn_beats_a == 1 then 
 		beats = beats_a1

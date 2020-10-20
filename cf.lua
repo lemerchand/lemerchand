@@ -60,7 +60,7 @@ function is_note_in(n)
 	return false
 end
 
-function select_notes(clear, min_vel, max_vel)
+function select_notes(clear, min_vel, max_vel, time_selection_select)
 
 	--Make sure we are working on the active midi item
 	update_active()
@@ -83,7 +83,7 @@ function select_notes(clear, min_vel, max_vel)
 	for i = 0, notes-1 do
 		retval, selected, muted, startppqpos, endppqpos, chan, pitch, vel = reaper.MIDI_GetNote(take, i)
 
-		if time_selection == 1 and is_note_in_time_selection(startppqpos) == false then goto pass end
+		if time_selection_select and is_note_in_time_selection(startppqpos) == false then goto pass end
 
 		if vel >= min_vel and vel <= max_vel and pitch >= note_to_midi(min_note) and pitch <= note_to_midi(max_note) then 
 			if there_are_beats_selected and matches_selected_beats(startppqpos) == false then goto pass end
