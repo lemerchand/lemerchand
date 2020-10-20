@@ -1,18 +1,12 @@
 -------------------------------------------------------------------------------
 --					User Interface Library
 -------------------------------------------------------------------------------
--- Modified: 2020.10.17 7:30am
+-- Modified: 2020.10.20 at 5am
 --
 --TODO: 
---		+ Replace long code with mouseover()
---		+ Optimize for simplicity, elegance, and modularity
+--		+ Optimize for simplicity, elegance, and modularity (possibly using classes)
 -- 		+ Ctrl + Left click exclusive select on toggle buttons
 --
---RECENT:
--- 		+ Statusbar tooltips
---		+ Addded Right click return for small_toggles
---		+ Added backwards functionality to slider!
---		+ Added Mouseover() function 
 -------------------------------------------------------------------------------
 
 mouse_down = 0

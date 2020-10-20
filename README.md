@@ -1,26 +1,25 @@
 
-## MIDI Selection Tool v.85b
+## MIDI Selection Tool v.9b
 
 ![Selecting Notes](https://t2361428.p.clickup-attachments.com/t2361428/f4ada0df-c594-47ac-8ddc-d258eac1de16/selecting_notes.gif?view=open)
 
-**NEW!**
-
-		- Click "Sample" to set parameters from selected notes (global)
-		- Shift + L-Click to set individual parameters from selected notes
-		- Right-click "Select" to restrict selected notes to  time selection
-		- Better handling of velocity slider
-		- Ctrl+LC on a toggle button to exclusive-select it
-		- Script can act on any focused midi editor window
-
-
 **Description:**
-Selects only midi notes in a take or time selection based user parameters including:
+
+A tool for quickly selecting midi notes in REAPER. Filters for events such as:
 		
 		- Note Range
 		- Pitch
 		- Min/Max Velocity 
 		- Beat position in 16th notes (sorry--no odd time signatures)
 
+**What's New!?**
+
+		- Click "Capture" to set parameters from selected notes (global)
+		- Shift + L-Click to set individual parameters from selected notes
+		- Right-click "Select" to restrict selected notes to  time selection
+		- Better handling of velocity slider
+		- Ctrl+LC on a toggle button to exclusive-select it
+		- Added version number to titlebar
 
 **Cool Features:**
 
@@ -34,7 +33,6 @@ Selects only midi notes in a take or time selection based user parameters includ
 
 		- Entering an invalid note range isn't error-handled
 		- Inclusive select only works with velocity
-		- Delete button is dumb and should be something else
 		- My code is messy
 
 **Some things I want to add:**
@@ -52,7 +50,8 @@ Then you'll need to bind it to a hotkey. Run the actions menu and select MIIDI E
 
 Finally, when in the midi editor, press said key and the GUI will pop up allowing you to select notes quickly. Be sure to read the help text in the "Info" frame. 
 
-Email me with any questions: arsnocturnaaudio@gmail.com
-Discord: Robert ±#0379	
+**Contact:**
 
-Special thanks to the REAPER community, and especially Stevie and Birdbird (and everyone else) from the Reascript Discord for their support, suggestions, and lulz. 
+Email me (arsnocturnaaudio@gmail.com) or hit me up on Discord (Robert ±#0379) with any questions, feedback, bugs, hi-fives. 	
+
+Special thanks to the Cockos, the REAPER community, and especially Stevie and Birdbird (and everyone else) from the Reascript Discord for their support, suggestions, and lulz. 

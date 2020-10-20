@@ -1,16 +1,15 @@
 -------------------------------------------------------------------------------
---					MIDI Note Selection TOOL v.7
+--					MIDI Selection TOOL 3k v.9b
 -------------------------------------------------------------------------------
 --  Modified: 2020.10.20 at 5am
 --
 --	TODO: 
---		+ Add the ability to select from: 
---					- Selected Notes 		
---		 			- Length
+-- 		+ 
+-- 		+ Length
 -- 		+ Fix inclusive select for Notes
 -- 		+ Scales?
 -- 		+ Make Beat presets persistant by saving to and reading from a file
--- 		+ Delete button functionality
+-- 		+ Inverted select 
 --
 -- RECENT CHANGES:
 --		+ Set parameters from selection
@@ -22,6 +21,8 @@
 --		+ Bad values for pitch range aren't checked for
 --		+ Inclusive select don't b wurk
 ------------------------------------------------------------------------------
+_version = .95
+
 
 --Load UI Library
 function reaperDoFile(file) local info = debug.getinfo(1,'S'); script_path = info.source:match[[^@?(.*[\/])[^\/]-$]]; dofile(script_path .. file); end
@@ -88,7 +89,7 @@ default_vars()
 ----------------------------------------------------------
 ht_select =				"Select notes based on settings.\nR-click restricts to time selection.\nHotkey: (Shift+) Enter"
 ht_clear = 				"Clear Selection. \nR-click for global reset.\nHotkeys: (Shift+) Backspace"
-ht_sample = 			'Set parameters from selected notes.\nOr Shift+L-Click a parameter.'
+ht_capture = 			'Set parameters from selected notes.\nOr Shift+L-Click a parameter.'
 ht_range_low = 			"Set minimum velocity.\nR-click to reset."
 ht_range_hi = 			"Set maximum velocity.\nR-click to reset."
 ht_pitch_select = 		"Toggles pitches.\nR-click to reset.\nCtrl+L-click: exclusive select."
@@ -109,9 +110,9 @@ last_window = reaper.JS_Window_GetFocus()
 
 --Open window at mouse position--
 mousex, mousey = reaper.GetMousePosition()
-gfx.init("MIDI Tool", 248, 630, false, mousex+150, mousey-125)
+gfx.init("MST3k v " .. _version, 248, 630, false, mousex+150, mousey-125)
 -- Keep on top
-w = reaper.JS_Window_Find("MIDI Tool", true)
+w = reaper.JS_Window_Find("MST3k v " .. _version, true)
 if w then reaper.JS_Window_AttachTopmostPin(w) end
 
 
@@ -161,7 +162,7 @@ function main()
 	label(gen_frame_x+2,gen_frame_y-label_offset,"General")
 	btn_select = button(gen_frame_x + btn_offset_x, gen_frame_y+btn_offset_y,"   Select  ",-1, ht_select)
 	btn_clear = button(gen_frame_x+btn_offset_x,gen_frame_y+52, "   Clear   ",2,ht_clear)
-	btn_sample =button(gen_frame_x+120,gen_frame_y+btn_offset_y,"  Sample ", 0, ht_sample)
+	btn_capture =button(gen_frame_x+120,gen_frame_y+btn_offset_y," Capture ", 0, ht_capture)
 	btn_cut = button(gen_frame_x+120,gen_frame_y+52, "  Unused ",0, ht_delete)
 
 	--Pitch Frame
@@ -305,7 +306,7 @@ function main()
 		default_vars()
 		select_notes(true, -1, -1, false)
 	elseif btn_clear == 1 or char == 08 then select_notes(true, -1,-1, false)
-	elseif btn_sample == 1 then set_from_selected(true, true, true, true, true)
+	elseif btn_capture == 1 then set_from_selected(true, true, true, true, true)
 	elseif btn_beats_a == 1 then 
 		beats = beats_a1
 	elseif btn_beats_a == 2 then
