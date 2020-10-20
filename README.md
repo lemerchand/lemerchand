@@ -3,6 +3,7 @@
 
 
 **NEW!**
+
 		- Click "Sample" to set parameters from selected notes (global)
 		- Shift + L-Click to set individual parameters from selected notes
 		- Right-click "Select" to restrict selected notes to  time selection
@@ -51,4 +52,4 @@ Then you'll need to bind it to a hotkey. Run the actions menu and select MIIDI E
 Finally, when in the midi editor, press said key and the GUI will pop up allowing you to select notes quickly. Be sure to read the help text in the "Info" frame. 
 
 Email me with any questions: arsnocturnaaudio@gmail.com
-Discord: Robert ±#0379
+Discord: Robert ±#0379	
