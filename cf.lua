@@ -22,7 +22,7 @@ end
 
 function midi_to_note(n)
 
-	return tostring(note_names[note_midi_n[(n%12)+2]]) .. "4"
+	return tostring(note_names[note_midi_n[(n%12)+2]]) .. tostring(math.floor(n/12))
 
 end
 
@@ -121,9 +121,7 @@ function set_from_selected()
 			if vel < min_vel then min_vel = vel
 			elseif vel > max_vel then max_vel = vel
 			elseif pitch < temp_min_note then 
-				cons("here")
 				temp_min_note = pitch
-				
 			elseif pitch > temp_max_note then 
 				temp_max_note = pitch
 			end
@@ -131,8 +129,6 @@ function set_from_selected()
 	end
 	min_note = midi_to_note(temp_min_note)
 	max_note = midi_to_note(temp_max_note)
-
-	cons(temp_min_note .. "         " .. midi_to_note(pitch%12), false)
 
 end
 
