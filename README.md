@@ -44,6 +44,11 @@ Selects only midi notes in a take or time selection based user parameters includ
 
 **Installation:**
 
-Place ui.lua, cf.lua, and midi_selector.lua into a folder called "lemerchand" inside your "Scripts" directory in the REAPER resources path. Go into your MIDI editor and run "Action List." Search for "Midi Selector" and bind it to a key of your choice ("T" if you have it available.)
+If you don't use github then click the "code" button and select "Download Zip." Chose your REAPER resources path (usually something like c:/users/yourname/appdata/roaming/reaper) and unzip it in the 'Scripts' folder. 
 
-Make sure the midi item you want to use the script on is selected and then run the script in the midi editor window.
+Then you'll need to bind it to a hotkey. Run the actions menu and select MIIDI Editor. Click 'Load Reascript' and navigate to the 'Lemerchand' where you unzipped the files. Select "midi_selector.lua" and choose a key. 
+
+Finally, when in the midi editor, press said key and the GUI will pop up allowing you to select notes quickly. Be sure to read the help text in the "Info" frame. 
+
+Email me with any questions: arsnocturnaaudio@gmail.com
+Discord: Robert ±#0379
