@@ -1,24 +1,27 @@
 
-## MIDI Selection Tool v.75b*
+## MIDI Selection Tool v.85b
 
 
 **NEW!**
-		- Toggle "Selection" to exclude notes outside of time selection
+		- Set the selection parameters by selected notes
+		- Right-click "Select" to restrict selected notes to  time selection
 		- Better handling of velocity slider
 		- Ctrl+LC on a toggle button to exclusive-select it
-		- Script acts on currently focused midi window
+		- Script can act on any focused midi editor window
 
-Select any note within a take or time selection based on a number of parameters including:
+
+**Description:**
+Selects only midi notes in a take or time selection based user parameters including:
 		
 		- Note Range
 		- Pitch
-		- Velocity 
-		- Beat position in 16th notes
+		- Min/Max Velocity 
+		- Beat position in 16th notes (sorry--no odd time signatures)
 
 
 **Cool Features:**
 
-		- Right-click anything to reset just THAT section
+		- Right-click toggle buttons to reset that section to default
 		- Right-click 'Clear' button for global reset 
 		- 'A,' 'B,' and 'C' buttons load beat presets
 			    - Modifications to a preset persist until global reset or script closes
