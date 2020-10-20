@@ -54,3 +54,5 @@ Finally, when in the midi editor, press said key and the GUI will pop up allowin
 
 Email me with any questions: arsnocturnaaudio@gmail.com
 Discord: Robert ±#0379	
+
+Special thanks to the REAPER community, and especially Stevie and Birdbird (and everyone else) from the Reascript Discord for their support, suggestions, and lulz. 
