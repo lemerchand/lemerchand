@@ -1,6 +1,7 @@
 
 ## MIDI Selection Tool v.85b
 
+![Selecting Notes](https://t2361428.p.clickup-attachments.com/t2361428/f4ada0df-c594-47ac-8ddc-d258eac1de16/selecting_notes.gif?view=open)
 
 **NEW!**
 
