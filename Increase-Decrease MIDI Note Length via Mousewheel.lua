@@ -61,8 +61,9 @@ function main()
 
 	-----------------------------
 	--Debugging Stuff
-	--cons(noteRow .. "\n" .. mouse_time_pos .. "\n" .. selected_notes, true)
-	--cons(val)
+	--cons("Note Row: " .. noteRow .. "\nMouse time pos: " .. mouse_time_pos .. "\nMouse Time Snapped: " .. reaper.SnapToGrid(0, mouse_time_pos)*reaper.MIDI_GetGrid(take), true)
+--	med = reaper.MIDI_GetGrid(take)
+
 	-----------------------------
 
 	--Run main() until the mousewheel is no longer used
