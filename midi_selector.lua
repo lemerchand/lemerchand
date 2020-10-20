@@ -88,15 +88,15 @@ default_vars()
 ----------------------------------------------------------
 ht_select =				"Select notes based on settings.\nR-click restricts to time selection.\nHotkey: (Shift+) Enter"
 ht_clear = 				"Clear Selection. \nR-click for global reset.\nHotkeys: (Shift+) Backspace"
-ht_sample = 			'Sets parameters from selection.\n(Not implemented yet)'
-ht_time_selection = 	"When enabeled only notes within\nthe time selection are selected."
+ht_sample = 			'Set parameters from selected notes.\nOr Shift+L-Click a parameter.'
 ht_range_low = 			"Set minimum velocity.\nR-click to reset."
 ht_range_hi = 			"Set maximum velocity.\nR-click to reset."
-ht_pitch_select = 		"Toggled pitches.\nR-click to reset.\nCtrl+L-click: exclusive select."
+ht_pitch_select = 		"Toggles pitches.\nR-click to reset.\nCtrl+L-click: exclusive select."
 ht_min_vel =  			"Sets the lowest selectable pitch.\nR-click to reset."
 ht_max_vel =			"Set the highest selectable pitch.\nR-click to reset."
 ht_beat_select = 		"Include/exclude specific beats.\nR-click to reset.\nCtrl+L-click: exclusive select."
 ht_btn_beats =			"Recalls beat patterns.\nR-click for an additional preset."
+ht_delete =				"Unused"
 
 
 ----------------------
@@ -162,7 +162,7 @@ function main()
 	btn_select = button(gen_frame_x + btn_offset_x, gen_frame_y+btn_offset_y,"   Select  ",-1, ht_select)
 	btn_clear = button(gen_frame_x+btn_offset_x,gen_frame_y+52, "   Clear   ",2,ht_clear)
 	btn_sample =button(gen_frame_x+120,gen_frame_y+btn_offset_y,"  Sample ", 0, ht_sample)
-	btn_cut = button(gen_frame_x+120,gen_frame_y+52, "   Delete  ",0, ht_cut)
+	btn_cut = button(gen_frame_x+120,gen_frame_y+52, "  Unused ",0, ht_delete)
 
 	--Pitch Frame
 	frame(pitch_frame_x, pitch_frame_y, pitch_frame_w, pitch_frame_h)
@@ -192,6 +192,8 @@ function main()
 		elseif btn == 5 then 
 			clear_pitch()
 			notes_list[i] = 1
+		elseif btn == 9 then
+			set_from_selected(false,false,false,false,true)
 		end
 	end
 	beat_btn_pos = 0
@@ -202,13 +204,15 @@ function main()
 		elseif btn == 5 then 
 			clear_pitch()
 			notes_list[i+6] = 1
-	 end
+		elseif btn == 9 then
+			set_from_selected(false,false,false,false,true)
+	 	end
 	end	
 	
 	--Makes sure there is always at least one note selected
-	-- c=0
-	-- for b = 1, 12 do c = c + notes_list[b] end
-	-- if c == 0 then notes_list[1] = 1 end
+	c=0
+	for b = 1, 12 do c = c + notes_list[b] end
+	if c == 0 then notes_list[1] = 1 end
 	
 
 	--Velocity Frame
@@ -295,8 +299,8 @@ function main()
 	--Deal with interactions--
 	--------------------------
 
-	if btn_select == 1 or char == 13 then select_notes(true, min_vel, max_vel, false)
-	elseif btn_select == 2 or gfx.mouse_cap == 8 and char == 13 then select_notes(false, min_vel, max_vel, true)
+	if btn_select == 2 or gfx.mouse_cap == 8 and char == 13 then select_notes(false, min_vel, max_vel, true)
+	elseif btn_select == 1 or char == 13 then select_notes(true, min_vel, max_vel, false)
 	elseif btn_clear == 2 or gfx.mouse_cap == 8 and char == 08 then
 		default_vars()
 		select_notes(true, -1, -1, false)

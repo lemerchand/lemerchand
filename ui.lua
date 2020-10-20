@@ -163,6 +163,7 @@ function small_toggle(x,y,text, state, help_text)
 		elseif gfx.mouse_cap == 4 then return 4
 		elseif gfx.mouse_cap == 5 then return 5 
 		elseif gfx.mouse_cap == 8 then return 8
+		elseif gfx.mouse_cap == 9 then return 9
 		elseif gfx.mouse_cap == 16 then return 16
 		end
 
