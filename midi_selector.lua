@@ -299,7 +299,7 @@ function main()
 	--Deal with interactions--
 	--------------------------
 
-	if btn_select == 2 or gfx.mouse_cap == 8 and char == 13 then select_notes(false, min_vel, max_vel, true)
+	if btn_select == 2 or gfx.mouse_cap == 8 and char == 13 then select_notes(true, min_vel, max_vel, true)
 	elseif btn_select == 1 or char == 13 then select_notes(true, min_vel, max_vel, false)
 	elseif btn_clear == 2 or gfx.mouse_cap == 8 and char == 08 then
 		default_vars()
