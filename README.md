@@ -3,7 +3,8 @@
 
 
 **NEW!**
-		- Set the selection parameters by selected notes
+		- Click "Sample" to set parameters from selected notes (global)
+		- Shift + L-Click to set individual parameters from selected notes
 		- Right-click "Select" to restrict selected notes to  time selection
 		- Better handling of velocity slider
 		- Ctrl+LC on a toggle button to exclusive-select it

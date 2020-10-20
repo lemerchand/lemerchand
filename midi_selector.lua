@@ -1,11 +1,11 @@
 -------------------------------------------------------------------------------
 --					MIDI Note Selection TOOL v.7
 -------------------------------------------------------------------------------
---  Modified: 2020.10.19 at 7am
+--  Modified: 2020.10.20 at 5am
 --
 --	TODO: 
 --		+ Add the ability to select from: 
---					- Selected Notes 			- Capture Note (Note Range)
+--					- Selected Notes 		
 --		 			- Length
 -- 		+ Fix inclusive select for Notes
 -- 		+ Scales?
@@ -13,13 +13,10 @@
 -- 		+ Delete button functionality
 --
 -- RECENT CHANGES:
+--		+ Set parameters from selection
 -- 		+ Time selection toggle
 --		+ Helptext on mousehover
---		+ Beat selector works and detects selected beat up to +/- 30 ppq
--- 		+ Preset buttons for beat selector 
--- 		+ Created beat patterns for beat buttons
---		+ Right-click resets section
---
+--		+ Beat selector works and detects selected beat up to +/- 30 ppq--
 --
 --- KNOWN ISSUES:
 --		+ Bad values for pitch range aren't checked for
@@ -173,8 +170,12 @@ function main()
  
 
 	--make sure there is a correct low/max note
-	if min_note == -1 then min_note = "C0" end
-	if max_note == -1 then max_note = "G10" end
+	if min_note == 2 or max_note == 2 then default_note_range() 
+	elseif min_note == 9 then set_from_selected(true, false, false, false) 
+	elseif max_note == 9 then 
+		set_from_selected(false, true, false, false)
+	end
+
 
 
 	text(pitch_frame_x+10, pitch_frame_y+13,"Low Note:")
@@ -205,9 +206,9 @@ function main()
 	end	
 	
 	--Makes sure there is always at least one note selected
-	c=0
-	for b = 1, 12 do c = c + notes_list[b] end
-	if c == 0 then notes_list[1] = 1 end
+	-- c=0
+	-- for b = 1, 12 do c = c + notes_list[b] end
+	-- if c == 0 then notes_list[1] = 1 end
 	
 
 	--Velocity Frame
@@ -216,9 +217,12 @@ function main()
 
 	min_vel = h_slider(vel_frame_x+35,vel_frame_y+btn_offset_y,"Min",min_vel, 0, 127, false, ht_range_low)
 	max_vel = h_slider(vel_frame_x+35,vel_frame_y+btn_offset_y+35,"Max",max_vel,0, 127, true,ht_range_hi)
-	if min_vel == -1 or max_vel == -1 then default_vel()
-	elseif min_vel >= max_vel then min_vel = max_vel-1
-	
+	if min_vel == -2222 or max_vel == -2222 then default_vel()
+	elseif min_vel == -9999 then set_from_selected(false, false, true, false)
+	elseif max_vel == -9999 then set_from_selected(false, false, false, true)
+
+	elseif min_vel >= max_vel then min_vel = max_vel
+
 
 	end
 
@@ -299,7 +303,7 @@ function main()
 		default_vars()
 		select_notes(true, -1, -1, false)
 	elseif btn_clear == 1 or char == 08 then select_notes(true, -1,-1, false)
-	elseif btn_sample == 1 then set_from_selected()
+	elseif btn_sample == 1 then set_from_selected(true, true, true, true, true)
 	elseif btn_beats_a == 1 then 
 		beats = beats_a1
 	elseif btn_beats_a == 2 then
@@ -320,12 +324,7 @@ function main()
 	--For Debugging
 	-----------------------------
 	-- update_active()
-	-- ts_start, ts_end = reaper.GetSet_LoopTimeRange(false, false, 0, 0, false)
-	-- ts_start_ppq  = reaper.MIDI_GetPPQPosFromProjTime( take, ts_start )
-	-- cons("Mouse_cap: " .. gfx.mouse_cap ..
-	-- 	"\nTime Selection Start: " .. ts_start ..
-	-- 	"\nTime Selection End: " .. ts_end ..
-	-- 	"\nTStart PPQ: " .. ts_start_ppq, true )
+	--cons("Mouse_cap: " .. gfx.mouse_cap,true)
 
 
 

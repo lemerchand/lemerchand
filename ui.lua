@@ -87,7 +87,9 @@ function option_text(x,y,text, help_text)
 			retval, retvals_csv, v = reaper.GetUserInputs( "Enter a value", 1, "", "C4")
 			return string.upper(retvals_csv)
 		elseif mouseover(x,y,w,h) and gfx.mouse_cap == 2 then
-			return -1
+			return 2
+		elseif mouseover(x,y,w,h) and gfx.mouse_cap == 9 then
+			return 9
 		end
 	end
 
@@ -135,6 +137,7 @@ function small_toggle(x,y,text, state, help_text)
 		elseif gfx.mouse_cap == 4 then return 4
 		elseif gfx.mouse_cap == 5 then return 5 
 		elseif gfx.mouse_cap == 8 then return 8
+		elseif gfx.mouse_cap == 9 then return 9
 		elseif gfx.mouse_cap == 16 then return 16
 
 		end
@@ -432,8 +435,10 @@ function h_slider(x,y, text, value, min_value, max_value, backwards, help_text)
 	gfx.drawstr(text .. ": " .. value .. " / " .. max_value)
 
 	if gfx.mouse_x >= x-10 and gfx.mouse_x < x + 148 and gfx.mouse_y > y and gfx.mouse_y < y+28 then 
-		if  gfx.mouse_cap == 2 then return -1 end
 		status(help_text)
+		if  gfx.mouse_cap == 2 then return -2222
+		elseif gfx.mouse_cap == 9 then return -9999
+		end
 	end
 
 

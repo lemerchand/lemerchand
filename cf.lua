@@ -22,7 +22,7 @@ end
 
 function midi_to_note(n)
 
-	return tostring(note_names[note_midi_n[(n%12)+2]]) .. tostring(math.floor(n/12))
+	return tostring(note_names[(n%12)+1]) .. tostring(math.floor(n/12))
 
 end
 
@@ -107,28 +107,45 @@ function select_notes(clear, min_vel, max_vel, time_selection_select)
 	reaper.MIDI_Sort(take)
 end
 
-function set_from_selected()
+function set_from_selected(get_min_pitch, get_max_pitch, get_min_vel, get_max_vel, get_pitches)
 	update_active()
-	retval, selected, muted, startppqpos, endppqpos, chan, pitch, vel = reaper.MIDI_GetNote(take, 0)
-	min_vel = vel
-	max_vel = vel
-	temp_min_note = pitch
-	temp_max_note = pitch
+	
+	for i = 0, notes-1 do
+		retval, selected, muted, startppqpos, endppqpos, chan, pitch, vel = reaper.MIDI_GetNote(take, i)
+		if selected == true then 
+			goto set_firsts
+		end
+	end
+	
+	::set_firsts::
+	if get_min_vel then min_vel = vel end
+	if get_max_vel then max_vel = vel end
+	if get_min_pitch then temp_min_note = pitch end
+	if get_max_pitch then temp_max_note = pitch end
+	
+
+	if get_pitches then 
+		notes_list = {0,0,0,0,0,0,0,0,0,0,0,0}
+	end
+	
 
 	for i = 0, notes-1 do
 		retval, selected, muted, startppqpos, endppqpos, chan, pitch, vel = reaper.MIDI_GetNote(take, i)
 		if selected then
-			if vel < min_vel then min_vel = vel
-			elseif vel > max_vel then max_vel = vel
-			elseif pitch < temp_min_note then 
+			if get_min_vel and vel < min_vel then min_vel = vel
+			elseif get_max_vel and vel > max_vel then max_vel = vel 
+			end
+			if get_min_pitch and pitch < temp_min_note then 
 				temp_min_note = pitch
-			elseif pitch > temp_max_note then 
+			elseif get_max_pitch and pitch > temp_max_note then 
 				temp_max_note = pitch
 			end
+			if get_pitches then notes_list[(pitch%12)+1] = 1 end
+
 		end
 	end
-	min_note = midi_to_note(temp_min_note)
-	max_note = midi_to_note(temp_max_note)
+	if get_min_pitch then min_note = midi_to_note(temp_min_note) end
+	if get_max_pitch then max_note = midi_to_note(temp_max_note) end
 
 end
 
