@@ -220,11 +220,9 @@ function main()
 	if min_vel == -2222 or max_vel == -2222 then default_vel()
 	elseif min_vel == -9999 then set_from_selected(false, false, true, false)
 	elseif max_vel == -9999 then set_from_selected(false, false, false, true)
-
-	elseif min_vel >= max_vel then min_vel = max_vel
-
-
 	end
+	if min_vel >= max_vel  then max_vel = min_vel end
+
 
 
 	--Time Frame
