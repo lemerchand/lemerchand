@@ -46,13 +46,13 @@ if win then reaper.JS_Window_AttachTopmostPin(win) end
 ----------------------
 --Help Text-----------
 ---------------------
-local htSelect			= "Select notes based on settings.\nR-click restricts to time selection.\nShift+L-click to invert filter."
+local htSelect			= "Select notes based on settings.\nR-click: select in time selection.\nShift+L-click to invert filter."
 local htClear 			= "Clear Selection. \nR-click for global reset.\nHotkeys: (Shift+) Backspace"
-local htCapture 		= 'Set parameters from selected notes.\nOr Shift+L-Click a parameter.'
+local htCapture 		= "Set parameters from selected notes.\nOr Shift+L-Click a parameter."
 local htMinNote 		= "Set minimum velocity.\nR-click to reset."
 local htMaxNote 		= "Set maximum velocity.\nR-click to reset."
 local htPitchTgl 		= "Toggles pitches.\nR-click to reset.\nCtrl+L-click: exclusive select."
-
+local htVelSlider		= "Sets the lowest/highest velocity.\nR-click to reset."
 
 ----------------------
 --Midi Note Thangs-----------
@@ -85,7 +85,6 @@ local btn_capture = Button:Create(btn_select.x + btn_select.w + 10, btn_select.y
 --Pitch frame
 local frm_pitch = Frame:Create(10, frm_general.y + frm_general.h + 27, 227, 110, "PITCH")
 
-
 local ib_maxNote = InputBox:Create(frm_pitch.x + 178, frm_pitch.y + 30, "G10", htMaxNote)
 local ib_minNote = InputBox:Create(frm_pitch.x + 75, frm_pitch.y + 30, "C0", htMinNote, ib_maxNote.w)
 local group_noteRange ={ib_minNote, ib_maxNote}
@@ -96,6 +95,7 @@ local lbl_maxNote = Text:Create(ib_maxNote.x - 63, ib_maxNote.y + 7, "Highest:")
 local tgl_pitch = {}
 local pitchTglOffset = frm_pitch.x+20
 local group_pitchToggles = {}
+
 for pe = 1, 6 do
 	 tgl_pitch[pe] = Toggle:Create(frm_pitch.x + pitchTglOffset, frm_pitch.y+60, note_names[pe], htPitchTgl, 20, 25)
 	 pitchTglOffset = pitchTglOffset + 28
@@ -109,13 +109,50 @@ for pe = 7, 12 do
 	 table.insert(group_pitchToggles, tgl_pitch[pe])
 end
 
-
 --Velocity Frame
-local frm_velocity = Frame:Create(10, frm_pitch.y + frm_pitch.h + 27, 227,85, "VELOCITY")
+local frm_velocity = Frame:Create(10, frm_pitch.y + frm_pitch.h + 27, 227,90, "VELOCITY")
+
+local sldr_minVel = H_slider:Create(frm_velocity.x + 10, frm_velocity.y + 30, frm_velocity.w - 20, nil,"Min Velocity", htVelSlider, 0, 127, 0, false)
+local sldr_maxVel = H_slider:Create(sldr_minVel.x, sldr_minVel.y + sldr_minVel.h + 10, sldr_minVel.w, nil,  "Min Velocity", htVelSlider, 0, 127, 127, true)
+group_velSliders = {sldr_minVel, sldr_maxVel}
+
 
 
 --Beats fFrame
-local frm_beats = Frame:Create(10, frm_velocity.y + frm_velocity.h + 27, 227, 115, "BEATS")
+local frm_beats = Frame:Create(10, frm_velocity.y + frm_velocity.h + 27, 227, 128, "BEATS")
+
+local tgl_beats = {}
+local beatsTglOffset = frm_beats.x+74
+local group_beatsToggles = {}
+
+
+for be = 1, 4 do
+	 tgl_beats[be] = Toggle:Create(frm_beats.x + beatsTglOffset, frm_beats.y+30, be, htbeatsTgl, 20, 25)
+	 beatsTglOffset = beatsTglOffset + 28
+	 table.insert(group_beatsToggles, tgl_beats[be])
+end
+
+beatsTglOffset = frm_beats.x+74
+for be = 5, 8 do
+	 tgl_beats[be] = Toggle:Create(frm_beats.x + beatsTglOffset, frm_beats.y+56, be, htbeatsTgl, 20, 25)
+	 beatsTglOffset = beatsTglOffset + 28
+	 table.insert(group_beatsToggles, tgl_beats[be])
+end
+
+beatsTglOffset = frm_beats.x+74
+for be = 9, 12 do
+	 tgl_beats[be] = Toggle:Create(frm_beats.x + beatsTglOffset, frm_beats.y+82, be, htbeatsTgl, 20, 25)
+	 beatsTglOffset = beatsTglOffset + 28
+	 table.insert(group_beatsToggles, tgl_beats[be])
+end
+
+beatsTglOffset = frm_beats.x+74
+
+for be = 13, 16 do
+	 tgl_beats[be] = Toggle:Create(frm_beats.x + beatsTglOffset, frm_beats.y+108, be, htbeatsTgl, 20, 25)
+	 beatsTglOffset = beatsTglOffset + 28
+	 table.insert(group_beatsToggles, tgl_beats[be])
+end
 
 
 --Status bar
@@ -148,8 +185,14 @@ function main()
 		if pp.rightClick then group_exec(group_pitchToggles, 'reset') end
 	end
 
+	for p, pp in ipairs(group_beatsToggles) do
+		if pp.rightClick then group_exec(group_beatsToggles, 'reset') end
+	end
+
 	--Reset note ranges on right click
 	if ib_minNote.rightClick or ib_maxNote.rightClick then group_exec(group_noteRange, 'reset') end
+	if sldr_minVel.rightClick or sldr_maxVel.rightClick then group_exec(group_velSliders, 'reset') end
+
 
 end
 

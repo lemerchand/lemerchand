@@ -17,7 +17,7 @@
 --
 --		- Many elements have the ability to respond to:
 --			- (Ctrl/Alt/Shift) Left Mouse clicks
---			- (Ctrl/Alt/Shift) Right Mouse clicks
+--			- (Ctrl/Alt/Sh2020.10.25 at 10:21ift) Right Mouse clicks
 --			- See the individual element's :Create() if unsure
 --
 --TODO:
@@ -48,13 +48,6 @@ function count_table(t)
 		n = n + 1
 	end
 	return n
-end
-
---Shows console mssages for debugging
---If clear is true it clears the console
-function cons(str, clear)
-	if clear then reaper.ClearConsole() end
-	reaper.ShowConsoleMsg("\n" .. str)
 end
 
 --Fills the gfx window background with color
@@ -758,7 +751,6 @@ function H_slider:Create(x, y, w, h, txt, help, min_val, max_val, default, backw
 		mouseDown = false,
 		leftClick = false,
 		rightClick = false,
-
 		hide = false
 	}
 	setmetatable(this, H_slider)
@@ -772,11 +764,10 @@ function H_slider:Draw()
 
 	self:ResetClicks()
 
-	gfx.setfont(13, self.font, self.fontSize)
 	gfx.x, gfx.y = self.x, self.y
 	
-	draw_border(self.x, self.y, self.w, self.h, .31, .21, .7)
-	draw_border(self.x+1, self.y+1, self.w-2, self.h-2, .31, .21, .7)
+	draw_border(self.x, self.y, self.w, self.h, .23, .21, .7)
+	draw_border(self.x+1, self.y+1, self.w-2, self.h-2, .23, .21, .7)
 
 	
 	--Formula to determine how much of the slider should be filled
@@ -801,19 +792,20 @@ function H_slider:Draw()
 
 	--If set to backwards handle the fill differently
 	if self.backwards then 
-		gfx.set(.23,.19,.57,1)
+		gfx.set(.2,.19,.6,1)
 		gfx.rect(self.x+4,self.y+4, self.w-8,self.h-8,true)
 		gfx.set(.2,.2,.2,1)
 		gfx.rect(self.x+4,self.y+4, fill,self.h-8,true)
 
 	else
-		gfx.set(.23,.19,.57,1)
+		gfx.set(.2,.19,.6,1)
 		gfx.rect(self.x+4,self.y+4, fill,self.h-8,true)
 	end
 
 	--Draw text	
 	gfx.set(.7,.7,.7,1)
 	gfx.x, gfx.y = self.x, self.y
+	gfx.setfont(13, self.font, self.fontSize)
 	gfx.drawstr(self.txt .. ": " .. self.value .. " / " .. self.max_val, 1 | 4, self.w+self.x, self.h+self.y+3)
 
 end
