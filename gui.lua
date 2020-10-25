@@ -446,6 +446,10 @@ function Button:Draw()
 		self.mouseDown = false
 	end
 end
+
+function Button:Reset()
+
+end
 -------------------------------------------END: BUTTON--------------------------------------------------------
 
 --------------------------------------------------------------------------------------------------------------
@@ -472,7 +476,7 @@ function InputBox:Create(x,y, default, help, w, h)
 	local this = {
 		x = x or 10,
 		y = y or 10,
-		text = default or "Text",
+		value = default or "Text",
 		default = default or "Text",
 		help = help or "",
 		w = w or 20,
@@ -513,7 +517,7 @@ function InputBox:Draw()
 	gfx.r, gfx.g, gfx.b = .8,.8,.8
 	
 	--gfx.x, gfx.y = self.x+4, self.y+2
-	gfx.drawstr(self.text, 1 | 4, self.x+self.w, self.y+self.h)
+	gfx.drawstr(self.value, 1 | 4, self.x+self.w, self.y+self.h)
 
 	if hovering(self.x, self.y, self.w, self.h) then 
 
@@ -525,7 +529,7 @@ function InputBox:Draw()
 				self.mouseDown = true
 				if gfx.mouse_cap == 1 then 
 					retval, retvals_csv, v = reaper.GetUserInputs( "Enter a value", 1, "", self.default)
-					self.text = string.upper(retvals_csv)
+					self.value = string.upper(retvals_csv)
 				elseif gfx.mouse_cap == 2 then self.rightClick = true
 				elseif gfx.mouse_cap == 5 then self.ctrlLeftClick = true
 				elseif gfx.mouse_cap == 9 then self.shiftLeftClick = true
@@ -547,7 +551,7 @@ function InputBox:Draw()
 end
 
 function InputBox:Reset()
-	self.text = self.default
+	self.value = self.default
 end
 
 function InputBox:ResetClicks()
@@ -690,6 +694,7 @@ function Toggle:Draw()
 			else
 				self.mouseDown = true
 				if gfx.mouse_cap == 1 then 
+					self.leftClick = true
 					if self.state == true then self.state = false else self.state = true end
 				elseif gfx.mouse_cap == 2 then self.rightClick = true
 				elseif gfx.mouse_cap == 5 then self.ctrlLeftClick = true
@@ -751,6 +756,7 @@ function H_slider:Create(x, y, w, h, txt, help, min_val, max_val, default, backw
 		mouseDown = false,
 		leftClick = false,
 		rightClick = false,
+		shiftLeftClick = false,
 		hide = false
 	}
 	setmetatable(this, H_slider)
@@ -785,8 +791,9 @@ function H_slider:Draw()
 			elseif new_val > self.max_val then new_val = self.max_val
 			end
 			self.value = new_val
-		elseif gfx.mouse_cap == 2 then
-		self.rightClick = true
+		elseif gfx.mouse_cap == 2 then self.rightClick = true
+
+		elseif gfx.mouse_cap == 9 then self.shiftLeftClick = true
 		end
 	end
 
@@ -813,6 +820,7 @@ end
 function H_slider:ResetClicks()
 	self.leftClick = false
 	self.rightClick = false
+	self.shiftLeftClick = false
 end
 
 function H_slider:Reset()
@@ -969,6 +977,8 @@ function Dropdown:ResetClicks()
 
 end
 
+function Dropdown:Reset()
+end
 ------------------------------------------END: DROPWDOWN-----------------------------------------------------
 
 --------------------------------------------------------------------------------------------------------------
@@ -1027,6 +1037,8 @@ function Status:Display(help_text)
 	gfx.drawstr(help_text)
 end
 
+function Status:Reset()
+end
 ------------------------------------------END: STATUS-----------------------------------------------------
 
 

@@ -40,7 +40,7 @@ local mousex, mousey = reaper.GetMousePosition()
 gfx.init(_name .. " " .. _version, 248, 630, false, mousex+165, mousey-265)
 
 -- Keep on top
-local win = reaper.JS_Window_Find(_name .. _version, true)
+local win = reaper.JS_Window_Find(_name .. " " .. _version, true)
 if win then reaper.JS_Window_AttachTopmostPin(win) end
 
 ----------------------
@@ -53,14 +53,29 @@ local htMinNote 		= "Set minimum velocity.\nR-click to reset."
 local htMaxNote 		= "Set maximum velocity.\nR-click to reset."
 local htPitchTgl 		= "Toggles pitches.\nR-click to reset.\nCtrl+L-click: exclusive select."
 local htVelSlider		= "Sets the lowest/highest velocity.\nR-click to reset."
+local htbeatsTgl		= "Include/exclude specific beats.\nR-click to reset.\nCtrl+L-click: exclusive select."
 
-----------------------
---Midi Note Thangs-----------
----------------------
-local note_midi_n = {0,1,2,3,4,5,6,7,8,9,10,11}			--Covers all 12 notes (pitch%12)
-local note_names = {'C','C#', 'D', 'D#', 'E',				--Note names for notes_list
+-------------------------------
+--Midi Note and BeatsThangs---
+-------------------------------
+note_midi_n = {0,1,2,3,4,5,6,7,8,9,10,11}			--Covers all 12 notes (pitch%12)
+note_names = {'C','C#', 'D', 'D#', 'E',				--Note names for notes_list
 			'F','F#', 'G', 'G#', 'A', 
 			'A#','B'}
+
+function default_vars()
+	selectedNotes = {1,1,1,1,1,1,1,1,1,1,1,1}
+	beats = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}	
+end
+
+default_vars()
+
+--PPQ values for 16th notes
+beats_in_ppq = {0,240,480,720,960,1200,1440,1680,1920,2160,2400,2640,2880,3120,3360,3600}
+beats_as_ppq = {}
+
+
+
 
 
 
@@ -97,14 +112,14 @@ local pitchTglOffset = frm_pitch.x+20
 local group_pitchToggles = {}
 
 for pe = 1, 6 do
-	 tgl_pitch[pe] = Toggle:Create(frm_pitch.x + pitchTglOffset, frm_pitch.y+60, note_names[pe], htPitchTgl, 20, 25)
+	 tgl_pitch[pe] = Toggle:Create(frm_pitch.x + pitchTglOffset, frm_pitch.y+60, note_names[pe], htPitchTgl, true, 25, nil)
 	 pitchTglOffset = pitchTglOffset + 28
 	 table.insert(group_pitchToggles, tgl_pitch[pe])
 end
 
 pitchTglOffset = frm_pitch.x+20
 for pe = 7, 12 do
-	 tgl_pitch[pe] = Toggle:Create(frm_pitch.x + pitchTglOffset, frm_pitch.y+86, note_names[pe], htPitchTgl, 20, 25)
+	 tgl_pitch[pe] = Toggle:Create(frm_pitch.x + pitchTglOffset, frm_pitch.y+86, note_names[pe], htPitchTgl, true, 25, nil)
 	 pitchTglOffset = pitchTglOffset + 28
 	 table.insert(group_pitchToggles, tgl_pitch[pe])
 end
@@ -130,6 +145,7 @@ for be = 1, 4 do
 	 tgl_beats[be] = Toggle:Create(frm_beats.x + beatsTglOffset, frm_beats.y+30, be, htbeatsTgl, 20, 25)
 	 beatsTglOffset = beatsTglOffset + 28
 	 table.insert(group_beatsToggles, tgl_beats[be])
+	 beats[be] = 0
 end
 
 beatsTglOffset = frm_beats.x+74
@@ -137,6 +153,7 @@ for be = 5, 8 do
 	 tgl_beats[be] = Toggle:Create(frm_beats.x + beatsTglOffset, frm_beats.y+56, be, htbeatsTgl, 20, 25)
 	 beatsTglOffset = beatsTglOffset + 28
 	 table.insert(group_beatsToggles, tgl_beats[be])
+	 beats[be] = 0
 end
 
 beatsTglOffset = frm_beats.x+74
@@ -144,6 +161,7 @@ for be = 9, 12 do
 	 tgl_beats[be] = Toggle:Create(frm_beats.x + beatsTglOffset, frm_beats.y+82, be, htbeatsTgl, 20, 25)
 	 beatsTglOffset = beatsTglOffset + 28
 	 table.insert(group_beatsToggles, tgl_beats[be])
+	 beats[be] = 0
 end
 
 beatsTglOffset = frm_beats.x+74
@@ -152,6 +170,7 @@ for be = 13, 16 do
 	 tgl_beats[be] = Toggle:Create(frm_beats.x + beatsTglOffset, frm_beats.y+108, be, htbeatsTgl, 20, 25)
 	 beatsTglOffset = beatsTglOffset + 28
 	 table.insert(group_beatsToggles, tgl_beats[be])
+	 beats[be] = 0
 end
 
 
@@ -180,21 +199,72 @@ function main()
 	group_exec(Elements, 'draw')
 
 
-	--Reset pitches on right click
-	for p, pp in ipairs(group_pitchToggles) do
-		if pp.rightClick then group_exec(group_pitchToggles, 'reset') end
+	--Handle select button clicks
+	if btn_select.leftClick  or char == 13 then select_notes(true, false, sldr_minVel.value, sldr_maxVel.value, ib_minNote.value, ib_maxNote.value) end
+	if btn_select.rightClick or gfx.mouse_cap == 8 and char == 13 then select_notes(true,true, sldr_minVel.value, sldr_maxVel.value, ib_minNote.value, ib_maxNote.value) end
+	if btn_select.shiftLeftClick then
+		select_notes(true, false, sldr_minVel.value, sldr_maxVel.value, ib_minNote.value, ib_maxNote.value)
+		reaper.MIDIEditor_OnCommand(active_midi_editor, 40501)
+	end
+	if btn_select.ctrlLeftClick then
+		select_notes(true, true, sldr_minVel.value, sldr_maxVel.value, ib_minNote.value, ib_maxNote.value)
 	end
 
-	for p, pp in ipairs(group_beatsToggles) do
-		if pp.rightClick then group_exec(group_beatsToggles, 'reset') end
+	--Handle Clear button clicks
+	if btn_clear.leftClick or char == 08 then select_notes(true, false, -1, -1) end
+	if btn_clear.rightClick or gfx.mouse_cap == 8 and char == 08 then
+		select_notes(true, false, -1, -1)
+		for e, element in ipairs(Elements) do
+			element:Reset() 
+			default_vars()
+			update_pitch_toggles()
+		end
+	end
+
+	--Capture button clicks
+	if btn_capture.leftClick then 
+		set_from_selected(true, true, true, true, true, sldr_minVel, sldr_maxVel, ib_minNote, ib_maxNote) 
+		update_pitch_toggles()
 	end
 
 	--Reset note ranges on right click
 	if ib_minNote.rightClick or ib_maxNote.rightClick then group_exec(group_noteRange, 'reset') end
-	if sldr_minVel.rightClick or sldr_maxVel.rightClick then group_exec(group_velSliders, 'reset') end
+	if ib_minNote.shiftLeftClick or ib_maxNote.shiftLeftClick then
+		set_from_selected(true, true, false, false, false, nil, nil, ib_minNote, ib_maxNote) 
+	end
 
+	if sldr_minVel.rightClick or sldr_maxVel.rightClick then group_exec(group_velSliders, 'reset') end
+	if sldr_minVel.shiftLeftClick or sldr_maxVel.shiftLeftClick then set_from_selected(false, false, true, true, false,  sldr_minVel, sldr_maxVel) end
+	
+	--Reset pitches on right click and handle clicks
+	for p, pp in ipairs(group_pitchToggles) do
+		if pp.rightClick then group_exec(group_pitchToggles, 'reset') 
+		elseif pp.leftClick then selectedNotes[p] = math.abs(selectedNotes[p] -1)
+		end
+		if pp.shiftLeftClick then set_from_selected(false, false, false, false, true)
+			update_pitch_toggles()
+		end
+	end
+
+	--Reset beats on right click and handle events
+	for p, pp in ipairs(group_beatsToggles) do
+		if pp.rightClick then group_exec(group_beatsToggles, 'reset')
+		elseif pp.leftClick then beats[p] = math.abs(beats[p] - 1) 
+		end
+	end
 
 end
 
 main()
 reaper.Undo_EndBlock(_name .. "", -1)
+
+--------------------------------
+--Special functions-------------
+--------------------------------
+
+function update_pitch_toggles()
+
+	for p, pp in ipairs(tgl_pitch) do
+		if selectedNotes[p] == 1 then pp.state = true else pp.state = false end
+	end
+end

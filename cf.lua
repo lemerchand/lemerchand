@@ -3,7 +3,7 @@ function is_note_in_time_selection(n)
 	ts_start_ppq  = reaper.MIDI_GetPPQPosFromProjTime( take, ts_start )
 	ts_end_ppq = reaper.MIDI_GetPPQPosFromProjTime( take, ts_end )
 
-	if n >= ts_start_ppq and n <= ts_end_ppq then return true else return false end
+	if n >= ts_start_ppq and n < ts_end_ppq then return true else return false end
 
 end
 
@@ -49,11 +49,11 @@ function update_active()
 
 end
 
-function notes_list_not_empty()
+function selectedNotes_not_empty()
 	
 	for i = 1, 12 do
-		--reaper.ShowConsoleMsg(notes_list[i])
-		if notes_list[i] == 1 then return true end
+		--reaper.ShowConsoleMsg(selectedNotes[i])
+		if selectedNotes[i] == 1 then return true end
 	end
 	return false
 
@@ -61,17 +61,16 @@ end
 
 function is_note_in(n)
 	for i = 1, 12 do
-		if notes_list[i] == 1  and note_midi_n[i] == n then return true
+		if selectedNotes[i] == 1  and note_midi_n[i] == n then return true
 		end
 	end
 	return false
 end
 
-function select_notes(clear, min_vel, max_vel, time_selection_select)
+function select_notes(clear, time_selection_select, minVel, maxVel, minNote, maxNote)
 
 	--Make sure we are working on the active midi item
 	update_active()
-	selected_notes = 0
 	--If clear is flagged we first clear the selection
 
 	if clear then reaper.MIDI_SelectAll(take, false) end
@@ -92,7 +91,7 @@ function select_notes(clear, min_vel, max_vel, time_selection_select)
 
 		if time_selection_select and is_note_in_time_selection(startppqpos) == false then goto pass end
 
-		if vel >= min_vel and vel <= max_vel and pitch >= note_to_midi(min_note) and pitch <= note_to_midi(max_note) then 
+		if vel >= minVel and vel <= maxVel and pitch >= note_to_midi(minNote) and pitch <= note_to_midi(maxNote) then 
 			if there_are_beats_selected and matches_selected_beats(startppqpos) == false then goto pass end
 	
 
@@ -107,7 +106,7 @@ function select_notes(clear, min_vel, max_vel, time_selection_select)
 	reaper.MIDI_Sort(take)
 end
 
-function set_from_selected(get_min_pitch, get_max_pitch, get_min_vel, get_max_vel, get_pitches)
+function set_from_selected(get_min_pitch, get_max_pitch, get_min_vel, get_max_vel, get_pitches, sldr_minVel, sldr_maxVel, ib_minNote, ib_maxNote)
 	update_active()
 	
 	for i = 0, notes-1 do
@@ -118,34 +117,34 @@ function set_from_selected(get_min_pitch, get_max_pitch, get_min_vel, get_max_ve
 	end
 	
 	::set_firsts::
-	if get_min_vel then min_vel = vel end
-	if get_max_vel then max_vel = vel end
+	if get_min_vel then sldr_minVel.value = vel end
+	if get_max_vel then sldr_maxVel.value = vel end
 	if get_min_pitch then temp_min_note = pitch end
 	if get_max_pitch then temp_max_note = pitch end
 	
 
 	if get_pitches then 
-		notes_list = {0,0,0,0,0,0,0,0,0,0,0,0}
+		selectedNotes = {0,0,0,0,0,0,0,0,0,0,0,0}
 	end
 	
 
 	for i = 0, notes-1 do
 		retval, selected, muted, startppqpos, endppqpos, chan, pitch, vel = reaper.MIDI_GetNote(take, i)
 		if selected then
-			if get_min_vel and vel < min_vel then min_vel = vel
-			elseif get_max_vel and vel > max_vel then max_vel = vel 
+			if get_min_vel and vel < sldr_minVel.value then sldr_minVel.value = vel
+			elseif get_max_vel and vel > sldr_maxVel.value then sldr_maxVel.value = vel 
 			end
 			if get_min_pitch and pitch < temp_min_note then 
 				temp_min_note = pitch
 			elseif get_max_pitch and pitch > temp_max_note then 
 				temp_max_note = pitch
 			end
-			if get_pitches then notes_list[(pitch%12)+1] = 1 end
+			if get_pitches then selectedNotes[(pitch%12)+1] = 1 end
 
 		end
 	end
-	if get_min_pitch then min_note = midi_to_note(temp_min_note) end
-	if get_max_pitch then max_note = midi_to_note(temp_max_note) end
+	if get_min_pitch then ib_minNote.value = midi_to_note(temp_min_note) end
+	if get_max_pitch then ib_maxNote.value = midi_to_note(temp_max_note) end
 
 end
 

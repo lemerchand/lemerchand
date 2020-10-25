@@ -244,7 +244,7 @@ function main()
 		elseif btn == 2 then default_beats()
 		elseif btn == 5 then 
 			default_beats()
-			beats[i] = 1
+			beats[i] = 0
 		end
 
 	end
@@ -256,7 +256,7 @@ function main()
 		elseif btn == 2 then default_beats()
 		elseif btn == 5 then 
 			default_beats()
-			beats[i+4] = 1
+			beats[i+4] = 0
 		end
 	end	
 
@@ -268,7 +268,7 @@ function main()
 		elseif btn == 2 then default_beats()
 		elseif btn == 5 then 
 			default_beats()
-			beats[i+8] = 1
+			beats[i+8] = 0
 		end
 	end
 
@@ -279,7 +279,7 @@ function main()
 		elseif btn == 2 then default_beats()
 		elseif btn == 5 then 
 			default_beats()
-			beats[i+12] = 1
+			beats[i+12] = 0
 		end
 	end	
 
