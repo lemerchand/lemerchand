@@ -697,7 +697,7 @@ function Toggle:Draw()
 			else
 				self.mouseDown = true
 				if gfx.mouse_cap == 1 then 
-					if self.state == false then self.state = true else self.state = false end
+					if self.state == true then self.state = false else self.state = true end
 				elseif gfx.mouse_cap == 2 then self.rightClick = true
 				elseif gfx.mouse_cap == 5 then self.ctrlLeftClick = true
 				elseif gfx.mouse_cap == 9 then self.shiftLeftClick = true
