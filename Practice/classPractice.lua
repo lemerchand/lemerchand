@@ -3,9 +3,11 @@
 --							GUI Library v1 Rev 2
 --
 -------------------------------------------------------------------------
+-- LAST MODIFIED: 2020.10.24 at 18:14
+--
 --
 --TODO:
---		+ Double check button clicking and get mouse mods for right-click
+--		
 --
 --
 
