@@ -911,7 +911,7 @@ function Dropdown:DrawChoices()
 
 	end
 
-	gfx.set(.37,.37,.37)
+	gfx.set(.37,.37,.37,2)
 	gfx.rect(self.x, self.y+self.h, self.w, choice_height+10, true)
 
 
