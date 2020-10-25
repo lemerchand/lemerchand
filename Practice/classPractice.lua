@@ -102,7 +102,7 @@ end
 Tabs = {}
 Tabs.__index = Tabs
 
-function Tabs:AddTab(name, selected, tabgroup, help)
+function Tabs:AddTab(name, selected, help)
 	local this = {
 		name = name or "Tab",
 		x = 0,
@@ -205,6 +205,7 @@ function Frame:Draw()
 
 	gfx.setfont(2, self.font, self.fontSize)
 	local titleWidth, titleHeight = gfx.measurestr(self.title)
+	
 
 	--Draw title
 	gfx.set(.8,.25,.3)
@@ -213,8 +214,7 @@ function Frame:Draw()
 	
 
 	--Draw tabs
-	local offset = 0
-	
+
 
 	for t, tab in ipairs(self.tabs) do
 		tab:Draw(self.tabs)
@@ -236,7 +236,9 @@ function Frame:AttatchTab(tab)
 
 	gfx.setfont(2, self.font, self.fontSize)
 	tw, th = gfx.measurestr(self.title)
-	local totalTabLength = tw + 150
+	local totalTabLength = tw + self.x+20
+
+	
 	
 	gfx.setfont(3, tab.font, tab.fontSize)
 	
@@ -312,7 +314,7 @@ end
 Button = {}
 Button.__index = Button
 
-function Button:Create(x, y, txt, help, w, h, font, fontSizehide)
+function Button:Create(x, y, txt, help, w, h, font, fontSize,hide)
 
 	if font == nil then gfx.setfont(16, "Lucida Console", 13, 'b') end
 
@@ -395,7 +397,7 @@ function Button:Draw()
 	end
 
 	gfx.set(.7,.7,.7,1)
-	gfx.drawstr(self.txt, 1 | 4, self.w+self.x, self.h+self.y+5)
+	gfx.drawstr(self.txt, 1 | 4, self.w+self.x, self.h+self.y+4)
 
 	if hovering(self.x, self.y, self.w, self.h) then 
 		status.text = self.help
@@ -757,17 +759,19 @@ function H_slider:Draw()
 	local fill = (percent*(self.w/100))-8
 
 
-	if hovering(self.x-10, self.y+1, self.w+self.x, self.h-4) and gfx.mouse_cap == 1 then
+	if hovering(self.x-10, self.y+1, self.w+self.x, self.h-4)  then
 
 		status.text = self.help
+		if gfx.mouse_cap == 1 then 
 
-		new_val = math.ceil(((gfx.mouse_x-self.x)/self.w)*self.max_val)
-		if new_val < self.min_val then new_val = self.min_val 
-		elseif new_val > self.max_val then new_val = self.max_val
-		end
-		self.value = new_val
-	elseif hovering(self.x-10, self.y+1, self.w+self.x, self.h-4) and gfx.mouse_cap == 2 then
+			new_val = math.ceil(((gfx.mouse_x-self.x)/self.w)*self.max_val)
+			if new_val < self.min_val then new_val = self.min_val 
+			elseif new_val > self.max_val then new_val = self.max_val
+			end
+			self.value = new_val
+		elseif gfx.mouse_cap == 2 then
 		self.rightClick = true
+		end
 	end
 
 	if self.backwards then 
@@ -808,9 +812,14 @@ function Dropdown:Create(x,y,w,h,choices, default, selected, help)
 	if choices == nil then choices = {} end
 	if font == nil then gfx.setfont(3, "Lucida Console", 11) end
 
+
 	if w == nil then 
-		ww,hh = gfx.measurestr(choices[1])
-		w = ww + 25
+		local longest_choice
+		for l, len in ipairs(choices) do
+			ww,hh = gfx.measurestr(choices[l])
+			if ww > gfx.measurestr(choices[l-1]) then longest_choice = ww end
+		end
+		w = longest_choice + 25
 	end
 
 	if h == nil then 
@@ -832,6 +841,7 @@ function Dropdown:Create(x,y,w,h,choices, default, selected, help)
 		fontSize = fontSize or 11,
 		leftClick = false,
 		rightClick = false,
+		choicesHide = true,
 		hide = false
 	}
 	setmetatable(this, Dropdown)
@@ -844,19 +854,56 @@ function Dropdown:Draw()
 
 	if self.hide then return end
 
-	local choice_height = 0
-
+	self:ResetClicks()
 	gfx.setfont(3, self.font, self.fontSize)
 	draw_border(self.x, self.y, self.w, self.h)
 
-	gfx.set(.35,.35,.35)
+	gfx.set(.2,.21,.24)
 	gfx.rect(self.x+1, self.y+1, self.w-2, self.h-2, true)
-	gfx.x, gfx.y = self.x+5, self.y+5
+	gfx.x, gfx.y = self.x+6, self.y+5
 	gfx.set(.7,.7,.7)
 	gfx.drawstr(self.choices[self.selected])
-	gfx.x, gfx.y = self.x+self.w-15, self.y+5
+	gfx.x, gfx.y = self.x+self.w-13, self.y+5
 	gfx.set(.2, .8, .2)
 	gfx.drawstr("v")
+
+	if self.choicesHide == false then self:DrawChoices() end
+
+
+	if hovering(self.x, self.y, self.w, self.h) then 
+		status.text = self.help
+		self.mouseOver = true 
+		if gfx.mouse_cap >= 1 and self.mouseDown == false then 
+			
+			if gfx.mouse_cap == 4 or gfx.mouse_cap == 8 or gfx.mouse_cap == 16 then self.mouse_down = false
+			else
+				self.mouseDown = true
+				if gfx.mouse_cap == 1 then if self.choicesHide == true then self.choicesHide = false else self.choicesHide = true end
+				elseif gfx.mouse_cap == 2 then self.rightClick = true
+				elseif gfx.mouse_cap == 5 then self.ctrlLeftClick = true
+				elseif gfx.mouse_cap == 9 then self.shiftLeftClick = true
+				elseif gfx.mouse_cap == 10 then self.shiftRightClick = true	
+				elseif gfx.mouse_cap == 17 then self.altLeftClick = true
+				elseif gfx.mouse_cap == 18 then self.altRightClick = true
+				elseif gfx.mouse_cap == 64 then self.middleClick = true
+				
+				end
+			end
+		elseif gfx.mouse_cap == 0 and self.mouseDown == true then
+			self.mouseDown = false
+		end
+	elseif hovering(self.x, self.y, self.w, self.h) == false and gfx.mouse_cap == 1 then self.choicesHide = true 
+	else
+		self.mouseOver = false
+		self.mouseDown = false
+	end
+
+end
+	
+
+function Dropdown:DrawChoices()
+
+	local choice_height = 0
 
 	for c, choice in ipairs(self.choices) do
 		local w,h = gfx.measurestr(choice)
@@ -868,19 +915,37 @@ function Dropdown:Draw()
 	gfx.rect(self.x, self.y+self.h, self.w, choice_height+10, true)
 
 
-
 	local choice_pos_y = 25
 	for c, choice in ipairs(self.choices) do
 		
-		gfx.x, gfx.y = self.x+5, self.y+ choice_pos_y
+		gfx.x, gfx.y = self.x+6, self.y+ choice_pos_y
 		
 		if c == self.selected then gfx.set(1,.7,.2) else gfx.set(.1,.1,.1) end
+
+		if hovering(self.x+6, self.y+choice_pos_y, self.x+self.w, self.y+choice_pos_y) and gfx.mouse_cap == 1 then
+
+		 self.selected = c
+		 self.choicesHide = true
+		end
+
 
 		gfx.drawstr(choice)
 		choice_pos_y = choice_pos_y + 12
 	end
 
+end
 
+function Dropdown:ResetClicks()
+
+	self.leftClick = false
+	self.rightClick = false
+	self.middleClick = false
+	self.ctrlLeftClick = false
+	self.ctrlRightClick = false
+	self.shiftLeftClick = false
+	self.shiftRightClick = false
+	self.altLeftClick = false
+	self.altRightClick = false
 
 end
 
@@ -953,17 +1018,17 @@ gfx.init("GUI Class Practice", 450,500, false, 500,370)
 
 --Create our frames
 
-frame1 = Frame:Create(125,10,275,175, "HELLO ")
-frame2 = Frame:Create(125, frame1.h+frame1.y+30,275,150, "HELLO AGAIN")
-status = Status:Create(125, frame2.y+frame2.h+30, 275)
+frame1 = Frame:Create(155,10,275,175, "A FRAME        ")
+frame2 = Frame:Create(155, frame1.h+frame1.y+30,275,150, "A LONGER FRAME NAME   ")
+status = Status:Create(155, frame2.y+frame2.h+30, 275)
 
 --Create tabs
-tab1 = Tabs:AddTab('Tab 1', true)
-tab2 = Tabs:AddTab("Tab 2")
-tab3 = Tabs:AddTab("Another")
+tab1 = Tabs:AddTab('Tab 1', true, "Default tab...")
+tab2 = Tabs:AddTab("Tab 2", false, "Some sliders...")
+tab3 = Tabs:AddTab("Another", false, "Nothing to see here, folks!")
 
-tab4 = Tabs:AddTab("Tab 1", true)
-tab5 = Tabs:AddTab("Tab 2")
+tab4 = Tabs:AddTab("Tab 1", true, "Sliders, and some input boxes!")
+tab5 = Tabs:AddTab("Tab 2", false, "Nothing New...")
 
 --Bind tabs to a frame 1
 frame1:AttatchTab(tab1)
@@ -975,15 +1040,25 @@ frame2:AttatchTab(tab4)
 frame2:AttatchTab(tab5)
 
 --Buttons! Why not!?
-btn_txt1 = Button:Create(20,50, "Test 1")
-btn_txt2 = Button:Create(20,100, "Test 2")
+btn_txt1 = Button:Create(20,50, "Test 1", "Doesn't do much..." )
+btn_txt2 = Button:Create(20,100, "Test 2", "Does even less!")
 
 --Dropwdown
-d = Dropdown:Create(20, 150, nil, nil, {'Pick one: ', 'This one', 'Or this one', 'Or this!'}, 1, 2)
+
+someChoices = 
+{
+	"Pick one...",
+	"Like this...",
+	"Or this...",
+	"Even this!",
+	"But Not this!",
+}
+d = Dropdown:Create(20, 150, nil, nil, someChoices, 1, 1)
+d2 = Dropdown:Create(20,180, nil, nil, someChoices, 1, 1)
 
 --Input box
 lowNote = InputBox:Create(frame2.x+10, frame2.y+140, "C#4", "Help", 35)
-hiNote = InputBox:Create(frame2.x+50, frame2.y+140, "D4", "Help", 35)
+hiNote = InputBox:Create(frame2.x+50, frame2.y+140, "D4", "More", 35)
 
 --Some text for flavor
 txt_txt1 = Text:Create(frame1.x+10, frame1.y+25, "Hello. So you would have some text \nand/or other GUI elements here.")
@@ -993,16 +1068,16 @@ txt_txt3 = Text:Create(frame2.x+10, frame2.y+25, "Hello. So you would have some 
 txt_txt4 = Text:Create(frame2.x+10, frame2.y+25, "And when you click a tab it \nhides the current element and \nshows the next.")
 
 --Some toggle buttons
-tgl_test = Toggle:Create(frame1.x+10, 75, "X", "g")
-tgl_test2 = Toggle:Create(frame1.x+45, 75, "X")
-tgl_test3 = Toggle:Create(frame1.x+80, 75, "Poo")
+tgl_test = Toggle:Create(frame1.x+10, 75, "X", "Placeholder text!")
+tgl_test2 = Toggle:Create(frame1.x+45, 75, "X", "More and more placeholders are placeholding.")
+tgl_test3 = Toggle:Create(frame1.x+80, 75, "Poo", "The place to be...")
 
 --Some fun sliders
-s = H_slider:Create(125,75, 250, nil, "Min Vel", "Hey", 0, 127, 100, true)
-s2 = H_slider:Create(125,115, 250, nil, "Max Vel", nil, 0, 300, 25, false)
+s = H_slider:Create(frame1.x+10,75, 250, nil, "Min Vel", "Sets minimum velocity.", 0, 127, 0, false)
+s2 = H_slider:Create(frame1.x+10,115, 250, nil, "Max Vel", "Sets maximum velocity.", 0, 127, 127, true)
 
 s3 = H_slider:Create(frame2.x+10, frame2.y+100, 250, nil, "Something", "Hey", 0, 127, 25, false)
-s4 = H_slider:Create(frame2.x+10, frame2.y+100, 250, nil, "Another", nil, 0, 300, 210, true)
+s4 = H_slider:Create(frame2.x+10, frame2.y+100, 250, nil, "Another", "There", 0, 300, 210, true)
 
 
 --Bind elements to a tab
