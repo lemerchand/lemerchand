@@ -24,7 +24,7 @@
 --		+ Make pretty
 --		+ Fix dropdown draw issue when dropdown choices overlap another dropdown
 --		+ Ranged slider
---		+ Vertical Slider
+--		+ Vertical Sliderr
 --
 
 -------------------------------------------------------------------------
