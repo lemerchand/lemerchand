@@ -759,6 +759,7 @@ function H_slider:Create(x, y, w, h, txt, help, min_val, max_val, default, backw
 		shiftLeftClick = false,
 		ctrlRightClick = false,
 		ctrlLeftClick = false,
+		override = false,
 		hide = false
 	}
 	setmetatable(this, H_slider)
@@ -786,8 +787,8 @@ function H_slider:Draw()
 	if hovering(self.x-10, self.y+1, self.w+self.x, self.h-4)  then
 
 		status:Display(self.help)
-		if gfx.mouse_cap == 1 then 
-			
+		if gfx.mouse_cap == 1 or self.override then 
+			self.mouseDown = true
 			new_val = math.ceil(((gfx.mouse_x-self.x)/self.w)*self.max_val)
 			if new_val < self.min_val then new_val = self.min_val 
 			elseif new_val > self.max_val then new_val = self.max_val
@@ -797,6 +798,7 @@ function H_slider:Draw()
 		elseif gfx.mouse_cap == 5 then self.ctrlLeftClick = true
 		elseif gfx.mouse_cap == 9 then self.shiftLeftClick = true
 		end
+		if gfx.mouse_cap > 0 then self.mouseDown = true else self.mouseDown = false end
 	end
 
 	--If set to backwards handle the fill differently

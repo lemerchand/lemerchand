@@ -18,7 +18,7 @@
 --		+ 
 --		+ 
 ------------------------------------------------------------------------------
-local _version = " v.95"
+local _version = " v.98"
 local _name = "MST3K"
 
 
@@ -73,10 +73,6 @@ default_vars()
 --PPQ values for 16th notes
 beats_in_ppq = {0,240,480,720,960,1200,1440,1680,1920,2160,2400,2640,2880,3120,3360,3600}
 beats_as_ppq = {}
-
-
-
-
 
 
 
@@ -266,13 +262,38 @@ function main()
 			sldr_minVel.value = sldr_maxVel.value
 	end
 
-	--NEW FUNCTION
-	if sldr_minVel.ctrlLeftClick then
-		sldr_minVel.leftClick = true
-		-- local t = sldr_minVel.value 
-		-- sldr_maxVel.leftClick = true
+	--
 	
+	if sldr_minVel.mouseDown == false then dif = sldr_maxVel.value - sldr_minVel.value end
+	if sldr_minVel.ctrlLeftClick  then 
+		if sldr_minVel.mouseDown then 
+			if sldr_maxVel.value <=127 then
+				sldr_minVel.override = true
+				dif = dif
+				sldr_maxVel.value = sldr_minVel.value  + dif
+			else sldr_maxVel.value = 127
+			end
+		end
+		
+	else sldr_minVel.override = false 
+
 	end
+
+	if sldr_maxVel.mouseDown == false then dif2 = sldr_maxVel.value - sldr_minVel.value end
+	if sldr_maxVel.ctrlLeftClick  then 
+		if sldr_maxVel.mouseDown then 
+			if sldr_minVel.value  >=0 then
+				sldr_maxVel.override = true
+				dif2 = dif2
+				sldr_minVel.value = sldr_maxVel.value  - dif2
+			else sldr_minVel.value = 0
+			end
+		end
+		
+	else sldr_maxVel.override = false 
+
+	end
+
 
 	-------------------------------
 	--BEAT Toggles----------------
@@ -298,3 +319,4 @@ function update_pitch_toggles()
 		if selectedNotes[p] == 1 then pp.state = true else pp.state = false end
 	end
 end
+
