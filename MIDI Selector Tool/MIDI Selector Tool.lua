@@ -48,11 +48,11 @@ if win then reaper.JS_Window_AttachTopmostPin(win) end
 ---------------------
 local htSelect			= "Select notes based on settings.\nR-click: select in time selection.\nShift+L-click to invert filter."
 local htClear 			= "Clear Selection. \nR-click for global reset.\nHotkeys: (Shift+) Backspace"
-local htCapture 		= "Set parameters from selected notes.\nOr Shift+L-Click a parameter."
-local htMinNote 		= "Set minimum velocity.\nR-click to reset."
-local htMaxNote 		= "Set maximum velocity.\nR-click to reset."
+local htCapture 		= "Set parameters from selected notes.\nOr Shift+L-Click a parameter to\ncapture only that."
+local htMinNote 		= "Sets lowest possible note.\nR-click to reset."
+local htMaxNote 		= "Sets highest possible note.\nR-click to reset."
 local htPitchTgl 		= "Toggles pitches.\nR-click to reset.\nCtrl+L-click: exclusive select."
-local htVelSlider		= "Sets the lowest/highest velocity.\nR-click to reset."
+local htVelSlider		= "Sets the lowest/highest velocity.\nR-click to reset.\nCtrl+L-click to slide both (beta)"
 local htbeatsTgl		= "Include/exclude specific beats.\nR-click to reset.\nCtrl+L-click: exclusive select."
 
 -------------------------------
@@ -93,29 +93,36 @@ local btn_select = Button:Create(frm_general.x+10, frm_general.y+30, "Select", h
 local btn_clear = Button:Create(btn_select.x, btn_select.y + btn_select.h + 10, "Clear", htClear)
 local btn_capture = Button:Create(btn_select.x + btn_select.w + 10, btn_select.y, "Capture", htCapture)
 
---Pitch frame
-local frm_pitch = Frame:Create(10, frm_general.y + frm_general.h + 27, 227, 110, "PITCH")
 
-local ib_maxNote = InputBox:Create(frm_pitch.x + 178, frm_pitch.y + 30, "G10", htMaxNote)
-local ib_minNote = InputBox:Create(frm_pitch.x + 75, frm_pitch.y + 30, "C0", htMinNote, ib_maxNote.w)
+
+
+
+
+--Pitch frame
+local frm_pitch = Frame:Create(10, frm_general.y + frm_general.h + 27, 227, 100, "PITCH")
+
+local ib_maxNote = InputBox:Create(frm_pitch.x + 10, frm_pitch.y + 41, "G10", htMaxNote)
+local ib_minNote = InputBox:Create(frm_pitch.x + 10, frm_pitch.y + 70, "C0", htMinNote, ib_maxNote.w)
 local group_noteRange ={ib_minNote, ib_maxNote}
 
-local lbl_minNote = Text:Create(ib_minNote.x - 60, ib_minNote.y + 7, "Lowest:")
-local lbl_maxNote = Text:Create(ib_maxNote.x - 63, ib_maxNote.y + 7, "Highest:")
+local lbl_minNote = Text:Create(ib_minNote.x+4, ib_minNote.y + 24, "MAX")
+local lbl_maxNote = Text:Create(ib_maxNote.x+4, ib_maxNote.y -13, "MIN")
+
+
 
 local tgl_pitch = {}
-local pitchTglOffset = frm_pitch.x+20
+local pitchTglOffset = frm_pitch.x+42
 local group_pitchToggles = {}
 
 for pe = 1, 6 do
-	 tgl_pitch[pe] = Toggle:Create(frm_pitch.x + pitchTglOffset, frm_pitch.y+60, note_names[pe], htPitchTgl, true, 25, nil)
+	 tgl_pitch[pe] = Toggle:Create(frm_pitch.x + pitchTglOffset, frm_pitch.y+41, note_names[pe], htPitchTgl, true, 25, nil)
 	 pitchTglOffset = pitchTglOffset + 28
 	 table.insert(group_pitchToggles, tgl_pitch[pe])
 end
 
-pitchTglOffset = frm_pitch.x+20
+pitchTglOffset = frm_pitch.x+42
 for pe = 7, 12 do
-	 tgl_pitch[pe] = Toggle:Create(frm_pitch.x + pitchTglOffset, frm_pitch.y+86, note_names[pe], htPitchTgl, true, 25, nil)
+	 tgl_pitch[pe] = Toggle:Create(frm_pitch.x + pitchTglOffset, frm_pitch.y+67, note_names[pe], htPitchTgl, true, 25, nil)
 	 pitchTglOffset = pitchTglOffset + 28
 	 table.insert(group_pitchToggles, tgl_pitch[pe])
 end
@@ -240,14 +247,23 @@ function main()
 	-------------------------------
 	--PITCH Toggles----------------
 	-------------------------------
+
+	local count = 0
 	for p, pp in ipairs(group_pitchToggles) do
 		if pp.rightClick then group_exec(group_pitchToggles, 'reset') 
 		elseif pp.leftClick then selectedNotes[p] = math.abs(selectedNotes[p] -1)
+		elseif pp.ctrlLeftClick then 
+			group_exec(group_pitchToggles, 'false')
+			pp.state = true
 		end
 		if pp.shiftLeftClick then set_from_selected(false, false, false, false, true)
 			update_pitch_toggles()
 		end
+		if pp.state then selectedNotes[p] = 1 else selectedNotes[p] = 0 end
+		if pp.state == true then count = count + 1 end
 	end
+
+	if count == 0 then tgl_pitch[1].state = true ; selectedNotes[1] = 1 end
 
 	-------------------------------
 	--VEL Sliders------------------
@@ -262,16 +278,16 @@ function main()
 			sldr_minVel.value = sldr_maxVel.value
 	end
 
-	--
+	
+	--Mutual Sliding
 	
 	if sldr_minVel.mouseDown == false then dif = sldr_maxVel.value - sldr_minVel.value end
 	if sldr_minVel.ctrlLeftClick  then 
 		if sldr_minVel.mouseDown then 
 			if sldr_maxVel.value <=127 then
 				sldr_minVel.override = true
-				dif = dif
 				sldr_maxVel.value = sldr_minVel.value  + dif
-			else sldr_maxVel.value = 127
+			--else sldr_maxVel.value = 127
 			end
 		end
 		
@@ -284,9 +300,8 @@ function main()
 		if sldr_maxVel.mouseDown then 
 			if sldr_minVel.value  >=0 then
 				sldr_maxVel.override = true
-				dif2 = dif2
 				sldr_minVel.value = sldr_maxVel.value  - dif2
-			else sldr_minVel.value = 0
+			--else sldr_minVel.value = 0
 			end
 		end
 		

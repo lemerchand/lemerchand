@@ -114,6 +114,10 @@ function group_exec(group, action)
 		for e, element in ipairs(group) do
 			element.hide = false
 		end
+	elseif action == 'false' then
+		for e, element in ipairs(group) do
+			element.state = false
+		end
 	end
 end
 
