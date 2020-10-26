@@ -757,6 +757,8 @@ function H_slider:Create(x, y, w, h, txt, help, min_val, max_val, default, backw
 		leftClick = false,
 		rightClick = false,
 		shiftLeftClick = false,
+		ctrlRightClick = false,
+		ctrlLeftClick = false,
 		hide = false
 	}
 	setmetatable(this, H_slider)
@@ -785,14 +787,14 @@ function H_slider:Draw()
 
 		status:Display(self.help)
 		if gfx.mouse_cap == 1 then 
-
+			
 			new_val = math.ceil(((gfx.mouse_x-self.x)/self.w)*self.max_val)
 			if new_val < self.min_val then new_val = self.min_val 
 			elseif new_val > self.max_val then new_val = self.max_val
 			end
 			self.value = new_val
 		elseif gfx.mouse_cap == 2 then self.rightClick = true
-
+		elseif gfx.mouse_cap == 5 then self.ctrlLeftClick = true
 		elseif gfx.mouse_cap == 9 then self.shiftLeftClick = true
 		end
 	end
@@ -821,6 +823,7 @@ function H_slider:ResetClicks()
 	self.leftClick = false
 	self.rightClick = false
 	self.shiftLeftClick = false
+	self.ctrlLeftClick = false
 end
 
 function H_slider:Reset()

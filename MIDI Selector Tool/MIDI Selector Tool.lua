@@ -199,7 +199,9 @@ function main()
 	group_exec(Elements, 'draw')
 
 
-	--Handle select button clicks
+	-------------------------------
+	--SELECT BUTTON----------------
+	-------------------------------
 	if btn_select.leftClick  or char == 13 then select_notes(true, false, sldr_minVel.value, sldr_maxVel.value, ib_minNote.value, ib_maxNote.value) end
 	if btn_select.rightClick or gfx.mouse_cap == 8 and char == 13 then select_notes(true,true, sldr_minVel.value, sldr_maxVel.value, ib_minNote.value, ib_maxNote.value) end
 	if btn_select.shiftLeftClick then
@@ -210,7 +212,9 @@ function main()
 		select_notes(true, true, sldr_minVel.value, sldr_maxVel.value, ib_minNote.value, ib_maxNote.value)
 	end
 
-	--Handle Clear button clicks
+	-------------------------------
+	--CLEAR BUTTON-----------------
+	-------------------------------
 	if btn_clear.leftClick or char == 08 then select_notes(true, false, -1, -1) end
 	if btn_clear.rightClick or gfx.mouse_cap == 8 and char == 08 then
 		select_notes(true, false, -1, -1)
@@ -221,22 +225,25 @@ function main()
 		end
 	end
 
-	--Capture button clicks
+	-------------------------------
+	--CAPTURE BUTTON---------------
+	-------------------------------
 	if btn_capture.leftClick then 
 		set_from_selected(true, true, true, true, true, sldr_minVel, sldr_maxVel, ib_minNote, ib_maxNote) 
 		update_pitch_toggles()
 	end
 
-	--Reset note ranges on right click
+	-------------------------------
+	--NOTE RANGES------------------
+	-------------------------------
 	if ib_minNote.rightClick or ib_maxNote.rightClick then group_exec(group_noteRange, 'reset') end
 	if ib_minNote.shiftLeftClick or ib_maxNote.shiftLeftClick then
 		set_from_selected(true, true, false, false, false, nil, nil, ib_minNote, ib_maxNote) 
 	end
 
-	if sldr_minVel.rightClick or sldr_maxVel.rightClick then group_exec(group_velSliders, 'reset') end
-	if sldr_minVel.shiftLeftClick or sldr_maxVel.shiftLeftClick then set_from_selected(false, false, true, true, false,  sldr_minVel, sldr_maxVel) end
-	
-	--Reset pitches on right click and handle clicks
+	-------------------------------
+	--PITCH Toggles----------------
+	-------------------------------
 	for p, pp in ipairs(group_pitchToggles) do
 		if pp.rightClick then group_exec(group_pitchToggles, 'reset') 
 		elseif pp.leftClick then selectedNotes[p] = math.abs(selectedNotes[p] -1)
@@ -246,7 +253,30 @@ function main()
 		end
 	end
 
-	--Reset beats on right click and handle events
+	-------------------------------
+	--VEL Sliders------------------
+	-------------------------------
+	if sldr_minVel.rightClick or sldr_maxVel.rightClick then group_exec(group_velSliders, 'reset') end
+	if sldr_minVel.shiftLeftClick or sldr_maxVel.shiftLeftClick then set_from_selected(false, false, true, true, false,  sldr_minVel, sldr_maxVel) end
+	
+	if sldr_minVel.value >= sldr_maxVel.value and hovering(sldr_minVel.x, sldr_minVel.y, sldr_minVel.w, sldr_minVel.h) then
+		sldr_maxVel.value = sldr_minVel.value
+	end
+	if sldr_maxVel.value <= sldr_minVel.value and hovering(sldr_maxVel.x,sldr_maxVel.y,sldr_maxVel.w,sldr_maxVel.h) then
+			sldr_minVel.value = sldr_maxVel.value
+	end
+
+	--NEW FUNCTION
+	if sldr_minVel.ctrlLeftClick then
+		sldr_minVel.leftClick = true
+		-- local t = sldr_minVel.value 
+		-- sldr_maxVel.leftClick = true
+	
+	end
+
+	-------------------------------
+	--BEAT Toggles----------------
+	-------------------------------
 	for p, pp in ipairs(group_beatsToggles) do
 		if pp.rightClick then group_exec(group_beatsToggles, 'reset')
 		elseif pp.leftClick then beats[p] = math.abs(beats[p] - 1) 
