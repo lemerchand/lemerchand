@@ -1,17 +1,16 @@
 -------------------------------------------------------------------------------
 --						SCRIPT NAME
 -------------------------------------------------------------------------------
---  Modified: 2020.10.20 at 5am
---
+--  Modified: 2020.10.26 at 09:57
 --	TODO: 
--- 		+ 
--- 		+
---		+
+-- 		+ Setup save file for beats/settings
+-- 		+ Spruce up the logic for the mutual sliding effect
+--		+ Fill up space/ improve UI
 --
 -- RECENT CHANGES:
---		+ 
---		+
---		+
+--		+ Moved over to new GUI lib
+--		+ Section-specific capture
+--		+ Toggle button swipe
 --
 --
 --- KNOWN ISSUES:
@@ -54,7 +53,9 @@ local htMaxNote 		= "Sets highest possible note.\nR-click to reset."
 local htPitchTgl 		= "Toggles pitches.\nR-click to reset.\nCtrl+L-click: exclusive select."
 local htVelSlider		= "Sets the lowest/highest velocity.\nR-click to reset.\nCtrl+L-click to slide both (beta)"
 local htbeatsTgl		= "Include/exclude specific beats.\nR-click to reset.\nCtrl+L-click: exclusive select."
-
+local htDockOnStart		= "Enable to dock MST3K when summoned."
+local htMainTab			= "Main Controls."
+local htSettingsTab 	= "General Settings."
 -------------------------------
 --Midi Note and BeatsThangs---
 -------------------------------
@@ -92,6 +93,24 @@ local frm_general = Frame:Create(10, 12, 227, 90, "GENERAL")
 local btn_select = Button:Create(frm_general.x+10, frm_general.y+30, "Select", htSelect)
 local btn_clear = Button:Create(btn_select.x, btn_select.y + btn_select.h + 10, "Clear", htClear)
 local btn_capture = Button:Create(btn_select.x + btn_select.w + 10, btn_select.y, "Capture", htCapture)
+
+btn_select.hide = true
+btn_clear.hide = true
+btn_capture.hide = true
+
+local tgl_dockOnStart = Toggle:Create(frm_general.x +10, frm_general.y + 30, "", htDockOnStart, false, 10, 10)
+local txt_dockOnStart = Text:Create(tgl_dockOnStart.x+20, tgl_dockOnStart.y, "Dock on start")
+
+
+local tab_main = Tabs:AddTab("Main", true, htMainTab)
+tab_main_elements = {btn_select, btn_clear, btn_capture}
+frm_general:AttatchTab(tab_main)
+tab_main:AttatchElements(tab_main_elements)
+
+local tab_settings = Tabs:AddTab("Settings", false, htSettingsTab)
+tab_settings_elements = {tgl_dockOnStart, txt_dockOnStart}
+frm_general:AttatchTab(tab_settings)
+tab_settings:AttatchElements(tab_settings_elements)
 
 
 

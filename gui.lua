@@ -299,9 +299,13 @@ function Text:Create(x,y, txt, fontSize, r, g, b, font, hide)
 
 	if font == nil then gfx.setfont(1, "Lucida Console", 13) end
 
+	local w,h = gfx.measurestr(txt)
+
 	local this = {
 		x = x or 10,
 		y = y or 10,
+		w = w,
+		h = h,
 		txt = txt or "Some text.",
 		fontSize = fontSize or 12,
 		r = r or .7,
