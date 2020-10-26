@@ -32,11 +32,11 @@ reaperDoFile('../cf.lua')
 --Get current midi window so it can refocus on it when script terminates
 
 local lastWindow = reaper.JS_Window_GetFocus()
-
-
+local dockOnStart = get_settings(reaper.GetResourcePath() .. '/Scripts/lemerchand/MIDI Selector Tool/lament.config') 
+if dockOnStart == "1" then dockOnStart = true else dockOnStart = false end
 --Open window at mouse position--
 local mousex, mousey = reaper.GetMousePosition()
-gfx.init(_name .. " " .. _version, 248, 630, false, mousex+165, mousey-265)
+gfx.init(_name .. " " .. _version, 248, 630, dockOnStart, mousex+165, mousey-265)
 
 -- Keep on top
 local win = reaper.JS_Window_Find(_name .. " " .. _version, true)
@@ -98,7 +98,7 @@ btn_select.hide = true
 btn_clear.hide = true
 btn_capture.hide = true
 
-local tgl_dockOnStart = Toggle:Create(frm_general.x +10, frm_general.y + 30, "", htDockOnStart, false, 10, 10)
+local tgl_dockOnStart = Toggle:Create(frm_general.x +10, frm_general.y + 30, "", htDockOnStart, dockOnStart, 10, 10)
 local txt_dockOnStart = Text:Create(tgl_dockOnStart.x+20, tgl_dockOnStart.y, "Dock on start")
 
 
@@ -336,6 +336,18 @@ function main()
 		if pp.rightClick then group_exec(group_beatsToggles, 'reset')
 		elseif pp.leftClick then beats[p] = math.abs(beats[p] - 1) 
 		end
+	end
+
+
+	if tgl_dockOnStart.leftClick then 
+		if tgl_dockOnStart.state == true then 
+			dockOnStart = "1"
+			set_settings(reaper.GetResourcePath() .. '/Scripts/lemerchand/MIDI Selector Tool/lament.config', dockOnStart)
+		else 
+			dockOnStart = "0"
+			set_settings(reaper.GetResourcePath() .. '/Scripts/lemerchand/MIDI Selector Tool/lament.config', dockOnStart)
+		end
+
 	end
 
 end

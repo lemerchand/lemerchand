@@ -1,3 +1,20 @@
+function get_settings(filename)
+
+	local file = io.open(filename, 'r')
+	io.input(file)
+	local dockOnStart = file:read()
+	file:close()
+	return dockOnStart
+end
+
+function set_settings(filename, dockOnStart)
+	local file = io.open(filename, 'w')
+	io.output()
+	file:write(dockOnStart)
+	file:close()
+end
+
+
 function is_note_in_time_selection(n)
 	ts_start, ts_end = reaper.GetSet_LoopTimeRange(false, false, 0, 0, false)
 	ts_start_ppq  = reaper.MIDI_GetPPQPosFromProjTime( take, ts_start )
