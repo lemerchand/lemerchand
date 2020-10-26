@@ -88,7 +88,7 @@ reaper.Undo_BeginBlock()
 
 
 --General Frame
-local frm_general = Frame:Create(10, 12, 227, 90, "GENERAL")
+local frm_general = Frame:Create(10, 12, 227, 90, "GENERAL       ")
 
 local btn_select = Button:Create(frm_general.x+10, frm_general.y+30, "Select", htSelect)
 local btn_clear = Button:Create(btn_select.x, btn_select.y + btn_select.h + 10, "Clear", htClear)
