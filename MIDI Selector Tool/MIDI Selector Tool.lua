@@ -26,14 +26,19 @@ function reaperDoFile(file) local info = debug.getinfo(1,'S'); script_path = inf
 reaperDoFile('../gui.lua')
 reaperDoFile('../cf.lua')
 
----------------------
---Window Mngmt--------
-----------------------
+----------------------------------
+--Window Mngmt & Settings --------
+----------------------------------
 --Get current midi window so it can refocus on it when script terminates
-
 local lastWindow = reaper.JS_Window_GetFocus()
+
+--Load settings
 local dockOnStart = get_settings(reaper.GetResourcePath() .. '/Scripts/lemerchand/MIDI Selector Tool/lament.config') 
 if dockOnStart == "1" then dockOnStart = true else dockOnStart = false end
+
+beatPresets = get_beat_presets(reaper.GetResourcePath() .. '/Scripts/lemerchand/MIDI Selector Tool/beatPresets.dat')
+
+
 --Open window at mouse position--
 local mousex, mousey = reaper.GetMousePosition()
 gfx.init(_name .. " " .. _version, 248, 630, dockOnStart, mousex+165, mousey-265)
@@ -156,40 +161,40 @@ group_velSliders = {sldr_minVel, sldr_maxVel}
 
 
 --Beats fFrame
-local frm_beats = Frame:Create(10, frm_velocity.y + frm_velocity.h + 27, 227, 128, "BEATS")
+local frm_time = Frame:Create(10, frm_velocity.y + frm_velocity.h + 27, 227, 128, "TIME")
+
 
 local tgl_beats = {}
-local beatsTglOffset = frm_beats.x+74
+local beatsTglOffset = frm_time.x+96
 local group_beatsToggles = {}
 
-
 for be = 1, 4 do
-	 tgl_beats[be] = Toggle:Create(frm_beats.x + beatsTglOffset, frm_beats.y+30, be, htbeatsTgl, 20, 25)
+	 tgl_beats[be] = Toggle:Create(frm_time.x + beatsTglOffset, frm_time.y+30, be, htbeatsTgl, 20, 25)
 	 beatsTglOffset = beatsTglOffset + 28
 	 table.insert(group_beatsToggles, tgl_beats[be])
 	 beats[be] = 0
 end
 
-beatsTglOffset = frm_beats.x+74
+beatsTglOffset = frm_time.x+96
 for be = 5, 8 do
-	 tgl_beats[be] = Toggle:Create(frm_beats.x + beatsTglOffset, frm_beats.y+56, be, htbeatsTgl, 20, 25)
+	 tgl_beats[be] = Toggle:Create(frm_time.x + beatsTglOffset, frm_time.y+56, be, htbeatsTgl, 20, 25)
 	 beatsTglOffset = beatsTglOffset + 28
 	 table.insert(group_beatsToggles, tgl_beats[be])
 	 beats[be] = 0
 end
 
-beatsTglOffset = frm_beats.x+74
+beatsTglOffset = frm_time.x+96
 for be = 9, 12 do
-	 tgl_beats[be] = Toggle:Create(frm_beats.x + beatsTglOffset, frm_beats.y+82, be, htbeatsTgl, 20, 25)
+	 tgl_beats[be] = Toggle:Create(frm_time.x + beatsTglOffset, frm_time.y+82, be, htbeatsTgl, 20, 25)
 	 beatsTglOffset = beatsTglOffset + 28
 	 table.insert(group_beatsToggles, tgl_beats[be])
 	 beats[be] = 0
 end
 
-beatsTglOffset = frm_beats.x+74
+beatsTglOffset = frm_time.x+96
 
 for be = 13, 16 do
-	 tgl_beats[be] = Toggle:Create(frm_beats.x + beatsTglOffset, frm_beats.y+108, be, htbeatsTgl, 20, 25)
+	 tgl_beats[be] = Toggle:Create(frm_time.x + beatsTglOffset, frm_time.y+108, be, htbeatsTgl, 20, 25)
 	 beatsTglOffset = beatsTglOffset + 28
 	 table.insert(group_beatsToggles, tgl_beats[be])
 	 beats[be] = 0
@@ -198,7 +203,7 @@ end
 
 --Status bar
 --For now status needs to be global
-status = Status:Create(10, frm_beats.y + frm_beats.h + 27, 227, 60, "INFO", nil, nil, "Hover over a control for more info!")
+status = Status:Create(10, frm_time.y + frm_time.h + 27, 227, 60, "INFO", nil, nil, "Hover over a control for more info!")
 
 
 
@@ -336,9 +341,27 @@ function main()
 		if pp.rightClick then group_exec(group_beatsToggles, 'reset')
 		elseif pp.leftClick then beats[p] = math.abs(beats[p] - 1) 
 		end
+
+		if pp.ctrlLeftClick then 
+			group_exec(group_beatsToggles, 'reset')
+			pp.state = true
+			beats[p] = 1
+		end
+
+		if pp.shiftLeftClick then 
+			for b = 1, 16 do
+
+			end
+
+		end
 	end
 
 
+
+
+	-------------------------------
+	--SETTING elements-------------
+	-------------------------------
 	if tgl_dockOnStart.leftClick then 
 		if tgl_dockOnStart.state == true then 
 			dockOnStart = "1"
@@ -347,13 +370,19 @@ function main()
 			dockOnStart = "0"
 			set_settings(reaper.GetResourcePath() .. '/Scripts/lemerchand/MIDI Selector Tool/lament.config', dockOnStart)
 		end
-
 	end
+
 
 end
 
 main()
 reaper.Undo_EndBlock(_name .. "", -1)
+
+
+
+for i=1, 16 do
+	--cons(beatPresets[1][1])
+end
 
 --------------------------------
 --Special functions-------------
