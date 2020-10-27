@@ -105,8 +105,18 @@ btn_select.hide = true
 btn_clear.hide = true
 btn_capture.hide = true
 
-local tgl_dockOnStart = Toggle:Create(frm_general.x +10, frm_general.y + 30, "", htDockOnStart, dockOnStart, 10, 10)
+local tgl_dockOnStart = Toggle:Create(frm_general.x +10, frm_general.y + 40, "", htDockOnStart, dockOnStart, 10, 10)
 local txt_dockOnStart = Text:Create(tgl_dockOnStart.x+20, tgl_dockOnStart.y, "Dock on start")
+
+local tgl_floatAtPos = Toggle:Create(frm_general.x +10, frm_general.y + 60, "", htFloatAtPos, floatOnPos, 10, 10)
+local txt_floatAtPos = Text:Create(tgl_floatAtPos.x+20, tgl_floatAtPos.y, "Float at pos: ")
+local ib_floatAtPosX = InputBox:Create(frm_general.w-70, txt_floatAtPos.y-5, 200, htFloatAtPos)
+local ib_floatAtPosY = InputBox:Create(frm_general.w-30, txt_floatAtPos.y-5, 200, htFloatAtPos)
+
+local tgl_floatAtMouse = Toggle:Create(frm_general.x +10, frm_general.y + 80, "", htFloatAtMouse, floatAtMouse, 10, 10)
+local txt_floatAtMouse = Text:Create(tgl_floatAtMouse.x+20, tgl_floatAtMouse.y, "Float at mouse: ")
+local ib_floatAtMouseX = InputBox:Create(frm_general.w-70, txt_floatAtMouse.y, 200, htFloatAtPos)
+local ib_floatAtMouseY = InputBox:Create(frm_general.w-30, txt_floatAtMouse.y, 200, htFloatAtPos)
 
 
 local tab_main = Tabs:AddTab("Main", true, htMainTab)
@@ -115,9 +125,11 @@ frm_general:AttatchTab(tab_main)
 tab_main:AttatchElements(tab_main_elements)
 
 local tab_settings = Tabs:AddTab("Settings", false, htSettingsTab)
-tab_settings_elements = {tgl_dockOnStart, txt_dockOnStart}
+tab_settings_elements = {tgl_dockOnStart, txt_dockOnStart, tgl_floatAtMouse, tgl_floatAtPos, txt_floatAtPos, 
+						txt_floatAtMouse, ib_floatAtPosX, ib_floatAtPosY, ib_floatAtMouseX, ib_floatAtMouseY}
 frm_general:AttatchTab(tab_settings)
 tab_settings:AttatchElements(tab_settings_elements)
+
 
 
 
@@ -259,7 +271,7 @@ function main()
 	-------------------------------
 	if btn_capture.leftClick then 
 		set_from_selected(true, true, true, true, true, sldr_minVel, sldr_maxVel, ib_minNote, ib_maxNote) 
-		update_pitch_toggles()
+		update_pitch_toggles(tgl_pitch)
 	end
 
 	-------------------------------
@@ -283,7 +295,7 @@ function main()
 			pp.state = true
 		end
 		if pp.shiftLeftClick then set_from_selected(false, false, false, false, true)
-			update_pitch_toggles()
+			update_pitch_toggles(tgl_pitch)
 		end
 		if pp.state then selectedNotes[p] = 1 else selectedNotes[p] = 0 end
 		if pp.state == true then count = count + 1 end
