@@ -1,19 +1,9 @@
-function get_settings(filename)
+function get_settings(filename, beatPresets)
 
 	local file = io.open(filename, 'r')
 	io.input(file)
 	local dockOnStart = file:read()
-	file:close()
-	return dockOnStart
-end
-
-function get_beat_presets(filename)
-
-	local file = io.open(filename, 'r')
-	io.input(file)
-
-	local beatPresets = {}
-
+	
 	for i=1, 16 do
 		b = file:read()
 		if b == nil then break end	
@@ -21,8 +11,10 @@ function get_beat_presets(filename)
 	end
 
 	file:close()
-	return beatPresets
+	return dockOnStart
 end
+
+
 
 function set_settings(filename, dockOnStart)
 	local file = io.open(filename, 'w')

@@ -33,10 +33,11 @@ reaperDoFile('../cf.lua')
 local lastWindow = reaper.JS_Window_GetFocus()
 
 --Load settings
-local dockOnStart = get_settings(reaper.GetResourcePath() .. '/Scripts/lemerchand/MIDI Selector Tool/lament.config') 
+beatPresets = {}
+local dockOnStart = get_settings(reaper.GetResourcePath() .. '/Scripts/lemerchand/MIDI Selector Tool/lament.config', beatPresets) 
 if dockOnStart == "1" then dockOnStart = true else dockOnStart = false end
 
-beatPresets = get_beat_presets(reaper.GetResourcePath() .. '/Scripts/lemerchand/MIDI Selector Tool/beatPresets.dat')
+
 
 
 --Open window at mouse position--
