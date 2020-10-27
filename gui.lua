@@ -3,7 +3,7 @@
 --							GUI Library v1 Rev 2
 --
 -------------------------------------------------------------------------
--- LAST MODIFIED: 2020.10.24 at 18:14
+-- LAST MODIFIED: 2020.10.27
 --
 --USAGE:
 --		- Read the comments, especially parameters
@@ -23,7 +23,6 @@
 --TODO:
 --		+ Make pretty
 --		+ Fix dropdown draw issue when dropdown choices overlap another dropdown
---		+ Ranged slider
 --		+ Vertical Sliderr
 --
 

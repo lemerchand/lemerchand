@@ -3,6 +3,12 @@ function get_settings(filename, beatPresets)
 	local file = io.open(filename, 'r')
 	io.input(file)
 	local dockOnStart = file:read()
+	local floatAtPos = file:read()
+	local floatAtPosX = file:read()
+	local floatAtPosY = file:read()
+	local floatAtMouse = file:read()
+	local floatAtMouseX = file:read()
+	local floatAtMouseY = file:read()
 	
 	for i=1, 16 do
 		b = file:read()
@@ -11,14 +17,20 @@ function get_settings(filename, beatPresets)
 	end
 
 	file:close()
-	return dockOnStart
+	return dockOnStart, floatAtPos, floatAtPosX, floatAtPosY, floatAtMouse, floatAtMouseX, floatAtMouseY
 end
 
 
-function set_settings(filename, dockOnStart)
-	local file = io.open(filename, 'w')
+function set_settings(filename, dockOnStart, floatAtPos, floatAtPosX, floatAtPosY, floatAtMouse, floatAtMouseX, floatAtMouseY)
+	local file = io.open(filename, 'r+')
 	io.output()
-	file:write(dockOnStart)
+	file:write(dockOnStart .."\n")
+	file:write(floatAtPos.."\n")
+	file:write(floatAtPosX.."\n")
+	file:write(floatAtPosY.."\n")
+	file:write(floatAtMouse.."\n")
+	file:write(floatAtMouseX.."\n")
+	file:write(floatAtMouseY)
 	file:close()
 end
 
@@ -27,7 +39,7 @@ function save_beat_preset(filename, btns, index)
 	io.input(file)
 	
 	
-	for i =1, index do
+	for i =1, index+6 do
 		file:read()
 	end
 	place = file:seek()
