@@ -349,8 +349,9 @@ function main()
 		end
 
 		if pp.shiftLeftClick then 
-			for b = 1, 16 do
-
+			for i = 1, #beatPresets[p] do
+			    local c = beatPresets[p]:sub(i,i)
+			    if c == "1" then tgl_beats[i].state = true else tgl_beats[i].state = false end
 			end
 
 		end
@@ -379,10 +380,6 @@ main()
 reaper.Undo_EndBlock(_name .. "", -1)
 
 
-
-for i=1, 16 do
-	--cons(beatPresets[1][1])
-end
 
 --------------------------------
 --Special functions-------------

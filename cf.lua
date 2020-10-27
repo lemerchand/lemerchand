@@ -12,21 +12,14 @@ function get_beat_presets(filename)
 	local file = io.open(filename, 'r')
 	io.input(file)
 
-	local beatPreset = {}
 	local beatPresets = {}
 
 	for i=1, 16 do
-		for ii=1,16 do
-			b = file:read(1)
-			if b == nil then break end
-			beatPreset[ii] = b
-		end
-		beatPresets[i] = beatPreset
+		b = file:read()
+		if b == nil then break end	
+		beatPresets[i] = b
 	end
 
-	for i=1, 16 do
-		cons(beatPresets[1][i])
-	end
 	file:close()
 	return beatPresets
 end
