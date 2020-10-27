@@ -1,7 +1,7 @@
 -------------------------------------------------------------------------------
 --						SCRIPT NAME
 -------------------------------------------------------------------------------
---  Modified: 2020.10.26 at 09:57
+--  Modified: 2020.10.27 at 09:57
 --	TODO: 
 -- 		+ Setup save file for beats/settings
 -- 		+ Spruce up the logic for the mutual sliding effect
@@ -17,7 +17,7 @@
 --		+ 
 --		+ 
 ------------------------------------------------------------------------------
-local _version = " v.98"
+local _version = " v.99"
 local _name = "MST3K"
 
 
@@ -250,7 +250,7 @@ function main()
 		for e, element in ipairs(Elements) do
 			element:Reset() 
 			default_vars()
-			update_pitch_toggles()
+			update_pitch_toggles(tgl_pitch)
 		end
 	end
 
@@ -313,7 +313,7 @@ function main()
 			if sldr_maxVel.value <=127 then
 				sldr_minVel.override = true
 				sldr_maxVel.value = sldr_minVel.value  + dif
-			--else sldr_maxVel.value = 127
+				if sldr_maxVel.value > 127 then sldr_maxVel.value = 127 end
 			end
 		end
 		
@@ -327,7 +327,7 @@ function main()
 			if sldr_minVel.value  >=0 then
 				sldr_maxVel.override = true
 				sldr_minVel.value = sldr_maxVel.value  - dif2
-			--else sldr_minVel.value = 0
+				if sldr_minVel.value < 0 then sldr_minVel.value = 0 end
 			end
 		end
 		
@@ -386,14 +386,4 @@ reaper.Undo_EndBlock(_name .. "", -1)
 
 
 
---------------------------------
---Special functions-------------
---------------------------------
-
-function update_pitch_toggles()
-
-	for p, pp in ipairs(tgl_pitch) do
-		if selectedNotes[p] == 1 then pp.state = true else pp.state = false end
-	end
-end
 

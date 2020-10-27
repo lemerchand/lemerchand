@@ -49,6 +49,13 @@ function save_beat_preset(filename, btns, index)
 end
 
 
+function update_pitch_toggles(tgl_pitch)
+
+	for p, pp in ipairs(tgl_pitch) do
+		if selectedNotes[p] == 1 then pp.state = true else pp.state = false end
+	end
+end
+
 function is_note_in_time_selection(n)
 	ts_start, ts_end = reaper.GetSet_LoopTimeRange(false, false, 0, 0, false)
 	ts_start_ppq  = reaper.MIDI_GetPPQPosFromProjTime( take, ts_start )
