@@ -33,11 +33,12 @@ reaperDoFile('../cf.lua')
 local lastWindow = reaper.JS_Window_GetFocus()
 
 --Load settings
-beatPresets = {}
-local dockOnStart = get_settings(reaper.GetResourcePath() .. '/Scripts/lemerchand/MIDI Selector Tool/lament.config', beatPresets) 
-if dockOnStart == "1" then dockOnStart = true else dockOnStart = false end
-
-
+local function update_settings()
+	beatPresets = {}
+	local dockOnStart = get_settings(reaper.GetResourcePath() .. '/Scripts/lemerchand/MIDI Selector Tool/lament.config', beatPresets) 
+	if dockOnStart == "1" then dockOnStart = true else dockOnStart = false end
+end
+update_settings()
 
 
 --Open window at mouse position--
@@ -170,7 +171,7 @@ local beatsTglOffset = frm_time.x+96
 local group_beatsToggles = {}
 
 for be = 1, 4 do
-	 tgl_beats[be] = Toggle:Create(frm_time.x + beatsTglOffset, frm_time.y+30, be, htbeatsTgl, 20, 25)
+	 tgl_beats[be] = Toggle:Create(frm_time.x + beatsTglOffset, frm_time.y+30, be, htbeatsTgl,false, 25)
 	 beatsTglOffset = beatsTglOffset + 28
 	 table.insert(group_beatsToggles, tgl_beats[be])
 	 beats[be] = 0
@@ -178,7 +179,7 @@ end
 
 beatsTglOffset = frm_time.x+96
 for be = 5, 8 do
-	 tgl_beats[be] = Toggle:Create(frm_time.x + beatsTglOffset, frm_time.y+56, be, htbeatsTgl, 20, 25)
+	 tgl_beats[be] = Toggle:Create(frm_time.x + beatsTglOffset, frm_time.y+56, be, htbeatsTgl, false, 25)
 	 beatsTglOffset = beatsTglOffset + 28
 	 table.insert(group_beatsToggles, tgl_beats[be])
 	 beats[be] = 0
@@ -186,7 +187,7 @@ end
 
 beatsTglOffset = frm_time.x+96
 for be = 9, 12 do
-	 tgl_beats[be] = Toggle:Create(frm_time.x + beatsTglOffset, frm_time.y+82, be, htbeatsTgl, 20, 25)
+	 tgl_beats[be] = Toggle:Create(frm_time.x + beatsTglOffset, frm_time.y+82, be, htbeatsTgl, false, 25)
 	 beatsTglOffset = beatsTglOffset + 28
 	 table.insert(group_beatsToggles, tgl_beats[be])
 	 beats[be] = 0
@@ -195,7 +196,7 @@ end
 beatsTglOffset = frm_time.x+96
 
 for be = 13, 16 do
-	 tgl_beats[be] = Toggle:Create(frm_time.x + beatsTglOffset, frm_time.y+108, be, htbeatsTgl, 20, 25)
+	 tgl_beats[be] = Toggle:Create(frm_time.x + beatsTglOffset, frm_time.y+108, be, htbeatsTgl,false, 25)
 	 beatsTglOffset = beatsTglOffset + 28
 	 table.insert(group_beatsToggles, tgl_beats[be])
 	 beats[be] = 0
@@ -354,7 +355,10 @@ function main()
 			    local c = beatPresets[p]:sub(i,i)
 			    if c == "1" then tgl_beats[i].state = true else tgl_beats[i].state = false end
 			end
-
+		end
+		if pp.shiftRightClick then
+			save_beat_preset(reaper.GetResourcePath() .. '/Scripts/lemerchand/MIDI Selector Tool/lament.config', group_beatsToggles, p)
+			update_settings()
 		end
 	end
 

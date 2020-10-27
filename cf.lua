@@ -15,11 +15,36 @@ function get_settings(filename, beatPresets)
 end
 
 
-
 function set_settings(filename, dockOnStart)
 	local file = io.open(filename, 'w')
 	io.output()
 	file:write(dockOnStart)
+	file:close()
+end
+
+function save_beat_preset(filename, btns, index)
+	local file = io.open(filename, 'r')
+	io.input(file)
+	
+	
+	for i =1, index do
+		file:read()
+	end
+	place = file:seek()
+	
+	file:close()
+	local file = io.open(filename, 'r+')
+	io.output(file)
+
+	file:seek('set', place)
+
+	for s, ss in ipairs(btns) do
+		if ss.state == true then file:write('1') 
+		elseif ss.state == false then  file:write('0')
+		end
+	end
+	
+	
 	file:close()
 end
 
