@@ -1,11 +1,13 @@
 -------------------------------------------------------------------------------
---						SCRIPT NAME
+--						MST3K
 -------------------------------------------------------------------------------
 --  Modified: 2020.10.27 at 09:57
 --	TODO: 
--- 		+ Setup save file for beats/settings
--- 		+ Spruce up the logic for the mutual sliding effect
---		+ Fill up space/ improve UI
+-- 		+ Add window position capture to floatAtPos on right-click
+--		+ Scales
+--		+ Note length
+--		+ Snapshots
+--		+ Bad input handling
 --
 -- RECENT CHANGES:
 --		+ Moved over to new GUI lib

@@ -1,7 +1,7 @@
 
-## MIDI Selection Tool v.9b
+## MIDI Selection Tool v.99b
 
-![Selecting Notes](https://t2361428.p.clickup-attachments.com/t2361428/f4ada0df-c594-47ac-8ddc-d258eac1de16/selecting_notes.gif?view=open)
+![Demo](https://t2361428.p.clickup-attachments.com/t2361428/9812d5e3-079e-4ec7-b53e-31a32272d4d1/dem.gif?view=open)
 
 **Description:**
 
@@ -53,6 +53,19 @@ If you don't use github then click the "code" button and select "Download Zip." 
 Then you'll need to bind it to a hotkey. Run the actions menu and select MIIDI Editor. Click 'Load Reascript' and navigate to the 'Lemerchand/MIDI Selector Tool' where you unzipped the files. Select "MIDI Selector Tool.lua" and choose a hotkey. 
 
 Finally, when in the midi editor, press said key and the GUI will pop up allowing you to select notes quickly. Be sure to read the help text in the "Info" frame. 
+
+
+**Usage:**
+
+Select & Clear 
+
+![Select & Clear](https://t2361428.p.clickup-attachments.com/t2361428/6efef399-0277-48e2-a40d-54ae0f79aafe/select-clear.gif?view=open)
+
+Capture
+![Capture](https://t2361428.p.clickup-attachments.com/t2361428/2d6eac77-210a-4cb0-b2a4-76be8315dbd2/capture.gif?view=open)
+
+Beats
+![Beats](https://t2361428.p.clickup-attachments.com/t2361428/e640485a-de4a-4d98-8457-bc13d7ea3bfb/beats.gif?view=open)
 
 **Contact:**
 
