@@ -12,25 +12,17 @@ A tool for quickly selecting midi notes in REAPER. Filters for events such as:
 		- Min/Max Velocity 
 		- Beat position in 16th notes (sorry--no odd time signatures)
 
-**What's New!?**
-
-		- Shift + L-click "Select" to invert the filter
-		- Click "Capture" to set parameters from selected notes (global)
-		- Shift + L-Click to set individual parameters from selected notes
-		- Right-click "Select" to restrict selected notes to  time selection
-		- Better handling of velocity slider
-		- Ctrl+LC on a toggle button to exclusive-select it
-		- Added version number to titlebar
-
 **Cool Features:**
 
 		- Right-click "Select" to restrict to the time selection
 		- Shift-click "Select" to invert the filter
 		- Right-click 'Clear' for a global reset
+		- Drag over beats/pitches to 'draw' patterns quickly
 		- Right-click a control to reset it
 		- Click 'Capture' to set the parameters dfrom the currently selected notes!
 		- Shift-click a control to set it's parameters to currently selected notes.
-		- Shift click a beat for a preset. Shift-right click to store in that slot.
+		- Shift-click a beat for a preset. Shift-right click to store in that slot.
+		- Ctrl-click and drag velocity slider to move note range
 		- Built-in documentation (hoverr over a control for info!)
 
 **Known Issues**
@@ -41,16 +33,24 @@ A tool for quickly selecting midi notes in REAPER. Filters for events such as:
 
 **Some things I want to add:**
 
-		- The ability to store user-defined beat presets in a file 
 		- Inclusive selection
 		- Pitch presets based on scales
 		- Info on selected notes displayed (eg., how many notes were selected)
 
 **Installation:**
 
+Dependencies: 
+	
+	- JS Reascript API (download from reapack)
+	- My gui.lua/cf.lua files 
+	- Directory structure must be your resource path then:
+		- /Scripts/lemerchnd/Midi Selector Tool
+		- gui.lua/cf.lua in the lemerchand directory
+
+
 If you don't use github then click the "code" button and select "Download Zip." Chose your REAPER resources path (usually something like c:/users/yourname/appdata/roaming/reaper) and unzip it in the 'Scripts' folder. 
 
-Then you'll need to bind it to a hotkey. Run the actions menu and select MIIDI Editor. Click 'Load Reascript' and navigate to the 'Lemerchand' where you unzipped the files. Select "midi_selector.lua" and choose a key. 
+Then you'll need to bind it to a hotkey. Run the actions menu and select MIIDI Editor. Click 'Load Reascript' and navigate to the 'Lemerchand/MIDI Selector Tool' where you unzipped the files. Select "MIDI Selector Tool.lua" and choose a hotkey. 
 
 Finally, when in the midi editor, press said key and the GUI will pop up allowing you to select notes quickly. Be sure to read the help text in the "Info" frame. 
 
