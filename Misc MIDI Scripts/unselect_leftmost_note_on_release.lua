@@ -15,21 +15,39 @@ update_active()
 ------------------------
 --Start the useful stuff
 ------------------------
-function main()
-	--Get mousewheel (val)
-	is_new_value,filename,sectionID,cmdID,mode,resolution,val = reaper.get_action_context()
+local mousedown = false
 
-	
-			
-	for i = 0, notes-1 do
-		retval, selected, muted, startppqpos, endppqpos, chan, pitch, vel = reaper.MIDI_GetNote( take, i )
-		if selected then 
-			reaper.MIDI_SetNote(take, i, false, false, startppqpos, endppqpos, chanIn, pitchIn, velIn, true)
-			break
+
+cons("open")
+function main()
+
+ 	
+	if reaper.JS_Mouse_GetState(1) == 1 and mousedown == false then mousedown = true 
+
+	elseif reaper.JS_Mouse_GetState(0) == 0 and reaper.JS_Mouse_GetState(1) ~= 1 and mousedown == true then 
+
+		for i = 0, notes-1 do
+			retval, selected, muted, startppqpos, endppqpos, chan, pitch, vel = reaper.MIDI_GetNote( take, i )
+			if selected then 
+				reaper.MIDI_SetNote(take, i, false, false, startppqpos, endppqpos, chanIn, pitchIn, velIn, true)
+				break
+			end
 		end
+		
+		
+		reaper.MIDI_Sort(take)
+		mousedown = false
 	end
 
-	reaper.MIDI_Sort(take)
+	
+	if reaper.JS_Mouse_GetState(2) == 2 then 
+	reaper.atexit(cons('close'))
+		return
+	else
+		reaper.defer(main)
+
+	end
+
 end
 	-----------------------------
 	--Debugging Stuff
