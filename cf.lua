@@ -1,3 +1,16 @@
+function restore_default_settings(filename)
+	local file = io.open(filename, 'r')
+	io.input()
+	f = file:read("*a")
+	file:close()
+
+	local file = io.open(reaper.GetResourcePath() .. '/Scripts/lemerchand/MIDI Selector Tool/lament.config', 'w')
+	io.output()
+	file:write(f)
+	file:close()
+
+end
+
 function get_settings(filename, beatPresets)
 
 	local file = io.open(filename, 'r')

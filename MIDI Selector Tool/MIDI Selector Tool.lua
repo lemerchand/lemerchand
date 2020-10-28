@@ -17,7 +17,7 @@
 --		+ 
 --		+ 
 ------------------------------------------------------------------------------
-local _version = " v.99"
+local _version = " v.995"
 local _name = "MST3K"
 
 
@@ -33,9 +33,9 @@ reaperDoFile('../cf.lua')
 local lastWindow = reaper.JS_Window_GetFocus()
 
 --Load settings
-local function update_settings()
+local function update_settings(filename)
 	beatPresets = {}
-	dockOnStart, floatAtPos, floatAtPosX, floatAtPosY, floatAtMouse, floatAtMouseX, floatAtMouseY = get_settings(reaper.GetResourcePath() .. '/Scripts/lemerchand/MIDI Selector Tool/lament.config', beatPresets) 
+	dockOnStart, floatAtPos, floatAtPosX, floatAtPosY, floatAtMouse, floatAtMouseX, floatAtMouseY = get_settings(filename, beatPresets) 
 	if dockOnStart == "1" then dockOnStart = true
 	elseif floatAtPos == "1" then 
 		floatAtPos = true
@@ -52,7 +52,7 @@ local function update_settings()
 		window_yPos = mouse_y + floatAtMouseY
 	end
 end
-update_settings()
+update_settings(reaper.GetResourcePath() .. '/Scripts/lemerchand/MIDI Selector Tool/lament.config')
 
 
 
@@ -76,6 +76,12 @@ local htbeatsTgl		= "Include/exclude specific beats.\nR-click to reset.\nCtrl+L-
 local htDockOnStart		= "Enable to dock MST3K when summoned."
 local htMainTab			= "Main Controls."
 local htSettingsTab 	= "General Settings."
+local htDockOnStart		= "Enable docking at startup."
+local htSaveSettings	= "L-click to save current settings.\nR-click to restore defaults.\nClose and restart script."
+local htFloatAtMouse 	= "Float the window at the mouse\ncursor with x/y offset."
+local htFloatAtPos 		= "Chose x/y coordinates\nfor the window to load."
+
+
 -------------------------------
 --Midi Note and BeatsThangs---
 -------------------------------
@@ -110,28 +116,29 @@ reaper.Undo_BeginBlock()
 --General Frame
 local frm_general = Frame:Create(10, 12, 227, 90, "GENERAL       ")
 
-local btn_select = Button:Create(frm_general.x+10, frm_general.y+30, "Select", htSelect)
-local btn_clear = Button:Create(btn_select.x, btn_select.y + btn_select.h + 10, "Clear", htClear)
-local btn_capture = Button:Create(btn_select.x + btn_select.w + 10, btn_select.y, "Capture", htCapture)
+local btn_select = Button:Create(frm_general.x+10, frm_general.y+30, "Select", htSelect, 64)
+local btn_capture = Button:Create(btn_select.x + btn_select.w + 7, btn_select.y, "Capture", htCapture, btn_select.w)
+local btn_clear = Button:Create(btn_capture.x + btn_capture.w+7, btn_select.y, "Clear", htClear, btn_capture.w)
 
 btn_select.hide = true
 btn_clear.hide = true
 btn_capture.hide = true
 
 local tgl_dockOnStart = Toggle:Create(frm_general.x +10, frm_general.y + 25, "", htDockOnStart, dockOnStart, 10, 10)
-local txt_dockOnStart = Text:Create(tgl_dockOnStart.x+20, tgl_dockOnStart.y, "Dock on start")
+local txt_dockOnStart = Text:Create(tgl_dockOnStart.x+20, tgl_dockOnStart.y, "Dock on start", htDockOnStart)
 
 local tgl_floatAtPos = Toggle:Create(frm_general.x +10, frm_general.y + 42, "", htFloatAtPos, floatAtPos, 10, 10)
-local txt_floatAtPos = Text:Create(tgl_floatAtPos.x+20, tgl_floatAtPos.y, "Float at pos: ")
+local txt_floatAtPos = Text:Create(tgl_floatAtPos.x+20, tgl_floatAtPos.y, "Float at pos: ", htFloatAtPos)
 local ib_floatAtPosX = InputBox:Create(frm_general.w-74, txt_floatAtPos.y-2, tonumber(floatAtPosX), htFloatAtPos,34, 17)
 local ib_floatAtPosY = InputBox:Create(frm_general.w-34, txt_floatAtPos.y-2, tonumber(floatAtPosY), htFloatAtPos,34, 17)
 
 local tgl_floatAtMouse = Toggle:Create(frm_general.x +10, frm_general.y + 59, "", htFloatAtMouse, floatAtMouse, 10, 10)
-local txt_floatAtMouse = Text:Create(tgl_floatAtMouse.x+20, tgl_floatAtMouse.y, "Float at mouse: ")
-local ib_floatAtMouseX = InputBox:Create(frm_general.w-74, txt_floatAtMouse.y-2, tonumber(floatAtMouseX), htFloatAtMousePos, 34, 17)
-local ib_floatAtMouseY = InputBox:Create(frm_general.w-34, txt_floatAtMouse.y-2, tonumber(floatAtMouseY), htFloatAtMousePos, 34, 17)
+local txt_floatAtMouse = Text:Create(tgl_floatAtMouse.x+20, tgl_floatAtMouse.y, "Float at mouse: ", htFloatAtMouse)
+local ib_floatAtMouseX = InputBox:Create(frm_general.w-74, txt_floatAtMouse.y-2, tonumber(floatAtMouseX), htFloatAtMouse, 34, 17)
+local ib_floatAtMouseY = InputBox:Create(frm_general.w-34, txt_floatAtMouse.y-2, tonumber(floatAtMouseY), htFloatAtMouse, 34, 17)
 
 local btn_save = Button:Create(frm_general.x+12, frm_general.h+frm_general.y-10, "Save", htSaveSettings, frm_general.w-20, 20)
+
 
 
 local tab_main = Tabs:AddTab("Main", true, htMainTab)
@@ -184,7 +191,7 @@ end
 local frm_velocity = Frame:Create(10, frm_pitch.y + frm_pitch.h + 27, 227,90, "VELOCITY")
 
 local sldr_minVel = H_slider:Create(frm_velocity.x + 10, frm_velocity.y + 30, frm_velocity.w - 20, nil,"Min Velocity", htVelSlider, 0, 127, 0, false)
-local sldr_maxVel = H_slider:Create(sldr_minVel.x, sldr_minVel.y + sldr_minVel.h + 10, sldr_minVel.w, nil,  "Min Velocity", htVelSlider, 0, 127, 127, true)
+local sldr_maxVel = H_slider:Create(sldr_minVel.x, sldr_minVel.y + sldr_minVel.h + 10, sldr_minVel.w, nil,  "Max Velocity", htVelSlider, 0, 127, 127, true)
 group_velSliders = {sldr_minVel, sldr_maxVel}
 
 
@@ -385,7 +392,7 @@ function main()
 		end
 		if pp.shiftRightClick then
 			save_beat_preset(reaper.GetResourcePath() .. '/Scripts/lemerchand/MIDI Selector Tool/lament.config', group_beatsToggles, p)
-			update_settings()
+			update_settings(reaper.GetResourcePath() .. '/Scripts/lemerchand/MIDI Selector Tool/lament.config')
 		end
 	end
 
@@ -395,15 +402,18 @@ function main()
 	-------------------------------
 	--SETTING elements-------------
 	-------------------------------
-	if tgl_dockOnStart.leftClick  then 
+	if tgl_dockOnStart.leftClick or txt_dockOnStart.leftClick then 
+		tgl_dockOnStart.state = true
 		tgl_floatAtMouse.state = false
 		tgl_floatAtPos.state = false
 	end
-	if tgl_floatAtMouse.leftClick == true then
+	if tgl_floatAtMouse.leftClick or txt_floatAtMouse.leftClick then
+		tgl_floatAtMouse.state = true
 		tgl_dockOnStart.state = false
 		tgl_floatAtPos.state = false
 	end
-	if tgl_floatAtPos.leftClick == true then 
+	if tgl_floatAtPos.leftClick or txt_floatAtPos.leftClick then 
+		tgl_floatAtPos.state = true
 		tgl_dockOnStart.state = false
 		tgl_floatAtMouse.state = false
 	end
@@ -413,10 +423,11 @@ function main()
 		if tgl_dockOnStart.state == true then dockOnStart = "1" else dockOnStart = "0" end
 		if tgl_floatAtPos.state == true then floatAtPos = "1" else floatAtPos = "0" end
 		if tgl_floatAtMouse.state == true then floatAtMouse = "1" else floatAtMouse = "0" end
-		set_settings(reaper.GetResourcePath() .. '/Scripts/lemerchand/MIDI Selector Tool/lament.config', dockOnStart, floatAtPos, ib_floatAtPosX.value, ib_floatAtPosY.value, floatAtMouse, ib_floatAtMouseX.value, ib_floatAtMouseY.value)
-			
+		set_settings(reaper.GetResourcePath() .. '/Scripts/lemerchand/MIDI Selector Tool/lament.config', dockOnStart, floatAtPos, ib_floatAtPosX.value, ib_floatAtPosY.value, floatAtMouse, ib_floatAtMouseX.value, ib_floatAtMouseY.value)	
 	end
-
+	if btn_save.rightClick then 
+		restore_default_settings(reaper.GetResourcePath() .. '/Scripts/lemerchand/MIDI Selector Tool/default_lament.config', beatPresets)
+	end
 
 end
 

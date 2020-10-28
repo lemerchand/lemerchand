@@ -294,7 +294,7 @@ end
 Text = {}
 Text.__index = Text
 
-function Text:Create(x,y, txt, fontSize, r, g, b, font, hide)
+function Text:Create(x,y, txt, help, fontSize, r, g, b, font, hide)
 
 	if font == nil then gfx.setfont(1, "Lucida Console", 13) end
 
@@ -303,6 +303,7 @@ function Text:Create(x,y, txt, fontSize, r, g, b, font, hide)
 	local this = {
 		x = x or 10,
 		y = y or 10,
+		help = help or "",
 		w = w,
 		h = h,
 		txt = txt or "Some text.",
@@ -321,12 +322,40 @@ function Text:Create(x,y, txt, fontSize, r, g, b, font, hide)
 end
 
 function Text:Draw()
-
+	self:ResetClicks()
 	if self.hide then return end
 	gfx.x, gfx.y = self.x, self.y
 	gfx.set(self.r, self.g, self.b, 1)
 	gfx.setfont(1, self.font, self.fontSize)
 	gfx.drawstr(self.txt)
+
+	if hovering(self.x, self.y, self.w, self.h) then
+		status:Display(self.help)
+		if gfx.mouse_cap == 1 then self.leftClick = true
+			elseif gfx.mouse_cap == 2 then self.rightClick = true
+			elseif gfx.mouse_cap == 5 then self.ctrlLeftClick = true
+			elseif gfx.mouse_cap == 9 then self.shiftLeftClick = true
+			elseif gfx.mouse_cap == 10 then self.shiftRightClick = true	
+			elseif gfx.mouse_cap == 17 then self.altLeftClick = true
+			elseif gfx.mouse_cap == 18 then self.altRightClick = true
+			elseif gfx.mouse_cap == 64 then self.middleClick = true
+			
+		end
+	end
+
+end
+
+function Text:ResetClicks()
+
+	self.leftClick = false
+	self.rightClick = false
+	self.middleClick = false
+	self.ctrlLeftClick = false
+	self.ctrlRightClick = false
+	self.shiftLeftClick = false
+	self.shiftRightClick = false
+	self.altLeftClick = false
+	self.altRightClick = false
 
 end
 
