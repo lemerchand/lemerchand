@@ -58,8 +58,9 @@ function main()
 		for i = 0, notes-1 do
 			retval, selected, muted, startppqpos, endppqpos, chan, pitch, vel = reaper.MIDI_GetNote( take, i )
 			if selected then 
+				
+				
 				new_endppqpos = endppqpos + (val*8)
-
 				if new_endppqpos <= startppqpos then 
 					new_startppqpos = new_endppqpos
 					new_endppqpos = startppqpos
