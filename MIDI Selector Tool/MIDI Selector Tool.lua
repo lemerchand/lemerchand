@@ -374,6 +374,7 @@ function main()
 	--BEAT Toggles----------------
 	-------------------------------
 	for p, pp in ipairs(group_beatsToggles) do
+		if pp.state == true then beats[p] = 1 else beats[p] = 0 end
 		if pp.rightClick then group_exec(group_beatsToggles, 'reset')
 		elseif pp.leftClick then beats[p] = math.abs(beats[p] - 1) 
 		end

@@ -24,17 +24,20 @@ A tool for quickly selecting midi notes in REAPER. Filters for events such as:
 
 **Cool Features:**
 
-		- Right-click toggle buttons to reset that section to default
-		- Right-click 'Clear' button for global reset 
-		- 'A,' 'B,' and 'C' buttons load beat presets
-			    - Modifications to a preset persist until global reset or script closes
-		- Help-text on mouse hover
+		- Right-click "Select" to restrict to the time selection
+		- Shift-click "Select" to invert the filter
+		- Right-click 'Clear' for a global reset
+		- Right-click a control to reset it
+		- Click 'Capture' to set the parameters dfrom the currently selected notes!
+		- Shift-click a control to set it's parameters to currently selected notes.
+		- Shift click a beat for a preset. Shift-right click to store in that slot.
+		- Built-in documentation (hoverr over a control for info!)
 
 **Known Issues**
 
 		- Entering an invalid note range isn't error-handled
-		- Inclusive select only works with velocity
-		- My code is messy
+		- Some issues might occure with saving.
+			- If they do, simply reload the default config
 
 **Some things I want to add:**
 
