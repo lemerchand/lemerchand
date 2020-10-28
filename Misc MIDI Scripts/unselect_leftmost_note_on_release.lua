@@ -17,8 +17,6 @@ update_active()
 ------------------------
 local mousedown = false
 
-
-cons("open")
 function main()
 
  	
@@ -31,17 +29,19 @@ function main()
 			if selected then 
 				reaper.MIDI_SetNote(take, i, false, false, startppqpos, endppqpos, chanIn, pitchIn, velIn, true)
 				break
+			elseif i == notes-1 and selected == false then  return 
 			end
 		end
 		
 		
 		reaper.MIDI_Sort(take)
 		mousedown = false
+
 	end
 
 	
 	if reaper.JS_Mouse_GetState(2) == 2 then 
-	reaper.atexit(cons('close'))
+	
 		return
 	else
 		reaper.defer(main)
