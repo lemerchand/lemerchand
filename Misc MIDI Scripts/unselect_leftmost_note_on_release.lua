@@ -7,40 +7,85 @@ reaperDoFile('../cf.lua')
 reaper.Undo_BeginBlock2(0)
 
 ----------------------
---Get neccessary info
+--Setup
 ---------------------
-
+local mousedown = false
+local clickType = 0
 update_active()
+
+function mouse_click()
+
+
+	if reaper.JS_Mouse_GetState(0x0008) == 0x0008 and reaper.JS_Mouse_GetState(1) == 1 then  -- Shift 
+		mousedown = true
+		clickType = 9
+	end
+
+	if reaper.JS_Mouse_GetState(0x0004) == 0x0004 and reaper.JS_Mouse_GetState(1) == 1 then  -- Ctrl 
+		mousedown = true
+		clickType = 5
+	end
+	
+	if reaper.JS_Mouse_GetState(1) == 1 then
+		mousedown = true
+		clickType = 1
+	end
+
+	if reaper.JS_Mouse_GetState(0) == 0 and reaper.JS_Mouse_GetState(1) ~= 1 and mousedown then 
+	mousedown = false
+	return clickType
+	end
+
+	if reaper.JS_Mouse_GetState(0) == 0 and mousedown == false then
+	return 0
+	end
+end
+
+function unselect_left()
+	
+	for i = 0, notes-1 do
+		retval, selected, muted, startppqpos, endppqpos, chan, pitch, vel = reaper.MIDI_GetNote( take, i )
+		if selected then 
+			reaper.MIDI_SetNote(take, i, false, false, startppqpos, endppqpos, chanIn, pitchIn, velIn, true)
+			break
+		elseif i == notes-1 and selected == false then  return 
+		end
+	end
+end
+
+function unselect_right()
+	
+	for i = 0, notes-1 do
+		retval, selected, muted, startppqpos, endppqpos, chan, pitch, vel = reaper.MIDI_GetNote( take, i )
+		if selected and i == notes - 1 then 
+			reaper.MIDI_SetNote(take, i, false, false, startppqpos, endppqpos, chanIn, pitchIn, velIn, true)
+			break 
+		end
+	end
+end
 
 ------------------------
 --Start the useful stuff
 ------------------------
-local mousedown = false
+
 
 function main()
 
- 	
-	if reaper.JS_Mouse_GetState(1) == 1 and mousedown == false then mousedown = true 
+	ms = mouse_click()
 
-	elseif reaper.JS_Mouse_GetState(0) == 0 and reaper.JS_Mouse_GetState(1) ~= 1 and mousedown == true then 
+	if ms == 1 then 
+		update_active()
+	
+		unselect_left()
 
-		for i = 0, notes-1 do
-			retval, selected, muted, startppqpos, endppqpos, chan, pitch, vel = reaper.MIDI_GetNote( take, i )
-			if selected then 
-				reaper.MIDI_SetNote(take, i, false, false, startppqpos, endppqpos, chanIn, pitchIn, velIn, true)
-				break
-			elseif i == notes-1 and selected == false then  return 
-			end
-		end
-		
-		
+			
 		reaper.MIDI_Sort(take)
 		mousedown = false
 
 	end
 
 	
-	if reaper.JS_Mouse_GetState(2) == 2 then 
+	if reaper.JS_Mouse_GetState(64) == 64 then 
 	
 		return
 	else
