@@ -49,7 +49,6 @@ function unselect_left()
 			reaper.MIDI_SetNote(take, i, false, false, startppqpos, endppqpos, chanIn, pitchIn, velIn, true)
 			break
 		elseif i == notes-1 and selected == false then  
-			cons('rrr')
 			return 
 		end
 	end
@@ -59,7 +58,8 @@ function unselect_right()
 	
 	for i = 0, notes-1 do
 		retval, selected, muted, startppqpos, endppqpos, chan, pitch, vel = reaper.MIDI_GetNote( take, i )
-		if selected and i == notes - 1 then 
+		retval2, selected2, muted2, startppqpos2, endppqpos2, chan2, pitch2, vel2 = reaper.MIDI_GetNote( take, i+1 )
+		if selected and selected2 == false then 
 			reaper.MIDI_SetNote(take, i, false, false, startppqpos, endppqpos, chanIn, pitchIn, velIn, true)
 			break 
 		end
@@ -74,11 +74,20 @@ end
 function main()
 
 	ms = mouse_click()
+	selectedNotes = 0
 
 	if ms == 1 then 
 		update_active()
 	
-		unselect_left()
+		for s = 0, notes-1 do
+			sretval, sselected, smuted, sstartppqpos, sendppqpos, schan, spitch, svel = reaper.MIDI_GetNote( take, s )
+			if sselected then selectedNotes = selectedNotes+1 end
+		end
+
+		if note_under_mouse_index() == nil then 
+		elseif note_under_mouse_index() >= selectedNotes - 2 then unselect_left() 
+		elseif note_under_mouse_index() <= 2 then unselect_right()
+		end
 
 			
 		reaper.MIDI_Sort(take)

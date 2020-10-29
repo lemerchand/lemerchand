@@ -1,3 +1,30 @@
+
+--Returns the index of the note under mouse cursor
+function note_under_mouse_index()
+	noteCount = reaper.MIDI_CountEvts(take)
+		
+	window, segment, details = reaper.BR_GetMouseCursorContext()
+	retval, inlineEditor, noteRow, ccLane, ccLaneVal, ccLaneId = reaper.BR_GetMouseCursorContext_MIDI()
+	mouse_time_pos = reaper.MIDI_GetPPQPosFromProjTime(take, reaper.BR_GetMouseCursorContext_Position()) --mouse time in ppq
+
+	for ind = 0, notes-1 do
+		retval, selected, muted, startppqpos, endppqpos, chan, pitch, vel = reaper.MIDI_GetNote( take, ind )
+		if pitch == noteRow and mouse_time_pos >= startppqpos and mouse_time_pos <= endppqpos then
+			return ind
+		end
+	end
+		
+end
+
+--Returns the number of values in a table
+function count_table(t)
+	local n = 0
+	for i, item in ipairs(t) do
+		n = n + 1
+	end
+	return n
+end
+
 function restore_default_settings(filename)
 	local file = io.open(filename, 'r')
 	io.input()
