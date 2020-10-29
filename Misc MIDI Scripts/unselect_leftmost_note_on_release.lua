@@ -48,7 +48,9 @@ function unselect_left()
 		if selected then 
 			reaper.MIDI_SetNote(take, i, false, false, startppqpos, endppqpos, chanIn, pitchIn, velIn, true)
 			break
-		elseif i == notes-1 and selected == false then  return 
+		elseif i == notes-1 and selected == false then  
+			cons('rrr')
+			return 
 		end
 	end
 end
@@ -84,14 +86,9 @@ function main()
 
 	end
 
-	
-	if reaper.JS_Mouse_GetState(64) == 64 then 
-	
-		return
-	else
-		reaper.defer(main)
+	reaper.defer(main)
 
-	end
+	
 
 end
 	-----------------------------
