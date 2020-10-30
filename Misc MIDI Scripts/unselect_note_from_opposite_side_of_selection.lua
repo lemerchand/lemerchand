@@ -56,10 +56,10 @@ end
 
 function unselect_right()
 	
-	for i = 0, notes-1 do
+	for i = notes-1, 0, -1 do
 		retval, selected, muted, startppqpos, endppqpos, chan, pitch, vel = reaper.MIDI_GetNote( take, i )
-		retval2, selected2, muted2, startppqpos2, endppqpos2, chan2, pitch2, vel2 = reaper.MIDI_GetNote( take, i+1 )
-		if selected and selected2 == false then 
+		
+		if selected  then 
 			reaper.MIDI_SetNote(take, i, false, false, startppqpos, endppqpos, chanIn, pitchIn, velIn, true)
 			break 
 		end
@@ -73,6 +73,8 @@ end
 
 function main()
 
+	reaper.JS_Mouse_SetCursor( reaper.JS_Mouse_LoadCursor(32644))
+	reaper.JS_WindowMessage_Intercept(reaper.JS_Window_GetFocus(), "WM_SETCURSOR", false)
 	ms = mouse_click()
 	selectedNotes = 0
 
@@ -84,33 +86,31 @@ function main()
 			if sselected then selectedNotes = selectedNotes+1 end
 		end
 
-		if note_under_mouse_index() == nil then 
-		if selectedNotes = 3 then i
-			if note_under_mouse_index() == 1 then unselect_right()
-			elseif note_under_mouse_index == 3 then unselect_left()
-			end
+		if note_under_mouse_index() == nil then goto pass
+
 		elseif note_under_mouse_index() >= selectedNotes/2 then unselect_left() 
 		elseif note_under_mouse_index() <= selectedNotes/2 then unselect_right()
 		end
 
 			
 		reaper.MIDI_Sort(take)
+		
+		::pass::
 		mousedown = false
 
 	end
-
-	reaper.defer(main)
-
 	
+	--check to see if any selected ntoes remain, if not then end
+	for s = 0, notes-1 do
+			sretval, sselected, smuted, sstartppqpos, sendppqpos, schan, spitch, svel = reaper.MIDI_GetNote( take, s )
+			if sselected then selectedNotes = selectedNotes+1 end
+		end
+
+	if selectedNotes == 0 then return
+	else reaper.defer(main) end
 
 end
-	-----------------------------
-	--Debugging Stuff
-	--cons("Note Row: " .. noteRow .. "\nMouse time pos: " .. mouse_time_pos .. "\nMouse Time Snapped: " .. reaper.SnapToGrid(0, mouse_time_pos)*reaper.MIDI_GetGrid(take), true)
---	med = reaper.MIDI_GetGrid(take)
-
-	-----------------------------
 
 
 main()
-reaper.Undo_EndBlock2(0, "Unselect leftmost", 0)
+reaper.Undo_EndBlock2(0, "Unselect note from opposite side of selected notes.", 0)
