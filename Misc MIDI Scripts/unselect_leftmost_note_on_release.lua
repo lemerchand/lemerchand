@@ -85,8 +85,12 @@ function main()
 		end
 
 		if note_under_mouse_index() == nil then 
-		elseif note_under_mouse_index() >= selectedNotes - 2 then unselect_left() 
-		elseif note_under_mouse_index() <= 2 then unselect_right()
+		if selectedNotes = 3 then i
+			if note_under_mouse_index() == 1 then unselect_right()
+			elseif note_under_mouse_index == 3 then unselect_left()
+			end
+		elseif note_under_mouse_index() >= selectedNotes/2 then unselect_left() 
+		elseif note_under_mouse_index() <= selectedNotes/2 then unselect_right()
 		end
 
 			
