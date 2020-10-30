@@ -73,7 +73,7 @@ end
 
 function main()
 
-	reaper.JS_Mouse_SetCursor( reaper.JS_Mouse_LoadCursor(32644))
+	reaper.JS_Mouse_SetCursor( reaper.JS_Mouse_LoadCursor(188))
 	reaper.JS_WindowMessage_Intercept(reaper.JS_Window_GetFocus(), "WM_SETCURSOR", false)
 	ms = mouse_click()
 	selectedNotes = 0
@@ -106,7 +106,10 @@ function main()
 			if sselected then selectedNotes = selectedNotes+1 end
 		end
 
-	if selectedNotes == 0 then return
+	if selectedNotes == 0 then 
+		reaper.atexit(reaper.JS_WindowMessage_ReleaseAll())
+		return
+
 	else reaper.defer(main) end
 
 end
