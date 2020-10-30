@@ -16,15 +16,6 @@ update_active()
 function mouse_click()
 
 
-	if reaper.JS_Mouse_GetState(0x0008) == 0x0008 and reaper.JS_Mouse_GetState(1) == 1 then  -- Shift 
-		mousedown = true
-		clickType = 9
-	end
-
-	if reaper.JS_Mouse_GetState(0x0004) == 0x0004 and reaper.JS_Mouse_GetState(1) == 1 then  -- Ctrl 
-		mousedown = true
-		clickType = 5
-	end
 	
 	if reaper.JS_Mouse_GetState(1) == 1 then
 		mousedown = true
