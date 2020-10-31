@@ -10,7 +10,7 @@ reaper.Undo_BeginBlock2(0)
 --Get neccessary info
 ---------------------
 selected_notes = 0
-update_active()
+update_active_midi()
 
 -- Look to see if there are selected notes
 -- If so flag selected_notes to run the appropraite if in main()

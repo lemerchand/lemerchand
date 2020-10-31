@@ -40,14 +40,7 @@ function draw_elements()
 	end
 end
 
---Returns the number of values in a table
-function count_table(t)
-	local n = 0
-	for i, item in ipairs(t) do
-		n = n + 1
-	end
-	return n
-end
+
 
 --Fills the gfx window background with color
 function fill_background()

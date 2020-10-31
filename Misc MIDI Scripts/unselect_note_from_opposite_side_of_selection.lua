@@ -11,7 +11,7 @@ reaper.Undo_BeginBlock2(0)
 ---------------------
 local mousedown = false
 local clickType = 0
-update_active()
+update_active_midi()
 
 function mouse_click()
 
@@ -70,7 +70,7 @@ function main()
 	selectedNotes = 0
 
 	if ms == 1 then 
-		update_active()
+		update_active_midi()
 	
 		for s = 0, notes-1 do
 			sretval, sselected, smuted, sstartppqpos, sendppqpos, schan, spitch, svel = reaper.MIDI_GetNote( take, s )

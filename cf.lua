@@ -151,7 +151,7 @@ function note_to_midi(str)
 	cons(midi_n-1, true)
 end
 
-function update_active()
+function update_active_midi()
 
 	active_midi_editor = reaper.MIDIEditor_GetActive()
 	take = reaper.MIDIEditor_GetTake(active_midi_editor)
@@ -180,7 +180,7 @@ end
 function select_notes(clear, time_selection_select, minVel, maxVel, minNote, maxNote)
 
 	--Make sure we are working on the active midi item
-	update_active()
+	update_active_midi()
 	--If clear is flagged we first clear the selection
 
 	if clear then reaper.MIDI_SelectAll(take, false) end
@@ -217,7 +217,7 @@ function select_notes(clear, time_selection_select, minVel, maxVel, minNote, max
 end
 
 function set_from_selected(get_min_pitch, get_max_pitch, get_min_vel, get_max_vel, get_pitches, sldr_minVel, sldr_maxVel, ib_minNote, ib_maxNote)
-	update_active()
+	update_active_midi()
 	
 	for i = 0, notes-1 do
 		retval, selected, muted, startppqpos, endppqpos, chan, pitch, vel = reaper.MIDI_GetNote(take, i)
