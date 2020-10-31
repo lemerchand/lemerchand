@@ -11,25 +11,28 @@ reaper.Undo_BeginBlock2(0)
 ---------------------
 local mousedown = false
 local clickType = 0
+local t = 0
 update_active_midi()
 
 function mouse_click()
 
-
 	
-	if reaper.JS_Mouse_GetState(1) == 1 then
-		mousedown = true
-		clickType = 1
+	
+	local clickType = reaper.JS_Mouse_GetState(-1)
+
+	if clickType ~= 0 then 
+		mousedown = true 
+		t = clickType
+
 	end
 
-	if reaper.JS_Mouse_GetState(0) == 0 and reaper.JS_Mouse_GetState(1) ~= 1 and mousedown then 
-	mousedown = false
-	return clickType
+	if clickType == 0 and mousedown == true then
+		mousedown = false
+	elseif reaper.JS_Mouse_GetState(0) == 0 and mousedown == false then
+
+		return t
 	end
 
-	if reaper.JS_Mouse_GetState(0) == 0 and mousedown == false then
-	return 0
-	end
 end
 
 function unselect_left()
@@ -69,6 +72,7 @@ function main()
 	ms = mouse_click()
 	selectedNotes = 0
 
+
 	if ms == 1 then 
 		update_active_midi()
 	
@@ -78,7 +82,6 @@ function main()
 		end
 
 		if note_under_mouse_index() == nil then goto pass
-
 		elseif note_under_mouse_index() >= selectedNotes/2 then unselect_left() 
 		elseif note_under_mouse_index() <= selectedNotes/2 then unselect_right()
 		end
@@ -88,6 +91,7 @@ function main()
 		
 		::pass::
 		mousedown = false
+		t = 0
 
 	end
 	

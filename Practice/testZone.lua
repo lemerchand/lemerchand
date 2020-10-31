@@ -22,7 +22,8 @@ function main()
 	draw_elements()
 	if char ~= 0 then lastChar = char end
 	status:Display("Mouse_cap:   " .. gfx.mouse_cap ..
-				"\nChar:   " .. lastChar)
+				"\nChar:   " .. lastChar .. 
+				"\nJS Mouse_getState: " .. reaper.JS_Mouse_GetState(-1))
 
 
 	
