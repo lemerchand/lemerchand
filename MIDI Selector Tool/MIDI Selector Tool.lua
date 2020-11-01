@@ -84,7 +84,7 @@ local htDockOnStart		= "Enable docking at startup."
 local htSaveSettings	= "L-click to save current settings.\nR-click to restore defaults.\nClose and restart script."
 local htFloatAtMouse 	= "Float the window at the mouse\ncursor with x/y offset."
 local htFloatAtPos 		= "Choose x/y coordinates\nfor the window to load."
-local htLengthTgle		= "Filter by note length."
+local htLengthTgle		= "Filter by note length.\nR-click to reset.\nCtrl+L-click: exclusive select."
 local htTimeThreshold	= "Threshold in ppq to catch notes\nwith imperfect lengths or times."
 
 
@@ -434,6 +434,12 @@ function main()
 		if pp.state == true then lengths[p] = 1 else lengths[p] = 0 end
 		if pp.rightClick then group_exec(group_lengthToggles, 'reset')
 		elseif pp.leftClick then lengths[p] = math.abs(lengths[p] - 1) 
+		end
+
+		if pp.ctrlLeftClick then 
+			group_exec(group_lengthToggles, 'reset')
+			pp.state = true
+			lengths[p] = 1
 		end
 	end
 
