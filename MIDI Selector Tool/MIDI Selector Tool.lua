@@ -10,6 +10,8 @@
 --		+ Bad input handling
 --
 -- RECENT CHANGES:
+--		+ Added PPQ Threshold
+--		+ Added 1-1/64 notes filter
 --		+ Moved over to new GUI lib
 --		+ Section-specific capture
 --		+ Toggle button swipe
@@ -58,7 +60,7 @@ update_settings(reaper.GetResourcePath() .. '/Scripts/lemerchand/MIDI Selector T
 
 
 
-gfx.init(_name .. " " .. _version, 248, 630, dockOnStart, window_xPos, window_yPos)
+gfx.init(_name .. " " .. _version, 248, 660, dockOnStart, window_xPos, window_yPos)
 
 -- Keep on top
 local win = reaper.JS_Window_Find(_name .. " " .. _version, true)
@@ -81,7 +83,9 @@ local htSettingsTab 	= "General Settings."
 local htDockOnStart		= "Enable docking at startup."
 local htSaveSettings	= "L-click to save current settings.\nR-click to restore defaults.\nClose and restart script."
 local htFloatAtMouse 	= "Float the window at the mouse\ncursor with x/y offset."
-local htFloatAtPos 		= "Chose x/y coordinates\nfor the window to load."
+local htFloatAtPos 		= "Choose x/y coordinates\nfor the window to load."
+local htLengthTgle		= "Filter by note length."
+local htTimeThreshold	= "Threshold in ppq to catch notes\nwith imperfect lengths or times."
 
 
 -------------------------------
@@ -91,6 +95,10 @@ note_midi_n = {0,1,2,3,4,5,6,7,8,9,10,11}			--Covers all 12 notes (pitch%12)
 note_names = {'C','C#', 'D', 'D#', 'E',				--Note names for notes_list
 			'F','F#', 'G', 'G#', 'A', 
 			'A#','B'}
+
+lengths_in_ppq = {3840, 1920, 960, 480, 240, 120, 60, -1}
+lengths_txt = {"1", "1/2", "1/4", "1/8", "1/16", "1/32", "1/64", "R"}
+lengths = {0,0,0,0,0,0,0,0,0}
 
 function default_vars()
 	selectedNotes = {1,1,1,1,1,1,1,1,1,1,1,1}
@@ -199,7 +207,7 @@ group_velSliders = {sldr_minVel, sldr_maxVel}
 
 
 --Beats fFrame
-local frm_time = Frame:Create(10, frm_velocity.y + frm_velocity.h + 27, 227, 128, "TIME")
+local frm_time = Frame:Create(10, frm_velocity.y + frm_velocity.h + 27, 227, 162, "TIME")
 
 
 local tgl_beats = {}
@@ -213,7 +221,7 @@ for be = 1, 4 do
 	 beats[be] = 0
 end
 
-beatsTglOffset = frm_time.x+96
+beatsTglOffset = frm_time.x+97
 for be = 5, 8 do
 	 tgl_beats[be] = Toggle:Create(frm_time.x + beatsTglOffset, frm_time.y+56, be, htbeatsTgl, false, 25)
 	 beatsTglOffset = beatsTglOffset + 28
@@ -221,7 +229,7 @@ for be = 5, 8 do
 	 beats[be] = 0
 end
 
-beatsTglOffset = frm_time.x+96
+beatsTglOffset = frm_time.x+97
 for be = 9, 12 do
 	 tgl_beats[be] = Toggle:Create(frm_time.x + beatsTglOffset, frm_time.y+82, be, htbeatsTgl, false, 25)
 	 beatsTglOffset = beatsTglOffset + 28
@@ -229,7 +237,7 @@ for be = 9, 12 do
 	 beats[be] = 0
 end
 
-beatsTglOffset = frm_time.x+96
+beatsTglOffset = frm_time.x+97
 
 for be = 13, 16 do
 	 tgl_beats[be] = Toggle:Create(frm_time.x + beatsTglOffset, frm_time.y+108, be, htbeatsTgl,false, 25)
@@ -237,6 +245,26 @@ for be = 13, 16 do
 	 table.insert(group_beatsToggles, tgl_beats[be])
 	 beats[be] = 0
 end
+
+local tgl_length = {}
+local lengthTglOffset = frm_time.y + 30
+local group_lengthToggles = {}
+
+for te = 1, 4 do
+	tgl_length[te] = Toggle:Create(frm_time.x+10, lengthTglOffset, lengths_txt[te], htLengthTgle, false, 40)
+	lengthTglOffset = lengthTglOffset + 26
+	table.insert(group_lengthToggles, tgl_length[te])
+end
+
+local lengthTglOffset = frm_time.y + 30
+
+for te = 5, 8 do
+	tgl_length[te] = Toggle:Create(frm_time.x+53, lengthTglOffset, lengths_txt[te], htLengthTgle, false, 40)
+	lengthTglOffset = lengthTglOffset + 26
+	table.insert(group_lengthToggles, tgl_length[te])
+end
+
+local sldr_timeThreshold = H_slider:Create(frm_time.x + 10, frm_time.y+frm_time.h - 20, frm_time.w - 20, nil,"PPQ Threshold", htTimeThreshold, 0, 50, 30, false)
 
 
 --Status bar
@@ -267,14 +295,14 @@ function main()
 	-------------------------------
 	--SELECT BUTTON----------------
 	-------------------------------
-	if btn_select.leftClick  or char == 13 then select_notes(true, false, sldr_minVel.value, sldr_maxVel.value, ib_minNote.value, ib_maxNote.value) end
-	if btn_select.rightClick or gfx.mouse_cap == 8 and char == 13 then select_notes(true,true, sldr_minVel.value, sldr_maxVel.value, ib_minNote.value, ib_maxNote.value) end
+	if btn_select.leftClick  or char == 13 then select_notes(true, false, sldr_minVel.value, sldr_maxVel.value, ib_minNote.value, ib_maxNote.value, sldr_timeThreshold.value) end
+	if btn_select.rightClick or gfx.mouse_cap == 8 and char == 13 then select_notes(true,true, sldr_minVel.value, sldr_maxVel.value, ib_minNote.value, ib_maxNote.value, sldr_timeThreshold.value) end
 	if btn_select.shiftLeftClick then
-		select_notes(true, false, sldr_minVel.value, sldr_maxVel.value, ib_minNote.value, ib_maxNote.value)
+		select_notes(true, false, sldr_minVel.value, sldr_maxVel.value, ib_minNote.value, ib_maxNote.value, sldr_timeThreshold.value)
 		reaper.MIDIEditor_OnCommand(active_midi_editor, 40501)
 	end
 	if btn_select.ctrlLeftClick then
-		select_notes(true, true, sldr_minVel.value, sldr_maxVel.value, ib_minNote.value, ib_maxNote.value)
+		select_notes(true, true, sldr_minVel.value, sldr_maxVel.value, ib_minNote.value, ib_maxNote.value, sldr_timeThreshold.value)
 	end
 
 	-------------------------------
@@ -399,7 +427,20 @@ function main()
 		end
 	end
 
+	-------------------------------
+	--LENGTH Toggles---------------
+	-------------------------------
+	for p, pp in ipairs(group_lengthToggles) do
+		if pp.state == true then lengths[p] = 1 else lengths[p] = 0 end
+		if pp.rightClick then group_exec(group_lengthToggles, 'reset')
+		elseif pp.leftClick then lengths[p] = math.abs(lengths[p] - 1) 
+		end
+	end
 
+	-------------------------------
+	--PPQ Slider-------------------
+	-------------------------------
+	if sldr_timeThreshold.rightClick then sldr_timeThreshold.value = 30 end
 
 
 	-------------------------------

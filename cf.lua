@@ -117,9 +117,7 @@ function is_note_in_time_selection(n)
 
 end
 
-function matches_selected_beats(startppqpos)
-	threshold = 30
-
+function matches_selected_beats(startppqpos, threshold)
 	for bbb = 16, 1, -1 do
 
 		if beats[bbb] == 1 and startppqpos%(3840) >= beats_in_ppq[bbb] - threshold and startppqpos%(3840) <= beats_in_ppq[bbb] + threshold then
@@ -129,6 +127,22 @@ function matches_selected_beats(startppqpos)
 	end
 	return false
 end
+
+function matches_selected_lengths(startppqpos, endppqpos, threshold)
+	for lll = 7, 1, -1 do
+
+		if lengths[lll] == 1 and (endppqpos-startppqpos) >= lengths_in_ppq[lll] - threshold and (endppqpos-startppqpos) <= lengths_in_ppq[lll] + threshold then
+			
+			return true
+		end
+	end
+	
+	return false
+
+end
+
+
+
 
 function midi_to_note(n)
 
@@ -177,7 +191,7 @@ function is_note_in(n)
 	return false
 end
 
-function select_notes(clear, time_selection_select, minVel, maxVel, minNote, maxNote)
+function select_notes(clear, time_selection_select, minVel, maxVel, minNote, maxNote, threshold)
 
 	--Make sure we are working on the active midi item
 	update_active_midi()
@@ -193,6 +207,15 @@ function select_notes(clear, time_selection_select, minVel, maxVel, minNote, max
 		end
 	end
 
+	for l = 1, 7 do
+		if lengths[l] == 1 then 
+			there_are_lengths_selected = true
+			break
+		else
+			there_are_lengths_selected = false
+		end
+	end
+
 
 	--Run through midi notes in take 
 	--If they are witin the velocity and note range then select them (according to the parameters of the pitch frame)
@@ -202,8 +225,8 @@ function select_notes(clear, time_selection_select, minVel, maxVel, minNote, max
 		if time_selection_select and is_note_in_time_selection(startppqpos) == false then goto pass end
 
 		if vel >= minVel and vel <= maxVel and pitch >= note_to_midi(minNote) and pitch <= note_to_midi(maxNote) then 
-			if there_are_beats_selected and matches_selected_beats(startppqpos) == false then goto pass end
-	
+			if there_are_beats_selected and matches_selected_beats(startppqpos, threshold) == false then goto pass end
+			if there_are_lengths_selected and matches_selected_lengths(startppqpos, endppqpos, threshold) == false then goto pass end
 
 			reaper.MIDI_SetNote(take, i, is_note_in(pitch%12), false, startppqpos, endppqpos, chan, pitch, vel, true)
 
