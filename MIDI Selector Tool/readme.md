@@ -46,7 +46,7 @@ Dependencies:
 	- JS Reascript API (download from reapack)
 	- My gui.lua/cf.lua files 
 	- Directory structure must be your resource path then:
-		- /Scripts/lemerchnd/Midi Selector Tool
+		- /Scripts/lemerchand/Midi Selector Tool
 		- gui.lua/cf.lua in the lemerchand directory
 
 
