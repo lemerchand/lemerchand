@@ -1,5 +1,5 @@
 
-## MIDI Selection Tool v.99b
+## MIDI Selection Tool v.998b
 
 ![Demo](https://t2361428.p.clickup-attachments.com/t2361428/9812d5e3-079e-4ec7-b53e-31a32272d4d1/dem.gif?view=open)
 
@@ -10,6 +10,7 @@ A tool for quickly selecting midi notes in REAPER. Filters for events such as:
 		- Note Range
 		- Pitch
 		- Min/Max Velocity 
+		- Note length (no triplets or dotted yet)
 		- Beat position in 16th notes (sorry--no odd time signatures)
 
 **Cool Features:**
@@ -24,6 +25,7 @@ A tool for quickly selecting midi notes in REAPER. Filters for events such as:
 		- Shift-click a beat for a preset. Shift-right click to store in that slot.
 		- Ctrl-click and drag velocity slider to move note range
 		- Built-in documentation (hoverr over a control for info!)
+		- Adjustable threshold for length/grid detection in PPQ
 
 **Known Issues**
 
