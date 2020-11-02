@@ -74,7 +74,7 @@ local htClear 			= "Clear Selection. \nR-click for global reset.\nHotkeys: (Shif
 local htCapture 		= "Set parameters from selected notes.\nOr Shift+L-Click a parameter to\ncapture only that."
 local htMinNote 		= "Sets lowest possible note.\nR-click to reset."
 local htMaxNote 		= "Sets highest possible note.\nR-click to reset."
-local htPitchTgl 		= "Toggles pitches.\nR-click to reset.\nCtrl+L-click: exclusive select."
+local htPitchTgl 		= "Toggles pitches.\nR-click to reset.\nCtrl+L-click: exclusive select.\nAlt+L-Click to set to scale."
 local htVelSlider		= "Sets the lowest/highest velocity.\nR-click to reset.\nCtrl+L-click to slide both (beta)"
 local htbeatsTgl		= "Include/exclude specific beats.\nR-click to reset.\nCtrl+L-click: exclusive select."
 local htDockOnStart		= "Enable to dock MST3K when summoned."
@@ -86,6 +86,7 @@ local htFloatAtMouse 	= "Float the window at the mouse\ncursor with x/y offset."
 local htFloatAtPos 		= "Choose x/y coordinates\nfor the window to load."
 local htLengthTgle		= "Filter by note length.\nR-click to reset.\nCtrl+L-click: exclusive select."
 local htTimeThreshold	= "Threshold in ppq to catch notes\nwith imperfect lengths or times."
+local htDdwnScales		= "Select a scale then Alt+L-Click\na note to set pitches."
 
 
 -------------------------------
