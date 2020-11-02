@@ -8,7 +8,7 @@
 A tool for quickly selecting midi notes in REAPER. Filters for events such as:
 		
 		- Note Range
-		- Pitch
+		- Pitch (including scales!)
 		- Min/Max Velocity 
 		- Note length (no triplets or dotted yet)
 		- Beat position in 16th notes (sorry--no odd time signatures)
@@ -36,7 +36,6 @@ A tool for quickly selecting midi notes in REAPER. Filters for events such as:
 **Some things I want to add:**
 
 		- Inclusive selection
-		- Pitch presets based on scales
 		- Info on selected notes displayed (eg., how many notes were selected)
 
 **Installation:**
@@ -45,7 +44,7 @@ Dependencies:
 	
 	- JS Reascript API (download from reapack)
 	- My gui.lua/cf.lua files 
-	- Directory structure must be your resource path then:
+	- Directory structure must be your REAPER resource path then:
 		- /Scripts/lemerchand/Midi Selector Tool
 		- gui.lua/cf.lua in the lemerchand directory
 
