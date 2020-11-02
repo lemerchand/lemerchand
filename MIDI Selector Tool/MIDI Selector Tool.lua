@@ -60,7 +60,7 @@ update_settings(reaper.GetResourcePath() .. '/Scripts/lemerchand/MIDI Selector T
 
 
 
-gfx.init(_name .. " " .. _version, 248, 660, dockOnStart, window_xPos, window_yPos)
+gfx.init(_name .. " " .. _version, 248, 680, dockOnStart, window_xPos, window_yPos)
 
 -- Keep on top
 local win = reaper.JS_Window_Find(_name .. " " .. _version, true)
@@ -96,6 +96,22 @@ note_names = {'C','C#', 'D', 'D#', 'E',				--Note names for notes_list
 			'F','F#', 'G', 'G#', 'A', 
 			'A#','B'}
 
+local scaleName = {"Major", "Minor", "Harmonic Minor", "Melodic Minor", "Dorian", "Phrygian", "Lydian", "Mixolydian", "Locrian", "Phrygian Dominant", "Major Pentatonic", "Minor Pentatonic", "Blues"}
+local scales = {}
+scales[1] = {1,0,1,0,1,1,0,1,0,1,0,1}
+scales[2] = {1,0,1,1,0,1,0,1,1,0,1,0}
+scales[3] = {1,0,1,1,0,1,0,1,1,0,0,1}
+scales[4] = {1,0,1,1,0,1,0,1,0,1,0,1}
+scales[5] = {1,0,1,1,0,1,0,1,0,1,1,0}
+scales[6] = {1,1,0,1,0,1,0,1,1,0,1,0}
+scales[7] = {1,0,1,0,1,0,1,1,0,1,0,1}
+scales[8] = {1,0,1,0,1,1,0,1,0,1,0,1}
+scales[9] = {1,1,0,1,0,1,1,0,1,0,1,0}
+scales[10] = {1,1,0,0,1,1,0,1,1,0,1,0}
+scales[11] = {1,0,1,0,1,0,0,1,0,1,0,0}
+scales[12] = {1,0,0,1,0,1,0,1,0,0,1,0}
+scales[13] = {1,0,0,1,0,1,1,1,0,0,1,0}
+
 lengths_in_ppq = {3840, 1920, 960, 480, 240, 120, 60, -1}
 lengths_txt = {"1", "1/2", "1/4", "1/8", "1/16", "1/32", "1/64", "R"}
 lengths = {0,0,0,0,0,0,0,0,0}
@@ -106,6 +122,8 @@ function default_vars()
 end
 
 default_vars()
+
+local wait = 0
 
 --PPQ values for 16th notes
 beats_in_ppq = {0,240,480,720,960,1200,1440,1680,1920,2160,2400,2640,2880,3120,3360,3600}
@@ -169,7 +187,7 @@ tab_settings:AttatchElements(tab_settings_elements)
 
 
 --Pitch frame
-local frm_pitch = Frame:Create(10, frm_general.y + frm_general.h + 27, 227, 100, "PITCH")
+local frm_pitch = Frame:Create(10, frm_general.y + frm_general.h + 27, 227, 120, "PITCH")
 
 local ib_maxNote = InputBox:Create(frm_pitch.x + 10, frm_pitch.y + 41, "G10", htMaxNote)
 local ib_minNote = InputBox:Create(frm_pitch.x + 10, frm_pitch.y + 70, "C0", htMinNote, ib_maxNote.w)
@@ -196,6 +214,9 @@ for pe = 7, 12 do
 	 pitchTglOffset = pitchTglOffset + 28
 	 table.insert(group_pitchToggles, tgl_pitch[pe])
 end
+
+
+
 
 --Velocity Frame
 local frm_velocity = Frame:Create(10, frm_pitch.y + frm_pitch.h + 27, 227,90, "VELOCITY")
@@ -271,6 +292,7 @@ local sldr_timeThreshold = H_slider:Create(frm_time.x + 10, frm_time.y+frm_time.
 --For now status needs to be global
 status = Status:Create(10, frm_time.y + frm_time.h + 27, 227, 60, "INFO", nil, nil, "Hover over a control for more info!")
 
+local ddwn_scaleName = Dropdown:Create(frm_pitch.x+60, frm_pitch.y+frm_pitch.h-15, nil, nil, scaleName, 1, 1, htDdwnScales)
 
 
 
@@ -349,11 +371,23 @@ function main()
 		if pp.shiftLeftClick then set_from_selected(false, false, false, false, true)
 			update_pitch_toggles(tgl_pitch)
 		end
+
+		--Set scale
+		if pp.altLeftClick then 
+			for t = p, p+11 do
+				local modt = t%12
+				if modt == 0 then modt = 12 end
+
+				if scales[ddwn_scaleName.selected][t-p+1] == 1 then tgl_pitch[modt].state = true else tgl_pitch[modt].state = false end
+			end
+
+		 end
 		if pp.state then selectedNotes[p] = 1 else selectedNotes[p] = 0 end
 		if pp.state == true then count = count + 1 end
 	end
 
 	if count == 0 then tgl_pitch[1].state = true ; selectedNotes[1] = 1 end
+
 
 	-------------------------------
 	--VEL Sliders------------------
@@ -479,7 +513,30 @@ function main()
 		restore_default_settings(reaper.GetResourcePath() .. '/Scripts/lemerchand/MIDI Selector Tool/default_lament.config', beatPresets)
 	end
 
+	---------------------------------
+	--SCALES Dropdown----------------
+	---------------------------------
+
+	if ddwn_scaleName.choicesHide == false then
+		wait = 0
+		group_exec(group_velSliders, 'block')
+	elseif ddwn_scaleName.choicesHide == true then 
+		if wait == 5 then 
+			group_exec(group_velSliders, 'unblock')
+		else
+			wait = wait + 1
+		end
+	end
+	
+
+
+
+
 end
+
+
+
+
 
 main()
 reaper.Undo_EndBlock(_name .. "", -1)

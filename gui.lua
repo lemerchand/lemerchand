@@ -110,6 +110,14 @@ function group_exec(group, action)
 		for e, element in ipairs(group) do
 			element.state = false
 		end
+	elseif action == 'block' then
+		for e, element in ipairs(group) do
+			element.block = true
+		end
+	elseif action == 'unblock' then
+		for e, element in ipairs(group) do
+			element.block = false
+		end
 	end
 end
 
@@ -523,6 +531,7 @@ function InputBox:Create(x,y, default, help, w, h)
 		altRightClick = false,
 		mouseDown = false,
 		hide = hide or false,
+		block = false
 	}
 	setmetatable(this, InputBox)
 	table.insert(Elements, this)
@@ -644,7 +653,8 @@ function Toggle:Create(x, y, txt, help, state,  w, h, hide)
 		altRightClick = false,
 		hide = hide or false,
 		font = "Lucida Console",
-		fontSize = fontSize or 11
+		fontSize = fontSize or 11,
+		block = false
 	}
 	setmetatable(this, Toggle)
 	table.insert(Elements, this)
@@ -789,7 +799,8 @@ function H_slider:Create(x, y, w, h, txt, help, min_val, max_val, default, backw
 		ctrlRightClick = false,
 		ctrlLeftClick = false,
 		override = false,
-		hide = false
+		hide = false,
+		block = false
 	}
 	setmetatable(this, H_slider)
 	table.insert(Elements, this)
@@ -813,10 +824,11 @@ function H_slider:Draw()
 	local fill = (percent*(self.w/100))-8
 
 
-	if hovering(self.x-10, self.y+1, self.w+self.x, self.h-4)  then
+	if self.block == false and hovering(self.x-10, self.y+1, self.w+self.x, self.h-4)  then
 
 		status:Display(self.help)
-		if gfx.mouse_cap == 1 or self.override then 
+		
+		if gfx.mouse_cap == 1 or self.override  then 
 			self.mouseDown = true
 			new_val = math.ceil(((gfx.mouse_x-self.x)/self.w)*self.max_val)
 			if new_val < self.min_val then new_val = self.min_val 
@@ -885,7 +897,7 @@ function Dropdown:Create(x,y,w,h,choices, default, selected, help)
 
 	if h == nil then 
 		ww,hh = gfx.measurestr(choices[1])
-		h = hh + 10
+		h = hh + 12
 	end
 
 	local this = {
@@ -902,7 +914,8 @@ function Dropdown:Create(x,y,w,h,choices, default, selected, help)
 		leftClick = false,
 		rightClick = false,
 		choicesHide = true,
-		hide = false
+		hide = false,
+		block = false
 	}
 	setmetatable(this, Dropdown)
 	table.insert(Elements, this)
@@ -936,7 +949,7 @@ function Dropdown:Draw()
 		status:Display(self.help)
 		self.mouseOver = true 
 		if gfx.mouse_cap >= 1 and self.mouseDown == false then 
-			
+			self.leftClick = true
 			if gfx.mouse_cap == 4 or gfx.mouse_cap == 8 or gfx.mouse_cap == 16 then self.mouse_down = false
 			else
 				self.mouseDown = true
@@ -968,6 +981,8 @@ function Dropdown:DrawChoices()
 
 	local choice_height = 0
 
+
+
 	for c, choice in ipairs(self.choices) do
 		local w,h = gfx.measurestr(choice)
 		choice_height = choice_height + h
@@ -975,7 +990,7 @@ function Dropdown:DrawChoices()
 	end
 
 	gfx.set(.37,.37,.37,1)
-	gfx.rect(self.x, self.y+self.h, self.w, choice_height+10, true)
+	gfx.rect(self.x, self.y+self.h, self.w, choice_height+15, true)
 
 	--Determine the x/y and hovering coordinates for each choice
 	local choice_pos_y = 25
@@ -988,6 +1003,7 @@ function Dropdown:DrawChoices()
 		if hovering(self.x+6, self.y+choice_pos_y, self.x+self.w, self.y+choice_pos_y) and gfx.mouse_cap == 1 then
 
 		 self.selected = c
+		 for wait = 0, 10000 do end
 		 self.choicesHide = true
 		end
 
@@ -1037,7 +1053,8 @@ function Status:Create(x,y,w,h,title, font, fontSize, help, r, g, b)
 		fontSize = fontSize or 10,
 		leftClick = false,
 		rightClick = false,
-		hide = false
+		hide = false,
+		block = false
 	}
 	setmetatable(this, Status)
 	table.insert(Elements, this)
@@ -1065,6 +1082,7 @@ end
 
 function Status:Display(help_text)
 	--Draw status message
+
 	gfx.setfont(2, self.font, self.fontSize)
 	gfx.x, gfx.y = self.x+10, self.y+25
 	gfx.set(.7,.7,.7)
@@ -1073,6 +1091,8 @@ end
 
 function Status:Reset()
 end
+
+
 ------------------------------------------END: STATUS-----------------------------------------------------
 
 
