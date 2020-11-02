@@ -93,33 +93,33 @@ local htDdwnScales		= "Select a scale then Alt+L-Click\na note to set pitches."
 --Midi Note and BeatsThangs---
 -------------------------------
 note_midi_n = {0,1,2,3,4,5,6,7,8,9,10,11}			--Covers all 12 notes (pitch%12)
-note_names = {'C','C#', 'D', 'D#', 'E',				--Note names for notes_list
-			'F','F#', 'G', 'G#', 'A', 
-			'A#','B'}
+note_names 	= {'C','C#', 'D', 'D#', 'E',				--Note names for notes_list
+				'F','F#', 'G', 'G#', 'A', 
+				'A#','B'}
 
 local scaleName = {"Major", "Minor", "Harmonic Minor", "Melodic Minor", "Dorian", "Phrygian", "Lydian", "Mixolydian", "Locrian", "Phrygian Dominant", "Major Pentatonic", "Minor Pentatonic", "Blues"}
 local scales = {}
-scales[1] = {1,0,1,0,1,1,0,1,0,1,0,1}
-scales[2] = {1,0,1,1,0,1,0,1,1,0,1,0}
-scales[3] = {1,0,1,1,0,1,0,1,1,0,0,1}
-scales[4] = {1,0,1,1,0,1,0,1,0,1,0,1}
-scales[5] = {1,0,1,1,0,1,0,1,0,1,1,0}
-scales[6] = {1,1,0,1,0,1,0,1,1,0,1,0}
-scales[7] = {1,0,1,0,1,0,1,1,0,1,0,1}
-scales[8] = {1,0,1,0,1,1,0,1,0,1,0,1}
-scales[9] = {1,1,0,1,0,1,1,0,1,0,1,0}
-scales[10] = {1,1,0,0,1,1,0,1,1,0,1,0}
-scales[11] = {1,0,1,0,1,0,0,1,0,1,0,0}
-scales[12] = {1,0,0,1,0,1,0,1,0,0,1,0}
-scales[13] = {1,0,0,1,0,1,1,1,0,0,1,0}
+scales[1] 	= {1,0,1,0,1,1,0,1,0,1,0,1}
+scales[2] 	= {1,0,1,1,0,1,0,1,1,0,1,0}
+scales[3] 	= {1,0,1,1,0,1,0,1,1,0,0,1}
+scales[4] 	= {1,0,1,1,0,1,0,1,0,1,0,1}
+scales[5] 	= {1,0,1,1,0,1,0,1,0,1,1,0}
+scales[6] 	= {1,1,0,1,0,1,0,1,1,0,1,0}
+scales[7] 	= {1,0,1,0,1,0,1,1,0,1,0,1}
+scales[8] 	= {1,0,1,0,1,1,0,1,0,1,0,1}
+scales[9] 	= {1,1,0,1,0,1,1,0,1,0,1,0}
+scales[10] 	= {1,1,0,0,1,1,0,1,1,0,1,0}
+scales[11] 	= {1,0,1,0,1,0,0,1,0,1,0,0}
+scales[12] 	= {1,0,0,1,0,1,0,1,0,0,1,0}
+scales[13] 	= {1,0,0,1,0,1,1,1,0,0,1,0}
 
-lengths_in_ppq = {3840, 1920, 960, 480, 240, 120, 60, -1}
-lengths_txt = {"1", "1/2", "1/4", "1/8", "1/16", "1/32", "1/64", "R"}
-lengths = {0,0,0,0,0,0,0,0,0}
+lengths_in_ppq 	= {3840, 1920, 960, 480, 240, 120, 60, -1}
+lengths_txt 	= {"1", "1/2", "1/4", "1/8", "1/16", "1/32", "1/64", "R"}
+lengths 		= {0,0,0,0,0,0,0,0,0}
 
 function default_vars()
-	selectedNotes = {1,1,1,1,1,1,1,1,1,1,1,1}
-	beats = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}	
+	selectedNotes 	= {1,1,1,1,1,1,1,1,1,1,1,1}
+	beats 			= {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}	
 end
 
 default_vars()
@@ -233,7 +233,7 @@ local frm_time = Frame:Create(10, frm_velocity.y + frm_velocity.h + 27, 227, 162
 
 
 local tgl_beats = {}
-local beatsTglOffset = frm_time.x+96
+local beatsTglOffset = frm_time.x+97
 local group_beatsToggles = {}
 
 for be = 1, 4 do
