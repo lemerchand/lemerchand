@@ -1,7 +1,7 @@
 
 ## MIDI Selection Tool v.998b
 
-![Demo](https://t2361428.p.clickup-attachments.com/t2361428/9812d5e3-079e-4ec7-b53e-31a32272d4d1/dem.gif?view=open)
+![Demo](https://t2361428.p.clickup-attachments.com/t2361428/3f5587aa-833f-4cab-8b80-c9cc140aa938/dem.gif?view=open)
 
 **Description:**
 
@@ -61,13 +61,19 @@ Finally, when in the midi editor, press said key and the GUI will pop up allowin
 
 Select & Clear 
 
-![Select & Clear](https://t2361428.p.clickup-attachments.com/t2361428/6efef399-0277-48e2-a40d-54ae0f79aafe/select-clear.gif?view=open)
+![Select & Clear](https://t2361428.p.clickup-attachments.com/t2361428/32a91a63-ca6b-4e5a-a4f1-2eb1dce5a085/select-clear.gif?view=open)
 
 Capture
-![Capture](https://t2361428.p.clickup-attachments.com/t2361428/2d6eac77-210a-4cb0-b2a4-76be8315dbd2/capture.gif?view=open)
+![Capture](https://t2361428.p.clickup-attachments.com/t2361428/f0e4d949-29de-4b9e-92d5-e6cee17cccd6/capture.gif?view=open)
 
 Beats
-![Beats](https://t2361428.p.clickup-attachments.com/t2361428/e640485a-de4a-4d98-8457-bc13d7ea3bfb/beats.gif?view=open)
+![Beats](https://t2361428.p.clickup-attachments.com/t2361428/a3529dbe-2b58-4b2b-9b81-5672b5497068/beats.gif?view=open)
+
+Note Lengths
+![Note Lengths](https://t2361428.p.clickup-attachments.com/t2361428/4417adfe-444a-493a-8039-545e02280789/timeinlength.gif?view=open)
+
+Scales
+![Scales](https://t2361428.p.clickup-attachments.com/t2361428/a77b90d7-9e67-46ae-8ff1-728899d465cb/scales.gif?view=open)
 
 **Contact:**
 
