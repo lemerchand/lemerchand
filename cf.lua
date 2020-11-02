@@ -165,11 +165,17 @@ function note_to_midi(str)
 	cons(midi_n-1, true)
 end
 
+function update_active_arrange()
+	tracks = reaper.CountTracks(0)
+	
+end
+
+
 function update_active_midi()
 
 	active_midi_editor = reaper.MIDIEditor_GetActive()
 	take = reaper.MIDIEditor_GetTake(active_midi_editor)
-	notes = reaper.MIDI_CountEvts(take)
+	retval, notes, ccevtcnt, textsyxevtcnt = reaper.MIDI_CountEvts( take )
 
 end
 
