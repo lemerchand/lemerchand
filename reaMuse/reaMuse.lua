@@ -27,7 +27,10 @@ local prompts = {}
 local determiners = {}
 local pluralDeterminers = {}
 local questionCaps = {}
-local pattern = {"literal", "abstract", "short", "long"}
+local altQuestionCaps = {}
+local questions = {}
+local pronouns = {"it", "them", "this", "yourself"}
+local patterns = {"literal", "abstract", "short", "long"}
 
 
 -- Load words from files into tables
@@ -178,6 +181,27 @@ function load_words()
 	end
 	questionCapsFile:close()
 
+	-- Load questions
+	local questionsFile = io.open(reaper.GetResourcePath() .. '/Scripts/lemerchand/reaMuse/questions.dat', 'r')
+	for line in questionsFile:lines() do
+		local word = line
+		if word == nil then break
+		else 
+			table.insert(questions, word)
+		end
+	end
+	questionsFile:close()
+
+	-- Load ing question caps
+	local altQuestionCapsFile = io.open(reaper.GetResourcePath() .. '/Scripts/lemerchand/reaMuse/altQuestionCaps.dat', 'r')
+	for line in altQuestionCapsFile:lines() do
+		local word = line
+		if word == nil then break
+		else 
+			table.insert(altQuestionCaps, word)
+		end
+	end
+	altQuestionCapsFile:close()
 
 end
 
@@ -188,87 +212,89 @@ function new_message()
 
 	local sentence = ""
 	local noun = ""
+	local prnoun = ""
 	local determiner = ""
+	local question = false
+	local command = false
+	local suggestion = false
+
 
 	-- Determine plural or singluar
 	if math.random(1,100) <=50 then 
 		noun = nouns[math.random(1, count_table(nouns))]
 		determiner = determiners[math.random(1, count_table(determiners))]
+		
 		local plural = false
 	else
 		noun = pluralNouns[math.random(1, count_table(pluralNouns))]
 		determiner = pluralDeterminers[math.random(1, count_table(pluralDeterminers))]
+
 		local plural = true
 	end
 
+	-- Determine question, command, or suggestion
+
+	local sentenceType = math.random(1, 100)
+	if sentenceType <= 35 then isQuestion = true
+	elseif sentenceType >=36 and sentenceType <=69 then isSuggestion = true
+	else isCommand = true
+	end
+
+	-- Determine sentence pattern
+	local rp = math.random(1, 4)
+	local pattern = patterns[3]
+
 	-- Generate random fragments
-	local prompt 		= prompts[math.random(1, count_table(prompts))]
-	local verb 			= verbs[math.random(1, count_table(verbs))]
-	local prep 			= preps[math.random(1, count_table(preps))]
-	local location 		= locations[math.random(1, count_table(locations))]
-	local adj 			= adjs[math.random(1, count_table(adjs))]
-	local adv 			= advs[math.random(1, count_table(advs))]
-	local gerund 		= gerunds[math.random(1, count_table(gerunds))]
-	local conj 			= conjs[math.random(1, count_table(conjs))]	
-	local questionCap 	= questionCaps[math.random(1, count_table(questionCaps))]
+	local prompt 			= prompts[math.random(1, count_table(prompts))]
+	local verb 				= verbs[math.random(1, count_table(verbs))]
+	local prep 				= preps[math.random(1, count_table(preps))]
+	local location 			= locations[math.random(1, count_table(locations))]
+	local adj 				= adjs[math.random(1, count_table(adjs))]
+	local adv 				= advs[math.random(1, count_table(advs))]
+	local gerund 			= gerunds[math.random(1, count_table(gerunds))]
+	local conj 				= conjs[math.random(1, count_table(conjs))]	
+	local questionCap 		= questionCaps[math.random(1, count_table(questionCaps))]
+	local question 			= questions[math.random(1, count_table(questions))]
+	local prompt2 			= prompts[math.random(1, count_table(prompts))]
+	local verb2 			= verbs[math.random(1, count_table(verbs))]
+	local prep2 			= preps[math.random(1, count_table(preps))]
+	local location2 		= locations[math.random(1, count_table(locations))]
+	local adj2 				= adjs[math.random(1, count_table(adjs))]
+	local adv2 				= advs[math.random(1, count_table(advs))]
+	local gerund2 			= gerunds[math.random(1, count_table(gerunds))]
+	local conj2 			= conjs[math.random(1, count_table(conjs))]	
+	local questionCap2	 	= questionCaps[math.random(1, count_table(questionCaps))]
+	local altQuestionCap 	= altQuestionCaps[math.random(1, count_table(altQuestionCaps))]
+	local pronoun 			= pronouns[math.random(1, count_table(pronouns))]
 
-	-- Make adjustments
-	if prompt == "is" and plural then 
-		prompt = "can" 
+	if isQuestion then 
 
-	end
-
-	if (prompt == "should" or prompt == "would" or prompt == "find") and not plural then 
-		noun = pluralNouns[math.random(1, count_table(pluralNouns))]
-		determiner = pluralDeterminers[math.random(1, count_table(pluralDeterminers))]
-		plural = true
-	 end
-
-	-- Randomly choose a pattern
-	
-	if prompt == "have you tried" then prompt = prompt .. "\n"
-	elseif gerund == "turning" then
-		gerund = gerund .. "\n" .. determiner .. "\n" .. noun .. "\ninto something else "
-		sentence = prompt .. " " .. gerund
-	elseif prompt == "make" or prompt == "let" then
-			sentence = prompt .. " " .. gerund .. "\n".. determiner .. "\n" .. noun ..  "\ntake priorty."
-	elseif prompt == "find" then
-		sentence = prompt .. "\n" .. determiner .. "\n" .. noun .. " " .. conj .. "\n" .. gerund .. " " .. pluralNouns[math.random(1,count_table(pluralNouns))]
-	else
-		local rp = math.random(1, 4)
-
-		if pattern[rp] == "literal" then
-
-			sentence = prompt .. "\n" .. gerund  .. "\n" .. determiner .. "\n"  ..  noun 
-			
- 		elseif pattern[rp] == "abstract" then 
-
- 			sentence = prompt .. " " .. adv .. "\n" .. gerund .. "\n" .. determiner .. "\n" .. noun .. " to\n" .. verb .. " " ..
- 				pluralNouns[math.random(1,count_table(pluralNouns))]
-
-		elseif pattern[rp] == "short" then 
-
-			sentence = prompt .. " " .. gerund
-
-			if plural then sentence = sentence .. "\n" .. pluralNouns[math.random(1,count_table(pluralNouns))] end
-			
-
-		elseif pattern[rp] == "long" then
-
-			sentence = prompt .. " " .. adv .. "\n" .. gerund  .. "\n" .. determiner .. "\n" .. adj .. " " ..  noun
-			
+		sentence = question 
+		if pattern == "short" then 
+			if gerund == "placing" or gerund == "putting"
+				or gerund == "questioning" or gerund == "satisfying" then
+				sentence = sentence .. " " .. gerund .. "\n" .. pronoun .. " " .. prep .. "\n" .. location
+				if question == "is" or question == "how is" then 
+					sentence = sentence .. "\n" .. altQuestionCap
+				elseif question == "have you tried" then
+					sentence = sentence .. "?"
+				else
+					sentence = sentence .. "\n" .. questionCap
+				end
+			elseif question == "is" or question == "how is"  then 
+				sentence = sentence .. "\n" .. gerund .. "\n" .. altQuestionCap
+			elseif question == "have you tried" then sentence = sentence .. "\n" .. gerund .. " " .. pronoun .. "?"
+			elseif question == "should" then sentence = sentence .. " you " .. "\n" .. verb .. " " .. pronoun .. "?"
+			else 
+				sentence = sentence .. "\n" .. gerund .. "\n".. determiner .. "\n" ..  noun .. "\n" .. questionCap
+		
+			end
+		
 		end
-	end
 
-	
-	if prompt == "will" or prompt == "how can"
-		or prompt == "how does" or prompt == "is"
-		or prompt == "are you" or prompt == "are"
-		or prompt == "could" or prompt == "should" 
-		or prompt == "would" or prompt == "can"
-		or prompt == "will" or promt == "is" then
-			sentence = sentence .. "\n" .. questionCap
-	elseif  prompt == "have you tried" then sentence = sentence .. "?"
+		
+
+
 	end
 
 	return sentence
