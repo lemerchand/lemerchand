@@ -9,7 +9,8 @@ if win then reaper.JS_Window_AttachTopmostPin(win) end
 
 status = Status:Create(10,10,280,350)
 
-lastChar = 0
+local lastChar = 0
+
 
 function insert_random_notes()
 
@@ -27,7 +28,12 @@ function insert_random_notes()
 	reaper.MIDI_Sort(take)
 end
 
-test = Button:Create(status.x+10, status.y+status.h-30, "Test")
+
+
+
+btn_randomNotes = Button:Create(status.x+10, status.y+status.h-30, "Test")
+btn_fadeText = Button:Create(btn_randomNotes.x + btn_randomNotes.w + 20, status.y+status.h-30, "Try")
+
 
 function main()
 
@@ -72,8 +78,9 @@ function main()
 	if char ~= 0 then lastChar = char end
 	status:Display(statustext)
 
+	
+	if btn_randomNotes.leftClick then insert_random_notes() end
 
-	if test.leftClick then insert_random_notes() end
 	 
 end
 main()
