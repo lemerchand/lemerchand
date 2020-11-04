@@ -202,17 +202,22 @@ function new_message()
 	end
 
 	-- Generate random fragments
-	local prompt 	= prompts[math.random(1, count_table(prompts))]
-	local verb 		= verbs[math.random(1, count_table(verbs))]
-	local prep 		= preps[math.random(1, count_table(preps))]
-	local location 	= locations[math.random(1, count_table(locations))]
-	local adj 		= adjs[math.random(1, count_table(adjs))]
-	local adv 		= advs[math.random(1, count_table(advs))]
-	local gerund 	= gerunds[math.random(1, count_table(gerunds))]
-	local conj 		= conjs[math.random(1, count_table(conjs))]	
+	local prompt 		= prompts[math.random(1, count_table(prompts))]
+	local verb 			= verbs[math.random(1, count_table(verbs))]
+	local prep 			= preps[math.random(1, count_table(preps))]
+	local location 		= locations[math.random(1, count_table(locations))]
+	local adj 			= adjs[math.random(1, count_table(adjs))]
+	local adv 			= advs[math.random(1, count_table(advs))]
+	local gerund 		= gerunds[math.random(1, count_table(gerunds))]
+	local conj 			= conjs[math.random(1, count_table(conjs))]	
+	local questionCap 	= questionCaps[math.random(1, count_table(questionCaps))]
 
 	-- Make adjustments
-	if prompt == "is" and plural then prompt = "are" end
+	if prompt == "is" and plural then 
+		prompt = "are" 
+	elseif prompt == "are you" and not plural then
+		promt = "is"
+	end
 
 	if (prompt == "should" or prompt == "would" or prompt == "find") and not plural then 
 		noun = pluralNouns[math.random(1, count_table(pluralNouns))]
@@ -222,24 +227,37 @@ function new_message()
 
 	-- Randomly choose a pattern
 
-	local rp = math.random(1, 4)
+	local rp = 3 -- math.random(1, 4)
 
-	if pattern[rp] == "literal" or "abstract" then 
+	if pattern[rp] == "literal" or pattern[rp] == "abstract" then 
 
 		sentence = prompt .. " " .. gerund  .. "\n" .. determiner .. " "  ..  noun
+		
 
 	elseif pattern[rp] == "short" then 
 
-		sentence = prompt .. "HAAAAAA " .. gerund
+		sentence = prompt .. " " .. gerund
+
+		if plural then sentence = sentence .. " " .. pluralNouns[math.random(1,count_table(pluralNouns))] end
+		
 
 	elseif pattern[rp] == "long" then
 
-		sentence = prompt .. " " .. adv .. "\n" .. gerund  .. " " .. determiner .. " " .. adj .. "\n" ..  noun
+		sentence = prompt .. " " .. adv .. "\n" .. gerund  .. " " .. determiner .. "\n" .. adj .. " " ..  noun
+		
 
 	end
 
-	cons(pattern[rp], true)
 	
+	if prompt == "will" or prompt == "how can"
+		or prompt == "how does" or prompt == "is"
+		or prompt == "are you" or prompt == "are"
+		or prompt == "could" or prompt == "should" 
+		or prompt == "would" or prompt == "can"
+		or prompt == "will" or promt == "is" then
+			sentence = sentence .. "\n" .. questionCap
+	elseif  prompt == "have you tried" then sentence = sentence .. "?"
+	end
 
 	return sentence
 end
