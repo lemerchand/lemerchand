@@ -3,7 +3,7 @@ reaperDoFile('../gui.lua')
 reaperDoFile('../cf.lua')
 
 
-gfx.init("reaMuse", 550,160, false, 550,350)
+gfx.init("reaMuse", 500,220, false, 550,350)
 
 -- Define window name so that script can stop defering when unfocused
 local me = reaper.JS_Window_GetFocus()
@@ -214,9 +214,8 @@ function new_message()
 
 	-- Make adjustments
 	if prompt == "is" and plural then 
-		prompt = "are" 
-	elseif prompt == "are you" and not plural then
-		promt = "is"
+		prompt = "can" 
+
 	end
 
 	if (prompt == "should" or prompt == "would" or prompt == "find") and not plural then 
@@ -226,26 +225,39 @@ function new_message()
 	 end
 
 	-- Randomly choose a pattern
-
-	local rp = 3 -- math.random(1, 4)
-
-	if pattern[rp] == "literal" or pattern[rp] == "abstract" then 
-
-		sentence = prompt .. " " .. gerund  .. "\n" .. determiner .. " "  ..  noun
-		
-
-	elseif pattern[rp] == "short" then 
-
+	
+	if prompt == "have you tried" then prompt = prompt .. "\n"
+	elseif gerund == "turning" then
+		gerund = gerund .. "\n" .. determiner .. "\n" .. noun .. "\ninto something else "
 		sentence = prompt .. " " .. gerund
+	elseif prompt == "make" or prompt == "let" then
+			sentence = prompt .. " " .. gerund .. "\n".. determiner .. "\n" .. noun ..  "\ntake priorty."
+	elseif prompt == "find" then
+		sentence = prompt .. "\n" .. determiner .. "\n" .. noun .. " " .. conj .. "\n" .. gerund .. " " .. pluralNouns[math.random(1,count_table(pluralNouns))]
+	else
+		local rp = math.random(1, 4)
 
-		if plural then sentence = sentence .. " " .. pluralNouns[math.random(1,count_table(pluralNouns))] end
-		
+		if pattern[rp] == "literal" then
 
-	elseif pattern[rp] == "long" then
+			sentence = prompt .. "\n" .. gerund  .. "\n" .. determiner .. "\n"  ..  noun 
+			
+ 		elseif pattern[rp] == "abstract" then 
 
-		sentence = prompt .. " " .. adv .. "\n" .. gerund  .. " " .. determiner .. "\n" .. adj .. " " ..  noun
-		
+ 			sentence = prompt .. " " .. adv .. "\n" .. gerund .. "\n" .. determiner .. "\n" .. noun .. " to\n" .. verb .. " " ..
+ 				pluralNouns[math.random(1,count_table(pluralNouns))]
 
+		elseif pattern[rp] == "short" then 
+
+			sentence = prompt .. " " .. gerund
+
+			if plural then sentence = sentence .. "\n" .. pluralNouns[math.random(1,count_table(pluralNouns))] end
+			
+
+		elseif pattern[rp] == "long" then
+
+			sentence = prompt .. " " .. adv .. "\n" .. gerund  .. "\n" .. determiner .. "\n" .. adj .. " " ..  noun
+			
+		end
 	end
 
 	
