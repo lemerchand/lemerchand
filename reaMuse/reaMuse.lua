@@ -31,8 +31,13 @@ local questions = {}
 local pronouns = {"it", "them", "this", "yourself"}
 local patterns = {"literal", "abstract", "short", "long"}
 
--- blocked words
-local shortblock = {"fnding", "find", "reverse", "reversing"}
+
+-- excludes words
+local shortexcludes = {"fnding", "find", "reverse", "reversing"}
+local commandexcludes = {"beneath"}
+local beneathbelow_excludes = {"the community", "the front", "the back", "the chorus", 
+							"the intro", "the verse", "the trash", "the measure", "the begining", "the end",
+							"the verse", "another section"}
 
 --Fills the gfx window background with color
 function fill_background()
@@ -216,6 +221,29 @@ function load_words()
 
 end
 
+function replace_excludes(verb, verb2, gerund, noun, noun2, questionCap, altQuestionCap, location, question, determiner, excluded)
+	local replacing = true
+
+	while replacing do
+		for i = 1, count_table(excluded) do
+			if verb == excluded[i] then verb = verbs[math.random(1, count_table(verbs))] 
+			elseif gerund == excluded[i] then gerund = gerund[math.random(1, count_table(gerunds))] 
+			elseif noun == excluded[i] then noun = nouns[math.random(1, count_table(nouns))] 
+			elseif questionCap == excluded[i] then questionCap = questionCaps[math.random(1, count_table(questionCaps))] 
+			elseif altQuestionCap == excluded[i] then altQuestionCap = altQuestionCaps[math.random(1, count_table(altQuestionCaps))] 
+			elseif location == excluded[i] then location = locations[math.random(1, count_table(locations))] 
+			elseif questions== excluded[i] then question = questions[math.random(1, count_table(questions))] 
+			elseif determiner == excluded[i] then determiner = determinersds[math.random(1, count_table(determiners))] 
+			elseif verb2 == excluded[i] then verb = verbs[math.random(1, count_table(verbs))] 
+			elseif noun2 == excluded[i] then verb = nouns[math.random(1, count_table(nouns))] 
+			else 
+				replacing = false
+			end
+		end
+	end
+
+end
+
 
 
 -- Randomly generate a new sentence
@@ -233,11 +261,13 @@ function new_message()
 	-- Determine plural or singluar
 	if math.random(1,100) <=50 then 
 		noun = nouns[math.random(1, count_table(nouns))]
+		noun2 = nouns[math.random(1, count_table(nouns))]
 		determiner = determiners[math.random(1, count_table(determiners))]
 		
 		local plural = false
 	else
 		noun = pluralNouns[math.random(1, count_table(pluralNouns))]
+		noun2 = nouns[math.random(1, count_table(nouns))]
 		determiner = pluralDeterminers[math.random(1, count_table(pluralDeterminers))]
 
 		local plural = true
@@ -252,9 +282,11 @@ function new_message()
 	else isCommand = true
 	end
 
-	cons(tostring(isCommand), true)
+	-- Isolate sentence type -- FOR DEBUG
 
 	--isCommand = true
+	--isQuestion = true
+	--isSuggestion = true
 
 	-- Determine sentence pattern
 	local rp = math.random(1, 4)
@@ -292,12 +324,14 @@ function new_message()
 		sentence = question 
 		--if pattern == "short" then 
 
-			for b=1, count_table(shortblock) do
-				if verb == shortblock[b] then verb = verb2 end
-				if verb2 == shortblock[b] then verb = verbs[math.random(1,count_table(verbs))] end
+			replace_excludes(verb, verb2, gerund, noun, noun2, questionCap, altQuestionCap, location, question, determiner, shortexcludes)
 
-				if gerund == shortblock[b] then gerund = gerund2 end
-				if gerund2 == shortblock[b] then gerund = gerunds[math.random(1,count_table(gerunds))] end
+			for b=1, count_table(shortexcludes) do
+				if verb == shortexcludes[b] then verb = verb2 end
+				if verb2 == shortexcludes[b] then verb = verbs[math.random(1,count_table(verbs))] end
+
+				if gerund == shortexcludes[b] then gerund = gerund2 end
+				if gerund2 == shortexcludes[b] then gerund = gerunds[math.random(1,count_table(gerunds))] end
 			end
 
 			if gerund == "placing" or gerund == "putting" then
@@ -327,23 +361,41 @@ function new_message()
 
 	elseif isCommand then 
 
+		replace_excludes(verb, verb2, gerund, noun, noun2, questionCap, altQuestionCap, location, question, determiner, commandexcludes)
+
 		if pattern == "short" then
+			replace_excludes(verb, verb2, gerund, noun, noun2, questionCap, altQuestionCap, location, question, determiner, {"place"})
 			if plural then sentence = verb .. "\n" .. noun
 			else sentence = verb .. " " .. determiner  .. "\n" .. noun
 			end
 		else
 		
-			if verb == "replace" then prep = "with" end
-			if verb == "simplify" then 
+			local cap = math.random(1,100)
+			if cap <= 50 then 
+				cap = prep .. "\n" .. location 
+			else
+				cap = adv
+			end
+
+			if prep == "before" or prep == "beneath"  or prep == "above" then 
+				replace_excludes(verb, verb2, gerund, noun, noun2, questionCap, altQuestionCap, location, question, determiner, beneathbelow_excludes)
+				prep = adj .. "\n" .. prep 
+
+			end
+
+			if verb == "replace" then 
+				prep = "with" 
+				sentence = verb .. " " .. determiner .. "\n".. noun .. " " .. prep .. "\n" .. noun2
+			elseif verb == "simplify" then 
 				if not plural then sentence = verb .. " " .. prep .. "\n" .. noun
-				else sentence = verb .. " " .. prep .. "\n" .. noun
+				else sentence = verb .. " " .. prep .. "\n" .. determiner .. " " .. noun
 				end
 			elseif verb == "connect" then 
-				sentence = verb .. " " .. noun .. "\n" .. "to " ..  determiner .. "\n" .. nouns[math.random(1,count_table(nouns))]
+				sentence = verb .. " " .. noun .. "\n" .. "to " ..  determiner .. "\n" .. pluralNouns[math.random(1,count_table(pluralNouns))]
 			elseif verb == "place" then
-				sentence = verb .. " " .. noun .. "\n" .. prep .. "\n" .. location
+				sentence = verb .. "\n" .. determiner .. " ".. pluralNouns[math.random(1, count_table(pluralNouns))] .. "\n"  .. cap
 			else
-				sentence = verb .. " " .. determiner .. "\n".. noun .. " " .. prep .. "\n" .. location
+				sentence = verb .. " " .. determiner .. "\n".. noun .. " " .. cap
 			end
 		end
 
