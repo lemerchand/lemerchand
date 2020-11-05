@@ -1,5 +1,4 @@
 function reaperDoFile(file) local info = debug.getinfo(1,'S'); script_path = info.source:match[[^@?(.*[\/])[^\/]-$]]; dofile(script_path .. file); end
-reaperDoFile('../gui.lua')
 reaperDoFile('../cf.lua')
 
 
@@ -32,6 +31,18 @@ local questions = {}
 local pronouns = {"it", "them", "this", "yourself"}
 local patterns = {"literal", "abstract", "short", "long"}
 
+-- blocked words
+local shortblock = {"fnding", "find", "reverse", "reversing"}
+
+--Fills the gfx window background with color
+function fill_background()
+	local r, g, b, a = .19,.19,.19, 1
+	local w, h = gfx.w, gfx.h
+
+	gfx.set(r,g,b,a)
+	gfx.rect(0,0,w,h,true)
+
+end
 
 -- Load words from files into tables
 function load_words()
@@ -214,9 +225,9 @@ function new_message()
 	local noun = ""
 	local prnoun = ""
 	local determiner = ""
-	local question = false
-	local command = false
-	local suggestion = false
+	local isCommand = false
+	local isQuestion = false
+	local isSuggestion = false
 
 
 	-- Determine plural or singluar
@@ -235,14 +246,19 @@ function new_message()
 	-- Determine question, command, or suggestion
 
 	local sentenceType = math.random(1, 100)
-	if sentenceType <= 35 then isQuestion = true
+
+	if sentenceType <= 35 then isQuestion = true 
 	elseif sentenceType >=36 and sentenceType <=69 then isSuggestion = true
 	else isCommand = true
 	end
 
+	cons(tostring(isCommand), true)
+
+	--isCommand = true
+
 	-- Determine sentence pattern
 	local rp = math.random(1, 4)
-	local pattern = patterns[3]
+	local pattern = patterns[rp]
 
 	-- Generate random fragments
 	local prompt 			= prompts[math.random(1, count_table(prompts))]
@@ -267,12 +283,24 @@ function new_message()
 	local altQuestionCap 	= altQuestionCaps[math.random(1, count_table(altQuestionCaps))]
 	local pronoun 			= pronouns[math.random(1, count_table(pronouns))]
 
-	if isQuestion then 
 
+	----------------------
+	--Questions-----------
+	----------------------
+
+	if isQuestion then 
 		sentence = question 
-		if pattern == "short" then 
-			if gerund == "placing" or gerund == "putting"
-				or gerund == "questioning" or gerund == "satisfying" then
+		--if pattern == "short" then 
+
+			for b=1, count_table(shortblock) do
+				if verb == shortblock[b] then verb = verb2 end
+				if verb2 == shortblock[b] then verb = verbs[math.random(1,count_table(verbs))] end
+
+				if gerund == shortblock[b] then gerund = gerund2 end
+				if gerund2 == shortblock[b] then gerund = gerunds[math.random(1,count_table(gerunds))] end
+			end
+
+			if gerund == "placing" or gerund == "putting" then
 				sentence = sentence .. " " .. gerund .. "\n" .. pronoun .. " " .. prep .. "\n" .. location
 				if question == "is" or question == "how is" then 
 					sentence = sentence .. "\n" .. altQuestionCap
@@ -281,23 +309,75 @@ function new_message()
 				else
 					sentence = sentence .. "\n" .. questionCap
 				end
+			elseif  gerund == "questioning" or gerund == "satisfying" then
+				sentence = sentence .. "\n" .. gerund .. " ".. pronoun .. "\n" .. altQuestionCap
 			elseif question == "is" or question == "how is"  then 
 				sentence = sentence .. "\n" .. gerund .. "\n" .. altQuestionCap
-			elseif question == "have you tried" then sentence = sentence .. "\n" .. gerund .. " " .. pronoun .. "?"
-			elseif question == "should" then sentence = sentence .. " you " .. "\n" .. verb .. " " .. pronoun .. "?"
+			elseif question == "have you tried" then sentence = sentence .. "\n" .. gerund .. " " .. pronouns[math.random(1,3)] .. "?"
+			elseif question == "should" then sentence = sentence .. " you " .. "\n" .. verb .. " " .. pronouns[math.random(1,3)] .. "?"
 			else 
 				sentence = sentence .. "\n" .. gerund .. "\n".. determiner .. "\n" ..  noun .. "\n" .. questionCap
 		
 			end
+		--end
+	
+	----------------------
+	--Commands------------
+	----------------------
+
+	elseif isCommand then 
+
+		if pattern == "short" then
+			if plural then sentence = verb .. "\n" .. noun
+			else sentence = verb .. " " .. determiner  .. "\n" .. noun
+			end
+		else
 		
+			if verb == "replace" then prep = "with" end
+			if verb == "simplify" then 
+				if not plural then sentence = verb .. " " .. prep .. "\n" .. noun
+				else sentence = verb .. " " .. prep .. "\n" .. noun
+				end
+			elseif verb == "connect" then 
+				sentence = verb .. " " .. noun .. "\n" .. "to " ..  determiner .. "\n" .. nouns[math.random(1,count_table(nouns))]
+			elseif verb == "place" then
+				sentence = verb .. " " .. noun .. "\n" .. prep .. "\n" .. location
+			else
+				sentence = verb .. " " .. determiner .. "\n".. noun .. " " .. prep .. "\n" .. location
+			end
 		end
 
-		
 
+	----------------------
+	--SUGGESTION PLACEHOLDER------------
+	----------------------
+
+	elseif isSuggestion then 
+
+		if pattern == "short" then
+			if plural then sentence = verb .. "\n" .. noun
+			else sentence = verb .. " " .. determiner  .. "\n" .. noun
+			end
+		else
+		
+			if verb == "replace" then prep = "with" end
+			if verb == "simplify" then 
+				if not plural then sentence = verb .. " " .. prep .. "\n" .. noun
+				else sentence = verb .. " " .. prep .. "\n" .. noun
+				end
+			elseif verb == "connect" then 
+				sentence = verb .. " " .. noun .. "\n" .. "to " ..  determiner .. "\n" .. nouns[math.random(1,count_table(nouns))]
+			elseif verb == "place" then
+				sentence = verb .. " " .. noun .. "\n" .. prep .. "\n" .. location
+			else
+				sentence = verb .. " " .. determiner .. "\n".. noun .. " " .. prep .."\n" .. location
+			end
+		end
 
 	end
-
+	
 	return sentence
+	
 end
 
 -- Draw the sentence
@@ -345,7 +425,7 @@ function main()
 	fade_text(message, 20,40)
 
 	-- Regenerate a sentence if the gui is clicked
-	if gfx.mouse_cap == 1 then
+	if gfx.mouse_cap == 1 or char ==  32 then
 		message = new_message()
 		f = .19
 	end
