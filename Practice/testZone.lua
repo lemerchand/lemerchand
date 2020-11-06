@@ -48,10 +48,15 @@ function main()
 	else reaper.defer(main) end
 
 
+	mousex, mousey = reaper.GetMousePosition()
+	projmouse= reaper.BR_GetMouseCursorContext_Position()
+
 	local window, segment, details = reaper.BR_GetMouseCursorContext()
 	update_active_arrange()	
 
 	statustext = statustext .. "             --==  GENERAL  ==--" ..
+								"\nMouse x: " .. mousex .. " Mouse y: " .. mousey ..
+								"\nProj Mouse x: " .. projmouse .. 
 								"\nMouse Cap: " .. reaper.JS_Mouse_GetState(-1) ..
 								"\nLast Character: " .. lastChar .. 
 								"\nContext: " .. window ..
