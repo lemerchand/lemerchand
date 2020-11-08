@@ -289,6 +289,113 @@ end
 
 
 --------------------------------------------------------------------------------------------------------------
+----------------------------------CLASS: TEXT FIELD-----------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------
+
+
+TextField = {}
+TextField.__index = TextField
+
+function TextField:Create(x,y, txt, help, fontSize, r, g, b, font, hide)
+
+	if font == nil then gfx.setfont(1, "Lucida Console", 13) end
+
+	local w,h = gfx.measurestr(txt)
+
+	local this = {
+		x = x or 10,
+		y = y or 10,
+		help = help or "",
+		w = w,
+		h = h,
+		txt = txt or "Some text.",
+		fontSize = fontSize or 12,
+		r = r or .7,
+		g = g or .7,
+		b = b or .7,
+		font = font or "Lucida Console",
+		hide = hide or false,
+		blink = 0
+
+	}
+
+	setmetatable(this, TextField)
+	table.insert(Elements, this)
+	return this
+end
+
+function TextField:Draw()
+	self:ResetClicks()
+	if self.hide then return end
+
+
+	gfx.x, gfx.y = self.x, self.y
+	gfx.set(self.r, self.g, self.b, 1)
+	gfx.setfont(1, self.font, self.fontSize)
+	
+
+
+	if self.blink <= 15 then 
+		gfx.drawstr(self.txt .. "_")
+		self.blink = self.blink + 1
+	elseif self.blink <=30 then
+		gfx.drawstr(self.txt .. " ")
+		self.blink = self.blink + 1
+	else
+		gfx.drawstr(self.txt .. "_")
+		self.blink = 0
+	end
+
+
+
+	if hovering(self.x, self.y, self.w, self.h) then
+		status:Display(self.help)
+		if gfx.mouse_cap == 1 then self.leftClick = true
+			elseif gfx.mouse_cap == 2 then self.rightClick = true
+			elseif gfx.mouse_cap == 5 then self.ctrlLeftClick = true
+			elseif gfx.mouse_cap == 9 then self.shiftLeftClick = true
+			elseif gfx.mouse_cap == 10 then self.shiftRightClick = true	
+			elseif gfx.mouse_cap == 17 then self.altLeftClick = true
+			elseif gfx.mouse_cap == 18 then self.altRightClick = true
+			elseif gfx.mouse_cap == 64 then self.middleClick = true
+			
+		end
+	end
+
+end
+
+function TextField:Change(char)
+	if char >= 33 and char <= 126 then self.txt = self.txt .. string.char(char) 
+	elseif char == 32 then self.txt = self.txt .. " "
+	elseif char == 8 then self.txt = self.txt:sub(1,-2)
+	end
+end
+
+
+function TextField:ResetClicks()
+
+	self.leftClick = false
+	self.rightClick = false
+	self.middleClick = false
+	self.ctrlLeftClick = false
+	self.ctrlRightClick = false
+	self.shiftLeftClick = false
+	self.shiftRightClick = false
+	self.altLeftClick = false
+	self.altRightClick = false
+
+end
+
+function TextField:Reset()
+
+end
+
+
+
+
+------------------------------------END: TEXT FIELD----------------------------------------------------------------
+
+--------------------------------------------------------------------------------------------------------------
 ----------------------------------CLASS: TEXT-----------------------------------------------------------------
 --------------------------------------------------------------------------------------------------------------
 

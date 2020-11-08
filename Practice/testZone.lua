@@ -33,7 +33,7 @@ end
 
 btn_randomNotes = Button:Create(status.x+10, status.y+status.h-30, "Test")
 btn_fadeText = Button:Create(btn_randomNotes.x + btn_randomNotes.w + 20, status.y+status.h-30, "Try")
-
+t = TextField:Create(20, 250, "Enter Some text: ")
 
 function main()
 
@@ -45,7 +45,10 @@ function main()
 		reaper.atexit(reaper.JS_Window_SetFocus(last_window))
 		return
 	-- Otherwise keep window open
-	else reaper.defer(main) end
+	else 
+		t:Change(char)
+		reaper.defer(main) end
+
 
 
 	mousex, mousey = reaper.GetMousePosition()
