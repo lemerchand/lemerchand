@@ -286,7 +286,7 @@ for te = 5, 8 do
 	table.insert(group_lengthToggles, tgl_length[te])
 end
 
-local sldr_timeThreshold = H_slider:Create(frm_time.x + 10, frm_time.y+frm_time.h - 20, frm_time.w - 20, nil,"PPQ Threshold", htTimeThreshold, 0, 50, 30, false)
+local sldr_timeThreshold = H_slider:Create(frm_time.x + 10, frm_time.y+frm_time.h - 20, frm_time.w - 20, nil,"PPQ Threshold", htTimeThreshold, 0, 100, 30, false)
 
 
 --Status bar
