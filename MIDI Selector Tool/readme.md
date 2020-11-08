@@ -53,7 +53,9 @@ Dependencies:
 
 2. Either clone the repo or if you don't use github then click the "code" button and select "Download Zip." Chose your REAPER resources path (usually something like c:/users/yourname/appdata/roaming/reaper) and unzip it in the 'Scripts' folder. 
 
-3. Bind it to a hotkey. Run the actions menu and select MIIDI Editor. Click 'Load Reascript' and navigate to the 'Lemerchand/MIDI Selector Tool' where you unzipped the files. Select "MIDI Selector Tool.lua" and choose a hotkey. 
+3. Rename the folder from "lemerchand - master" to "lemerchand"
+
+4. Bind it to a hotkey. Run the actions menu and select MIIDI Editor. Click 'Load Reascript' and navigate to the 'Lemerchand/MIDI Selector Tool' where you unzipped the files. Select "MIDI Selector Tool.lua" and choose a hotkey. 
 
 Finally, when in the midi editor, press said key and the GUI will pop up allowing you to select notes quickly. Be sure to read the help text in the "Info" frame. 
 
