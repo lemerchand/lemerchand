@@ -18,7 +18,12 @@ for i = 0, notes-1 do
 end
 
 
-
 reaper.MIDI_Sort(take)
+
+local id = reaper.GetMediaItemTakeInfo_Value( take, 'P_ITEM')
+local track = reaper.GetMediaItemTakeInfo_Value( take, 'P_TRACK')
+
+reaper.MarkTrackItemsDirty(track, id)
+
 
 reaper.Undo_EndBlock2(0, "Move selected notes to row under mouse", -1)
