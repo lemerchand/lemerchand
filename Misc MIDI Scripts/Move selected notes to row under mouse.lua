@@ -18,10 +18,12 @@ for i = 0, notes-1 do
 
 		--If the note overlaps with the next and it ISNT the last selected note
 		if endppqpos >= startppqpos2 and i ~= notes-1 then endppqpos = startppqpos2 - 1 end
-
+		if startppqpos == startppqpos2 then reaper.MIDI_DeleteNote(take, i)
+		else
 		--Insert the the new note, delete the old one
 		reaper.MIDI_InsertNote(take, true, false, startppqpos, endppqpos, chan, noteRow, vel, true)
 		reaper.MIDI_DeleteNote(take, i)
+		end
 	end
 end
 
