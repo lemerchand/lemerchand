@@ -59,7 +59,7 @@ function hovering(x,y,w,h)
 end
 
 --Draws an empty rectangle
-function draw_border(x,y,w,h, fill, r, g, b)
+function draw_border(x,y,w,h, r, g, b, fill)
 	
 	r = r or .45
 	g = g or .45
@@ -297,7 +297,7 @@ end
 TextField = {}
 TextField.__index = TextField
 
-function TextField:Create(x,y, w, h, txt, help, active, fontSize, r, g, b, font, hide)
+function TextField:Create(x,y, w, h, txt, help, active, multiline, fontSize, r, g, b, font, hide)
 
 	if font == nil then gfx.setfont(1, "Lucida Console", 13) end
 
@@ -325,6 +325,9 @@ function TextField:Create(x,y, w, h, txt, help, active, fontSize, r, g, b, font,
 		font = font or "Lucida Console",
 		hide = hide or false,
 		active = active or false,
+		hover = false,
+		multiline = multiline or false,
+		returned = false,
 		blink = 0
 
 	}
@@ -339,7 +342,7 @@ function TextField:Draw()
 	if self.hide then return end
 
 	draw_border(self.x,self.y, self.w,self.h)
-	draw_border(self.x+1, self.y+1,self.w-2,self.h-2, true, .22,.22,.22)
+	draw_border(self.x+1, self.y+1,self.w-2,self.h-2, .22,.22,.22, true)
 
 	gfx.x, gfx.y = self.x+5, self.y+5
 	gfx.set(self.r, self.g, self.b, 1)
@@ -362,6 +365,7 @@ function TextField:Draw()
 
 	if hovering(self.x, self.y, self.w, self.h) then
 		status:Display(self.help)
+		self.hover = true
 		if gfx.mouse_cap == 1 then self.leftClick = true
 			elseif gfx.mouse_cap == 2 then self.rightClick = true
 			elseif gfx.mouse_cap == 5 then self.ctrlLeftClick = true
@@ -370,18 +374,32 @@ function TextField:Draw()
 			elseif gfx.mouse_cap == 17 then self.altLeftClick = true
 			elseif gfx.mouse_cap == 18 then self.altRightClick = true
 			elseif gfx.mouse_cap == 64 then self.middleClick = true
-			
 		end
-	
+
+	else
+		self.hover = false
+		if gfx.mouse_cap == 1 or gfx.mouse_cap == 2 then self.active = false end
 	end
 
 end
 
 function TextField:Change(char)
-	if self.active then 
+	gfx.setfont(3, self.font, self.fontSize)
+
+
+	if self.active and gfx.measurestr(self.txt) + self.x <= self.w then
 		if char >= 33 and char <= 126 then self.txt = self.txt .. string.char(char) 
 		elseif char == 32 then self.txt = self.txt .. " "
-		elseif char == 8 then self.txt = self.txt:sub(1,-2)
+		end
+	end
+
+
+	if self.active and char == 8 then self.txt = self.txt:sub(1,-2)
+	elseif self.active and char == 13 then 
+		if self.multiline then self.txt = self.txt .. "\n"
+		else
+			self.returned = true
+			self.active = false
 		end
 	end
 end
@@ -417,11 +435,19 @@ end
 Text = {}
 Text.__index = Text
 
-function Text:Create(x,y, txt, help, fontSize, r, g, b, font, hide)
+function Text:Create(x,y, txt, help, fontSize, r, g, b, font, hide, w, h)
 
 	if font == nil then gfx.setfont(1, "Lucida Console", 13) end
 
-	local w,h = gfx.measurestr(txt)
+	if w == nil then 
+		ww,hh = gfx.measurestr(txt)
+		w = ww + 19
+	end
+
+	if h == nil then 
+		ww,hh = gfx.measurestr(txt)
+		h = hh + 17
+	end
 
 	local this = {
 		x = x or 10,

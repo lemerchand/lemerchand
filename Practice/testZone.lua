@@ -3,7 +3,7 @@ reaperDoFile('../gui.lua')
 reaperDoFile('../cf.lua')
 
 
-gfx.init("Lemerchand Testing", 300,400, false, 1500,600)
+gfx.init("Lemerchand Testing", 300,450, false, 1500,500)
 local win = reaper.JS_Window_Find("Lemerchand Testing", true)
 if win then reaper.JS_Window_AttachTopmostPin(win) end
 
@@ -31,13 +31,16 @@ end
 
 
 
-btn_randomNotes = Button:Create(status.x+10, status.y+status.h-30, "Test")
-btn_fadeText = Button:Create(btn_randomNotes.x + btn_randomNotes.w + 20, status.y+status.h-30, "Try")
-t = TextField:Create(20, 250, status.w-20, 20, "Enter Some text: ")
+local btn_randomNotes = Button:Create(status.x+10, status.y+status.h+30, "Test")
+
+local cmd = TextField:Create(20, 250, status.w-20, 20, "Enter Some text: ", "", false, false)
+local t2 = TextField:Create(20, 280, status.w-20,75, "Multiline", "", false, true)
+local log = Text:Create(20, 150, "", "", nil, nil, nil, nil, nil, false, status.w-20, 90)
 
 function main()
 
-	local statustext = ""
+	-- Clear text
+	local statustext = "" 
 	fill_background()
 
 	local char = gfx.getchar()
@@ -46,19 +49,23 @@ function main()
 		return
 	-- Otherwise keep window open
 	else 
-		t:Change(char)
+		-- Send characters to the textfields
+		cmd:Change(char)
+		t2:Change(char)
+		-- if "/" then activate cmd
+		if char == 47 and cmd.active == false then cmd.active = true end
 		reaper.defer(main) 
 	end
 
 
 
-	mousex, mousey = reaper.GetMousePosition()
-	projmouse= reaper.BR_GetMouseCursorContext_Position()
+	local mousex, mousey = reaper.GetMousePosition()
+	local projmouse= reaper.BR_GetMouseCursorContext_Position()
 
 	local window, segment, details = reaper.BR_GetMouseCursorContext()
 	update_active_arrange()	
 
-	statustext = statustext .. "             --==  GENERAL  ==--" ..
+	local statustext = statustext .. "             --==  GENERAL  ==--" ..
 								"\nMouse x: " .. mousex .. " Mouse y: " .. mousey ..
 								"\nProj Mouse x: " .. projmouse .. 
 								"\nMouse Cap: " .. reaper.JS_Mouse_GetState(-1) ..
@@ -85,12 +92,40 @@ function main()
 	--Draws all elements
 	draw_elements()
 	if char ~= 0 then lastChar = char end
-	status:Display(statustext)
-
 	
-	if btn_randomNotes.leftClick then insert_random_notes() end
-	if t.leftClick then t.active = true end
 
-	 
+
+
+if btn_randomNotes.leftClick then insert_random_notes() end
+	if cmd.leftClick then cmd.active = true end
+	if t2.leftClick then t2.active = true end
+	if cmd.active and cmd.txt == "s" then 
+
+		-- for i=0, tracks-1 do
+		-- 	local t = reaper.GetTrack(0, i )
+		-- 	local retval, buf = reaper.GetTrackName( t )
+
+		-- 	if buf == "Track 1" then cons(buf .. "\n") end
+		-- end
+
+		log.txt = "Select: " 
+
+	end
+	if cmd.returned then 
+
+		--Look for commands
+
+		if cmd.txt == "hello" then log.txt = "HI!"
+		else
+			-- Log the command and reset the textfield
+			log.txt = log.txt .. "\n" .. cmd.txt
+
+		end
+		cmd.txt = ""
+		cmd.returned = false
+	end
+
+	status:Display(statustext)
+	
 end
 main()
