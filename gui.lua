@@ -59,12 +59,13 @@ function hovering(x,y,w,h)
 end
 
 --Draws an empty rectangle
-function draw_border(x,y,w,h, r, g, b)
+function draw_border(x,y,w,h, fill, r, g, b)
+	
 	r = r or .45
 	g = g or .45
 	b = b or .45
 	gfx.set(r, g, b, 1)
-	gfx.rect(x,y,w,h, false)
+	gfx.rect(x,y,w,h, fill)
 end
 
 --Draws a filled round rectangle
@@ -296,11 +297,19 @@ end
 TextField = {}
 TextField.__index = TextField
 
-function TextField:Create(x,y, txt, help, fontSize, r, g, b, font, hide)
+function TextField:Create(x,y, w, h, txt, help, active, fontSize, r, g, b, font, hide)
 
 	if font == nil then gfx.setfont(1, "Lucida Console", 13) end
 
-	local w,h = gfx.measurestr(txt)
+	if w == nil then 
+		ww,hh = gfx.measurestr(txt)
+		w = ww + 19
+	end
+
+	if h == nil then 
+		ww,hh = gfx.measurestr(txt)
+		h = hh + 17
+	end
 
 	local this = {
 		x = x or 10,
@@ -315,6 +324,7 @@ function TextField:Create(x,y, txt, help, fontSize, r, g, b, font, hide)
 		b = b or .7,
 		font = font or "Lucida Console",
 		hide = hide or false,
+		active = active or false,
 		blink = 0
 
 	}
@@ -328,21 +338,23 @@ function TextField:Draw()
 	self:ResetClicks()
 	if self.hide then return end
 
+	draw_border(self.x,self.y, self.w,self.h)
+	draw_border(self.x+1, self.y+1,self.w-2,self.h-2, true, .22,.22,.22)
 
-	gfx.x, gfx.y = self.x, self.y
+	gfx.x, gfx.y = self.x+5, self.y+5
 	gfx.set(self.r, self.g, self.b, 1)
 	gfx.setfont(1, self.font, self.fontSize)
 	
 
 
-	if self.blink <= 15 then 
+	if self.active  and self.blink <= 15 then 
 		gfx.drawstr(self.txt .. "_")
 		self.blink = self.blink + 1
-	elseif self.blink <=30 then
+	elseif self.active and  self.blink <=30 then
 		gfx.drawstr(self.txt .. " ")
 		self.blink = self.blink + 1
 	else
-		gfx.drawstr(self.txt .. "_")
+		gfx.drawstr(self.txt .. "")
 		self.blink = 0
 	end
 
@@ -360,14 +372,17 @@ function TextField:Draw()
 			elseif gfx.mouse_cap == 64 then self.middleClick = true
 			
 		end
+	
 	end
 
 end
 
 function TextField:Change(char)
-	if char >= 33 and char <= 126 then self.txt = self.txt .. string.char(char) 
-	elseif char == 32 then self.txt = self.txt .. " "
-	elseif char == 8 then self.txt = self.txt:sub(1,-2)
+	if self.active then 
+		if char >= 33 and char <= 126 then self.txt = self.txt .. string.char(char) 
+		elseif char == 32 then self.txt = self.txt .. " "
+		elseif char == 8 then self.txt = self.txt:sub(1,-2)
+		end
 	end
 end
 

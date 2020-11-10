@@ -33,7 +33,7 @@ end
 
 btn_randomNotes = Button:Create(status.x+10, status.y+status.h-30, "Test")
 btn_fadeText = Button:Create(btn_randomNotes.x + btn_randomNotes.w + 20, status.y+status.h-30, "Try")
-t = TextField:Create(20, 250, "Enter Some text: ")
+t = TextField:Create(20, 250, status.w-20, 20, "Enter Some text: ")
 
 function main()
 
@@ -47,7 +47,8 @@ function main()
 	-- Otherwise keep window open
 	else 
 		t:Change(char)
-		reaper.defer(main) end
+		reaper.defer(main) 
+	end
 
 
 
@@ -88,6 +89,7 @@ function main()
 
 	
 	if btn_randomNotes.leftClick then insert_random_notes() end
+	if t.leftClick then t.active = true end
 
 	 
 end
