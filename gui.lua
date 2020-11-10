@@ -327,6 +327,7 @@ function TextField:Create(x,y, w, h, txt, help, active, multiline, fontSize, r, 
 		active = active or false,
 		hover = false,
 		multiline = multiline or false,
+		alwaysActive = false,
 		returned = false,
 		blink = 0
 
@@ -387,7 +388,7 @@ function TextField:Change(char)
 	gfx.setfont(3, self.font, self.fontSize)
 
 
-	if self.active and gfx.measurestr(self.txt) + self.x <= self.w then
+	if self.active and gfx.measurestr(self.txt) + self.x <= self.w-10 then
 		if char >= 33 and char <= 126 then self.txt = self.txt .. string.char(char) 
 		elseif char == 32 then self.txt = self.txt .. " "
 		end
@@ -399,7 +400,7 @@ function TextField:Change(char)
 		if self.multiline then self.txt = self.txt .. "\n"
 		else
 			self.returned = true
-			self.active = false
+			if not self.alwaysActive then self.active = false end
 		end
 	end
 end
