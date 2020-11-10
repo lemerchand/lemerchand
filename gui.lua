@@ -61,9 +61,9 @@ end
 --Draws an empty rectangle
 function draw_border(x,y,w,h, r, g, b, fill)
 	
-	r = r or .45
-	g = g or .45
-	b = b or .45
+	local r = r or .45
+	local g = g or .45
+	local b = b or .45
 	gfx.set(r, g, b, 1)
 	gfx.rect(x,y,w,h, fill)
 end
@@ -478,7 +478,7 @@ function Text:Draw()
 	gfx.setfont(1, self.font, self.fontSize)
 	gfx.drawstr(self.txt)
 
-	if hovering(self.x, self.y, self.w, self.h) then
+	if hovering(self.x, self.y, self.w, self.h-18) then
 		status:Display(self.help)
 		if gfx.mouse_cap == 1 then self.leftClick = true
 			elseif gfx.mouse_cap == 2 then self.rightClick = true

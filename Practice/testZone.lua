@@ -3,6 +3,10 @@ reaperDoFile('../gui.lua')
 reaperDoFile('../cf.lua')
 
 
+local snaptokey = reaper.SNM_GetIntConfigVar("snapflags" , -999)
+
+cons(snaptokey, true)
+
 gfx.init("Lemerchand Testing", 300,450, false, 1500,500)
 local win = reaper.JS_Window_Find("Lemerchand Testing", true)
 if win then reaper.JS_Window_AttachTopmostPin(win) end
