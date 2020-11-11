@@ -10,6 +10,9 @@ if win then reaper.JS_Window_AttachTopmostPin(win) end
 --Counter for refreshing gui after resize
 local refresh = 0
 
+--Table to hold selected tracks
+local selectedTracks = {}
+
 --Create and hide dummy status
 status = Status:Create()
 status.hide = true
@@ -40,19 +43,35 @@ local function select_tracks()
 		local retval, buf = reaper.GetTrackName( t )
 		local input = cmd.txt:sub(3)
 
-		
-		
 
-		display.txt = display.txt .. buf .. "\n"
 
 		if string.lower(buf):match(input) then reaper.SetTrackSelected( t, true ) 
-
+			display.txt = display.txt .. buf .. "\n"
 		else 
 			reaper.SetTrackSelected( t, false) 
 		end
 	end
 end
 
+local function update_selected_tracks()
+	update_active_arrange()
+	for i = 0, tracks - 1 do
+		if reaper.IsTrackSelected(i) then selectedTracks[i] = true
+		else
+			selectedTracks[i] = false
+		end
+		cons(selectedTracks[i])
+	end
+end
+
+local function restore_selected_tracks()
+
+	for i = 0, tracks-1 do
+		reaper.SetTrackSelected(reaper.GetTrack(0, i), selectedTracks[i])
+	end
+
+
+end
 
 
 function main()
@@ -79,12 +98,19 @@ function main()
 
 	--If the cmd is click it's activated
 	if cmd.leftClick then cmd.active = true end
+
+	--------------------------
+	--While Typing Updates----
+	--------------------------
 	if cmd.active and cmd.txt:sub(1,1) == "s" then 
 
 		select_tracks()
 
-
 	end
+
+	--------------------------
+	--Text field handling-----
+	--------------------------
 
 	--If enter is pressed 
 	if cmd.returned then 
@@ -97,6 +123,9 @@ function main()
 		end
 		cmd.txt = ""
 		cmd.returned = false
+	elseif char == 8 and gfx.mouse_cap == 04 then 
+		cmd.txt = ""
+
 	end
 
 
