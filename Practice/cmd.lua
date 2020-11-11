@@ -32,6 +32,27 @@ local function gui_size_update()
 
 end
 
+local function select_tracks()
+	update_active_arrange()
+	display.txt = "Select...\n\n"
+	for i=0, tracks-1 do
+		local t = reaper.GetTrack(0, i )
+		local retval, buf = reaper.GetTrackName( t )
+		local input = cmd.txt:sub(3)
+
+		
+		
+
+		display.txt = display.txt .. buf .. "\n"
+
+		if string.lower(buf):match(input) then reaper.SetTrackSelected( t, true ) 
+
+		else 
+			reaper.SetTrackSelected( t, false) 
+		end
+	end
+end
+
 
 
 function main()
@@ -58,16 +79,10 @@ function main()
 
 	--If the cmd is click it's activated
 	if cmd.leftClick then cmd.active = true end
-	if cmd.active and cmd.txt == "s" then 
+	if cmd.active and cmd.txt:sub(1,1) == "s" then 
 
-		-- for i=0, tracks-1 do
-		-- 	local t = reaper.GetTrack(0, i )
-		-- 	local retval, buf = reaper.GetTrackName( t )
+		select_tracks()
 
-		-- 	if buf == "Track 1" then cons(buf .. "\n") end
-		-- end
-
-		display.txt = "Select: " 
 
 	end
 
@@ -77,12 +92,15 @@ function main()
 		--Look for commands
 		if cmd.txt == "hello" then display.txt = "HI!"
 		else
+			
 			display.txt = "Nothing found..."
 		end
 		cmd.txt = ""
 		cmd.returned = false
 	end
 
+
+	--Refresh the gui size 
 	if refresh == 20 then 
 		refresh = 0
 		gui_size_update()
