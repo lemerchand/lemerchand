@@ -10,8 +10,8 @@ if win then reaper.JS_Window_AttachTopmostPin(win) end
 --Counter for refreshing gui after resize
 local refresh = 0
 
---Flag to prevent updating track selection when a command is entered
-local cmdFlags = {engaged = false, exitOnCommand = false}
+--Common properties for the comman line
+local c = {engaged = false, exitOnCommand = false, flags=""}
 
 --Table to hold selected tracks
 local selectedTracks = {}
@@ -46,13 +46,11 @@ local function select_tracks(exclusive)
 		local retval, buf = reaper.GetTrackName( t )
 
 		local input = cmd.txt:sub(3)
-		local flags = cmd.txt:find("-")
 
-		if flags then 
-			flags = cmd.txt:sub(cmd.txt:find("-")-1)
-			input = cmd.txt:sub(3, cmd.txt:find("-")-1)
-		else
-			input = cmd.txt:sub(3)
+		if cmd.txt:find("=") then 
+			local s, e = cmd.txt:find("=")
+			c.flags = cmd.txt:sub(s+1)
+			input = cmd.txt:sub(3, cmd.txt:find("=")-1)
 		end
 		
 			
@@ -82,10 +80,19 @@ local function restore_selected_tracks()
 	end
 end
 
-local function mute_selected_tracks()
+local function set_selected_tracks(param, state, exclusive)
+
 	for i = 0, tracks-1 do
 		if reaper.IsTrackSelected(reaper.GetTrack(0,i)) then 
-			reaper.SetMediaTrackInfo_Value( reaper.GetTrack(0,i), 'B_MUTE', math.abs(reaper.GetMediaTrackInfo_Value( reaper.GetTrack(0,i), "B_MUTE")-1))
+			if state == -1 then
+				reaper.SetMediaTrackInfo_Value(reaper.GetTrack(0, i), param, math.abs(reaper.GetMediaTrackInfo_Value( reaper.GetTrack(0,i), param)-1))
+			else
+				reaper.SetMediaTrackInfo_Value( reaper.GetTrack(0,i), param, state)
+			end
+		end
+
+		if reaper.IsTrackSelected(reaper.GetTrack(0,i)) == false and exclusive then 
+			reaper.SetMediaTrackInfo_Value( reaper.GetTrack(0,i), param, 0)
 		end
 	end
 end
@@ -93,9 +100,9 @@ end
 
 local function update_cmd(char)
 
-	if not cmdFlags.engaged and cmd.txt ~= "" then 
+	if not c.engaged and cmd.txt ~= "" then 
 		update_selected_tracks()
-		cmdFlags.engaged = true
+		c.engaged = true
 	end
 
 	--------------------------
@@ -115,16 +122,27 @@ local function update_cmd(char)
 	if cmd.returned then 
 
 		--Look for commands
-		if cmd.txt == "hello" then display.txt = "HI!"
-		elseif cmd.txt:find("-m") then mute_selected_tracks()
-		else
-			
-			display.txt = "Nothing found..."
+		if cmd.txt == "hello" then display.txt = "HI!" end
+
+		--Look for mute
+		if c.flags:find("m%-") then set_selected_tracks('B_MUTE', 0, false)
+		elseif c.flags:find("m%+") then set_selected_tracks('B_MUTE', 1, false)
+		elseif c.flags:find("m") then set_selected_tracks('B_MUTE',-1, false)
+		elseif c.flags:find("M") then set_selected_tracks('B_MUTE',1, true)
 		end
+
+		--Look for solo
+		if c.flags:find("o%-") then set_selected_tracks("I_SOLO", 0, false)
+		elseif c.flags:find("o%+") then set_selected_tracks('I_SOLO', 1, false)
+		elseif c.flags:find("o") then set_selected_tracks('I_SOLO',-1, false)
+		elseif c.flags:find("O") then set_selected_tracks('I_SOLO', 1, true)
+		end
+
 		cmd.txt = ""
 		cmd.returned = false
 		update_selected_tracks()
-		cmdFlags.engaged = false
+		c.engaged = false
+		c.flags = ""
 	end
 
 end
@@ -136,7 +154,7 @@ function main()
 	draw_elements()
 	
 	local char = gfx.getchar()
-	if char == 27 or char == -1  or cmdFlags.exitOnCommand then 
+	if char == 27 or char == -1  or c.exitOnCommand then 
 		reaper.atexit(reaper.JS_Window_SetFocus(last_window))
 		return
 	-- Otherwise keep window open
@@ -145,12 +163,13 @@ function main()
 		-- if "/" then activate cmd
 		if char == 47 and cmd.active == false then cmd.active = true 
 		-- if ctrl+backspace or the user clears out the cmd then clear text and restore the selected tracks
-		elseif (char == 8 and gfx.mouse_cap == 04) or (cmdFlags.engaged and cmd.txt == "" ) then 
+		elseif (char == 8 and gfx.mouse_cap == 04) or (c.engaged and cmd.txt == "" ) then 
 			cmd.txt = ""
+			display.txt = ""
 			restore_selected_tracks()
-			cmdFlags.engaged = false
+			c.engaged = false
 		else
-			if gfx.mouse_cap == 04 and char == 13 then cmdFlags.exitOnCommand = true end
+			if gfx.mouse_cap == 04 and char == 13 then c.exitOnCommand = true end
 			-- Send characters to the textfields
 			cmd:Change(char)
 			update_cmd(char)
