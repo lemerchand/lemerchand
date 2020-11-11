@@ -10,6 +10,9 @@ if win then reaper.JS_Window_AttachTopmostPin(win) end
 --Counter for refreshing gui after resize
 local refresh = 0
 
+--Flag to prevent updating track selection when a command is entered
+local engaged = false
+
 --Table to hold selected tracks
 local selectedTracks = {}
 
@@ -35,15 +38,25 @@ local function gui_size_update()
 
 end
 
-local function select_tracks()
+local function select_tracks(exclusive)
 	update_active_arrange()
 	display.txt = "Select...\n\n"
 	for i=0, tracks-1 do
 		local t = reaper.GetTrack(0, i )
 		local retval, buf = reaper.GetTrackName( t )
+
 		local input = cmd.txt:sub(3)
+		local flags = cmd.txt:find("-")
 
-
+		if flags then 
+			flags = cmd.txt:sub(cmd.txt:find("-")-1)
+			local input = cmd.txt:sub(3, cmd.txt:find("-"))
+		else
+			local input = cmd.txt:sub(3)
+		end
+		
+		cons(tostring(flags), true)
+	
 
 		if string.lower(buf):match(input) then reaper.SetTrackSelected( t, true ) 
 			display.txt = display.txt .. buf .. "\n"
@@ -56,11 +69,10 @@ end
 local function update_selected_tracks()
 	update_active_arrange()
 	for i = 0, tracks - 1 do
-		if reaper.IsTrackSelected(i) then selectedTracks[i] = true
+		if reaper.IsTrackSelected(reaper.GetTrack(0,i)) then selectedTracks[i] = true
 		else
 			selectedTracks[i] = false
 		end
-		cons(selectedTracks[i])
 	end
 end
 
@@ -69,43 +81,31 @@ local function restore_selected_tracks()
 	for i = 0, tracks-1 do
 		reaper.SetTrackSelected(reaper.GetTrack(0, i), selectedTracks[i])
 	end
+end
 
-
+local function mute_selected_tracks()
+	for i = 0, tracks-1 do
+		if reaper.IsTrackSelected(reaper.GetTrack(0,i)) then 
+			reaper.SetMediaTrackInfo_Value( reaper.GetTrack(0,i), 'B_MUTE', 1 )
+		end
+	end
 end
 
 
-function main()
+local function update_cmd(char)
 
-	fill_background()
-
-	local char = gfx.getchar()
-	if char == 27 or char == -1 then 
-		reaper.atexit(reaper.JS_Window_SetFocus(last_window))
-		return
-	-- Otherwise keep window open
-	else 
-		-- Send characters to the textfields
-		cmd:Change(char)
-		-- if "/" then activate cmd
-		if char == 47 and cmd.active == false then cmd.active = true end
-		reaper.defer(main) 
+	if not engaged and cmd.txt ~= "" then 
+		update_selected_tracks()
+		engaged = true
 	end
-
-
-	--Draws all elements
-	draw_elements()
-
-
-	--If the cmd is click it's activated
-	if cmd.leftClick then cmd.active = true end
 
 	--------------------------
 	--While Typing Updates----
 	--------------------------
 	if cmd.active and cmd.txt:sub(1,1) == "s" then 
-
-		select_tracks()
-
+		select_tracks(false)
+	elseif cmd.active and cmd.txt:sub(1,1) == "S" then
+		select_tracks(true)
 	end
 
 	--------------------------
@@ -117,16 +117,54 @@ function main()
 
 		--Look for commands
 		if cmd.txt == "hello" then display.txt = "HI!"
+		elseif cmd.txt:find("-m") then mute_selected_tracks()
 		else
 			
 			display.txt = "Nothing found..."
 		end
 		cmd.txt = ""
 		cmd.returned = false
-	elseif char == 8 and gfx.mouse_cap == 04 then 
-		cmd.txt = ""
-
+		update_selected_tracks()
+		engaged = false
 	end
+
+end
+
+function main()
+
+	--Draws all elements
+	fill_background()
+	draw_elements()
+	
+	local char = gfx.getchar()
+	if char == 27 or char == -1 then 
+		reaper.atexit(reaper.JS_Window_SetFocus(last_window))
+		return
+	-- Otherwise keep window open
+	else 
+
+		-- if "/" then activate cmd
+		if char == 47 and cmd.active == false then cmd.active = true 
+		-- if ctrl+backspace or the user clears out the cmd then clear text and restore the selected tracks
+		elseif (char == 8 and gfx.mouse_cap == 04) or (engaged and cmd.txt == "" ) then 
+			cmd.txt = ""
+			restore_selected_tracks()
+			engaged = false
+		else
+			-- Send characters to the textfields
+			cmd:Change(char)
+			update_cmd(char)
+		end
+		reaper.defer(main) 
+	end
+
+
+
+
+
+	--If the cmd is click it's activated
+	if cmd.leftClick then cmd.active = true end
+
 
 
 	--Refresh the gui size 
