@@ -11,7 +11,7 @@ if win then reaper.JS_Window_AttachTopmostPin(win) end
 local refresh = 0
 
 --Flag to prevent updating track selection when a command is entered
-local engaged = false
+local cmdFlags = {engaged = false, exitOnCommand = false}
 
 --Table to hold selected tracks
 local selectedTracks = {}
@@ -50,13 +50,12 @@ local function select_tracks(exclusive)
 
 		if flags then 
 			flags = cmd.txt:sub(cmd.txt:find("-")-1)
-			local input = cmd.txt:sub(3, cmd.txt:find("-"))
+			input = cmd.txt:sub(3, cmd.txt:find("-")-1)
 		else
-			local input = cmd.txt:sub(3)
+			input = cmd.txt:sub(3)
 		end
 		
-		cons(tostring(flags), true)
-	
+			
 
 		if string.lower(buf):match(input) then reaper.SetTrackSelected( t, true ) 
 			display.txt = display.txt .. buf .. "\n"
@@ -86,7 +85,7 @@ end
 local function mute_selected_tracks()
 	for i = 0, tracks-1 do
 		if reaper.IsTrackSelected(reaper.GetTrack(0,i)) then 
-			reaper.SetMediaTrackInfo_Value( reaper.GetTrack(0,i), 'B_MUTE', 1 )
+			reaper.SetMediaTrackInfo_Value( reaper.GetTrack(0,i), 'B_MUTE', math.abs(reaper.GetMediaTrackInfo_Value( reaper.GetTrack(0,i), "B_MUTE")-1))
 		end
 	end
 end
@@ -94,9 +93,9 @@ end
 
 local function update_cmd(char)
 
-	if not engaged and cmd.txt ~= "" then 
+	if not cmdFlags.engaged and cmd.txt ~= "" then 
 		update_selected_tracks()
-		engaged = true
+		cmdFlags.engaged = true
 	end
 
 	--------------------------
@@ -125,7 +124,7 @@ local function update_cmd(char)
 		cmd.txt = ""
 		cmd.returned = false
 		update_selected_tracks()
-		engaged = false
+		cmdFlags.engaged = false
 	end
 
 end
@@ -137,7 +136,7 @@ function main()
 	draw_elements()
 	
 	local char = gfx.getchar()
-	if char == 27 or char == -1 then 
+	if char == 27 or char == -1  or cmdFlags.exitOnCommand then 
 		reaper.atexit(reaper.JS_Window_SetFocus(last_window))
 		return
 	-- Otherwise keep window open
@@ -146,11 +145,12 @@ function main()
 		-- if "/" then activate cmd
 		if char == 47 and cmd.active == false then cmd.active = true 
 		-- if ctrl+backspace or the user clears out the cmd then clear text and restore the selected tracks
-		elseif (char == 8 and gfx.mouse_cap == 04) or (engaged and cmd.txt == "" ) then 
+		elseif (char == 8 and gfx.mouse_cap == 04) or (cmdFlags.engaged and cmd.txt == "" ) then 
 			cmd.txt = ""
 			restore_selected_tracks()
-			engaged = false
+			cmdFlags.engaged = false
 		else
+			if gfx.mouse_cap == 04 and char == 13 then cmdFlags.exitOnCommand = true end
 			-- Send characters to the textfields
 			cmd:Change(char)
 			update_cmd(char)
@@ -164,7 +164,6 @@ function main()
 
 	--If the cmd is click it's activated
 	if cmd.leftClick then cmd.active = true end
-
 
 
 	--Refresh the gui size 
