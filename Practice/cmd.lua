@@ -107,6 +107,7 @@ local function select_tracks(exclusive)
 				elseif displaySpacer > 16 then
 					display2.txt = display2.txt .. buf:sub(1,16) .. "\n"
 				else
+					gfx.set(1,0,0)
 					display.txt = display.txt .. buf:sub(1,16) .. "\n"
 				end
 			--if i is not a match deselect
@@ -204,7 +205,7 @@ local function update_cmd(char)
 		elseif c.flags:find("A") then set_selected_tracks('I_RECARM', 1, true)
 		end
 
-		--Look for fx bypas
+		--Look for fx bypass
 		if c.flags:find("b%-") then set_selected_tracks("I_FXEN", 0, false)
 		elseif c.flags:find("b%+") then set_selected_tracks('I_FXEN', 1, false)
 		elseif c.flags:find("b") then set_selected_tracks('I_FXEN',-1, false)
@@ -215,6 +216,7 @@ local function update_cmd(char)
 		--commit the currently selected tracks to previous selected tracks
 		--reset recall 
 
+		reaper.SetMixerScroll( reaper.GetSelectedTrack(0, 0))
 		cmd.txt = ""
 		cmd.returned = false
 		update_selected_tracks(prevSelectedTracks)
