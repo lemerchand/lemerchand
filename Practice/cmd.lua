@@ -69,6 +69,7 @@ end
 local function select_tracks(exclusive)
 	update_active_arrange()
 
+	--reaper.PreventUIRefresh(10)
 	local excessTrackCount = 0
 	
 	--reset the displays
@@ -80,7 +81,7 @@ local function select_tracks(exclusive)
 	local displaySpacer = 0
 
 	--Trim command from user input
-	local input = cmd.txt:sub(3)
+	local input = string.lower(cmd.txt:sub(3))
 
 	--look for and extract flags
 	--If a flag is found then trim input to just before flag
@@ -138,6 +139,7 @@ local function select_tracks(exclusive)
 	
 end
 	if excessTrackCount > 0 then display3.txt = display3.txt .. excessTrackCount-1 .. " more..." end
+	--reaper.PreventUIRefresh(-10)
 end
 
 --Restores the selection if user cancels command
