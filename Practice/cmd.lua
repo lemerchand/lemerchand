@@ -1,7 +1,7 @@
 function reaperDoFile(file) local info = debug.getinfo(1,'S'); script_path = info.source:match[[^@?(.*[\/])[^\/]-$]]; dofile(script_path .. file); end
 reaperDoFile('../gui.lua')
 reaperDoFile('../cf.lua')
-
+reaper.ClearConsole()
 --Create window, add pin-to-top and get last focused window
 gfx.init("Console", 400,300, false, 1400,400)
 local win = reaper.JS_Window_Find("Console", true)
@@ -11,10 +11,12 @@ if win then reaper.JS_Window_AttachTopmostPin(win) end
 local refresh = 0
 
 --Common properties for the comman line
-local c = {engaged = false, exitOnCommand = false, flags=""}
-
+local c = {engaged = false, exitOnCommand = false, flags="", recall = 0, prev=1, cmd = {}}
+c.cmd[1] = ""
 --Table to hold selected tracks
-local selectedTracks = {}
+local prevSelectedTracks = {}
+local curSelectedTracks = {}
+
 
 --Create and hide dummy status
 status = Status:Create()
@@ -38,32 +40,7 @@ local function gui_size_update()
 
 end
 
-local function select_tracks(exclusive)
-	update_active_arrange()
-	display.txt = "Select...\n\n"
-	for i=0, tracks-1 do
-		local t = reaper.GetTrack(0, i )
-		local retval, buf = reaper.GetTrackName( t )
-
-		local input = cmd.txt:sub(3)
-
-		if cmd.txt:find("=") then 
-			local s, e = cmd.txt:find("=")
-			c.flags = cmd.txt:sub(s+1)
-			input = cmd.txt:sub(3, cmd.txt:find("=")-1)
-		end
-		
-			
-
-		if string.lower(buf):match(input) then reaper.SetTrackSelected( t, true ) 
-			display.txt = display.txt .. buf .. "\n"
-		else 
-			reaper.SetTrackSelected( t, false) 
-		end
-	end
-end
-
-local function update_selected_tracks()
+local function update_selected_tracks(selectedTracks)
 	update_active_arrange()
 	for i = 0, tracks - 1 do
 		if reaper.IsTrackSelected(reaper.GetTrack(0,i)) then selectedTracks[i] = true
@@ -73,10 +50,56 @@ local function update_selected_tracks()
 	end
 end
 
+local function select_tracks(exclusive)
+	update_active_arrange()
+	
+	--update_selected_tracks(curSelectedTracks)
+	display.txt = "Select...\n\n"
+	local input = cmd.txt:sub(3)
+	if cmd.txt:find("=") then 
+		local s, e = cmd.txt:find("=")
+		c.flags = cmd.txt:sub(s+1)
+		input = cmd.txt:sub(3, cmd.txt:find("=")-1)
+
+	end
+		
+	--Remove spaces from input		
+	noSpacesInput = input:gsub("%s*", "")
+
+
+
+	for i=0, tracks-1 do
+		local t = reaper.GetTrack(0, i )
+		local retval, buf = reaper.GetTrackName( t )
+		local noSpacesBuf = buf:gsub("%s*", "")
+	
+		if string.lower(buf) == input or string.lower(buf .. " ") == input or string.lower(buf .. "  ") == input then 
+			reaper.SetTrackSelected( t, true ) 
+			display.txt = display.txt .. buf .. "\n"
+			
+			cons('\nre')
+
+		else 
+
+			if string.lower(buf):match(input) and string.lower(buf .. " ") ~= input then 
+				reaper.SetTrackSelected( t, true ) 
+				display.txt = display.txt .. buf .. "\n"
+	
+			else
+			reaper.SetTrackSelected( t, false) 
+		end
+	end
+	
+end
+	
+	
+end
+
+
 local function restore_selected_tracks()
 
 	for i = 0, tracks-1 do
-		reaper.SetTrackSelected(reaper.GetTrack(0, i), selectedTracks[i])
+		reaper.SetTrackSelected(reaper.GetTrack(0, i), prevSelectedTracks[i])
 	end
 end
 
@@ -101,7 +124,7 @@ end
 local function update_cmd(char)
 
 	if not c.engaged and cmd.txt ~= "" then 
-		update_selected_tracks()
+		update_selected_tracks(prevSelectedTracks)
 		c.engaged = true
 	end
 
@@ -120,6 +143,9 @@ local function update_cmd(char)
 
 	--If enter is pressed 
 	if cmd.returned then 
+
+		c.prev = c.prev + 1
+		c.cmd[c.prev] = cmd.txt
 
 		--Look for commands
 		if cmd.txt == "hello" then display.txt = "HI!" end
@@ -140,9 +166,11 @@ local function update_cmd(char)
 
 		cmd.txt = ""
 		cmd.returned = false
-		update_selected_tracks()
+		update_selected_tracks(prevSelectedTracks)
 		c.engaged = false
 		c.flags = ""
+		c.recall = count_table(c.cmd)+1
+
 	end
 
 end
@@ -168,16 +196,36 @@ function main()
 			display.txt = ""
 			restore_selected_tracks()
 			c.engaged = false
+	
+		elseif char == 30064 then 
+			if c.recall - 1 == 1 then 
+				c.recall = 2 
+				cmd.txt = c.cmd[c.recall]
+			else 
+				c.recall = c.recall - 1
+				cmd.txt = c.cmd[c.recall]
+			end
+			
+			
+		elseif char == 1685026670 then
+
+			if c.recall + 1 > count_table(c.cmd) then 
+				c.recall = count_table(c.cmd)
+				cmd.txt = c.cmd[1]
+			else
+				c.recall = c.recall + 1 
+				cmd.txt = c.cmd[c.recall]
+			end
+			
 		else
 			if gfx.mouse_cap == 04 and char == 13 then c.exitOnCommand = true end
 			-- Send characters to the textfields
 			cmd:Change(char)
 			update_cmd(char)
+			if c.recall == count_table(c.cmd)+1 then c.cmd[1] = cmd.txt end
 		end
 		reaper.defer(main) 
 	end
-
-
 
 
 
