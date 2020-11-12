@@ -4,7 +4,7 @@ reaperDoFile('../cf.lua')
 reaper.ClearConsole()
 
 --Create window, add pin-to-top and get last focused window
-gfx.init("Console", 400,300, false, 1400,400)
+gfx.init("Console", 400,320, false, 1400,400)
 local win = reaper.JS_Window_Find("Console", true)
 if win then reaper.JS_Window_AttachTopmostPin(win) end
 
@@ -14,6 +14,7 @@ local refresh = 0
 --Common properties for the comman line
 local c = {engaged = false, exitOnCommand = false, flags="", recall = 0, prev=1, cmd = {}}
 c.cmd[1] = ""
+local exclusive = false
 
 --Table to hold selected tracks
 local prevSelectedTracks = {}
@@ -32,9 +33,20 @@ cmd.alwaysActive = true
 
 --Create a text display for information
 local display = Text:Create(20, 30, "", "", nil, nil, nil, nil, nil, false, frame.w/3)
-local display2 = Text:Create(display.x+display.w+20, 30, "", "", nil, nil, nil, nil, nil, false, frame.w/3)
-local display3 = Text:Create(display2.x+display2.w-20, 30, "", "", nil, nil, nil, nil, nil, false, frame.w/3)
+local display2 = Text:Create(display.x+display.w, 30, "", "", nil, nil, nil, nil, nil, false, frame.w/3)
+local display3 = Text:Create(display2.x+display2.w, 30, "", "", nil, nil, nil, nil, nil, false, frame.w/3)
 local displays = {display, display2, display3}
+
+local function reset_display()
+	display.txt = 	"\nPrefix commands:" ..
+					"\n       s        -       filter tracks" ..
+					"\n\nSuffix commands:" ..
+					"\n	       =o       -       solo track(s) " ..
+					"\n	       =m       -       mute track(s) " ..
+					"\n	       =a       -       arm track(s)" ..
+					"\n	       =b       -       bypass FX"..
+					"\n\n       +/-      -       On/Off"
+end
 
 --Handles resize whenever the refresh threshold is reached
 local function gui_size_update()
@@ -56,6 +68,8 @@ end
 --Selects tracks by name
 local function select_tracks(exclusive)
 	update_active_arrange()
+
+	local excessTrackCount = 0
 	
 	--reset the displays
 	display.txt = "Selected:\n\n"
@@ -87,7 +101,9 @@ local function select_tracks(exclusive)
 			displaySpacer = displaySpacer + 1
 
 			--Format and display selected tracks
-			if displaySpacer > 32 then
+			if displaySpacer > 47 then 
+				excessTrackCount = excessTrackCount + 1
+			elseif displaySpacer > 32 then
 				display3.txt = display3.txt .. buf:sub(1,16) .. "\n"
 			elseif displaySpacer > 16 then
 				display2.txt = display2.txt .. buf:sub(1,16) .. "\n"
@@ -101,8 +117,11 @@ local function select_tracks(exclusive)
 				reaper.SetTrackSelected( t, true ) 
 				displaySpacer = displaySpacer + 1
 
+
 				--Format and display selected tracks
-				if displaySpacer > 32 then
+				if displaySpacer > 47 then 
+					excessTrackCount = excessTrackCount + 1
+				elseif displaySpacer > 32 then
 					display3.txt = display3.txt .. buf:sub(1,16) .. "\n"
 				elseif displaySpacer > 16 then
 					display2.txt = display2.txt .. buf:sub(1,16) .. "\n"
@@ -113,11 +132,11 @@ local function select_tracks(exclusive)
 			else 
 				reaper.SetTrackSelected( t, false) 
 		end
+
 	end
 	
 end
-	
-	
+	if excessTrackCount > 0 then display3.txt = display3.txt .. excessTrackCount-1 .. " more..." end
 end
 
 --Restores the selection if user cancels command
@@ -163,8 +182,11 @@ local function update_cmd(char)
 	--Look for various prefix commands
 	if cmd.active and cmd.txt:sub(1,1) == "s" then 
 		select_tracks(false)
+
 	elseif cmd.active and cmd.txt:sub(1,1) == "S" then
+		exclusive = true
 		select_tracks(true)
+
 	end
 
 
@@ -217,10 +239,23 @@ local function update_cmd(char)
 
 		cmd.txt = ""
 		cmd.returned = false
+
+		if not exclusive then 
+			update_selected_tracks(curSelectedTracks)
+			for i = 0, tracks -1 do
+				if prevSelectedTracks[i] == true or curSelectedTracks[i] == true then
+					reaper.SetTrackSelected( reaper.GetTrack(0,i), true )
+				else
+					reaper.SetTrackSelected( reaper.GetTrack(0,i), false )
+				end
+			end
+		end
+
 		update_selected_tracks(prevSelectedTracks)
 		c.engaged = false
 		c.flags = ""
 		c.recall = count_table(c.cmd)+1
+		exclusive = false
 
 
 	end
@@ -232,7 +267,8 @@ function main()
 	--Draws all elements
 	fill_background()
 	draw_elements()
-	
+
+
 	local char = gfx.getchar()
 	if char == 27 or char == -1  or c.exitOnCommand then 
 		reaper.atexit(reaper.JS_Window_SetFocus(last_window))
@@ -278,9 +314,10 @@ function main()
 			--if the user presses ctrl+enter then exit after commit
 			if gfx.mouse_cap == 04 and char == 13 then c.exitOnCommand = true end
 
-			-- Send characters to the textfields
+			-- Send characters to the textfield
 			cmd:Change(char)
 			update_cmd(char)
+			if not c.engaged then reset_display() end
 
 			--if the user isn't scrolling through the history then set c.cmd[1]
 			if c.recall == count_table(c.cmd)+1 then c.cmd[1] = cmd.txt end
