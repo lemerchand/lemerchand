@@ -23,6 +23,7 @@
 --TODO:
 --		+ Make pretty
 --		+ Fix dropdown draw issue when dropdown choices overlap another dropdown
+-- 				- Temporary fix: create after everything else
 --		+ Vertical Sliderr
 --
 
@@ -1252,27 +1253,15 @@ end
 Display = {}
 Display.__index = Display
 
-function Display:Create(x,y, w, h, txt, help, fontSized5, r, g, b, font, hide)
+function Display:Create(x,y, w, h, r, g, b, font, fontSize, hide)
 
 	if font == nil then gfx.setfont(1, "Lucida Console", 13) end
-
-	if w == nil then 
-		ww,hh = gfx.measurestr(txt)
-		w = ww + 19
-	end
-
-	if h == nil then 
-		ww,hh = gfx.measurestr(txt)
-		h = hh + 17
-	end
 
 	local this = {
 		x = x or 10,
 		y = y or 10,
-		help = help or "",
 		w = w,
 		h = h,
-		txt = txt or "Some text.",
 		fontSize = fontSize or 12,
 		r = r or .7,
 		g = g or .7,
@@ -1291,13 +1280,29 @@ end
 function Display:Draw()
 	self:ResetClicks()
 	if self.hide then return end
-	gfx.x, gfx.y = self.x, self.y
-	gfx.set(self.r, self.g, self.b, 1)
+
 	gfx.setfont(1, self.font, self.fontSize)
-	gfx.drawstr(self.txt)
+	
+	local offsetX = 0
+	local offsetY = 1
+
+	for l = 1, count_table(self.lines.line) do
+			
+		if l >= self.h/self.fontSize then 
+			offsetY = 1
+			offsetX = self.w/(self.fontSize/6) 
+		end
+
+		gfx.set(self.lines.r[l], self.lines.g[l], self.lines.b[l])
+		gfx.x, gfx.y = self.x + offsetX, self.y + l*self.fontSize
+		gfx.drawstr(self.lines.line[l])
+		offsetY = offsetY + 1
+	end
+
+
 
 	if hovering(self.x, self.y, self.w, self.h-18) then
-		status:Display(self.help)
+		
 		if gfx.mouse_cap == 1 then self.leftClick = true
 			elseif gfx.mouse_cap == 2 then self.rightClick = true
 			elseif gfx.mouse_cap == 5 then self.ctrlLeftClick = true
@@ -1328,15 +1333,15 @@ end
 
 function Display:AddLine(str, red, green, blue, column)
 
-	local red, green, blue = red, green, blue or .7, .7, .7
+	local red, green, blue = red or self.r, green or self.g, blue or self.b
 	local column = column or -1
 
 
-	table.insert(self.lines[line], str)
-	table.insert(self.lines[col], column)
-	table.insert(self.lines[r], red)
-	table.insert(self.lines[b], blue)
-	table.insert(self.lines[g], green)
+	table.insert(self.lines.line, str)
+	table.insert(self.lines.col, column)
+	table.insert(self.lines.r, red)
+	table.insert(self.lines.b, blue)
+	table.insert(self.lines.g, green)
 
 
 

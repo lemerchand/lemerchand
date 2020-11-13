@@ -4,7 +4,7 @@ reaperDoFile('../cf.lua')
 
 
 
-gfx.init("Lemerchand Testing", 300,450, false, 1500,500)
+gfx.init("Lemerchand Testing", 400,650, false, 1500,500)
 local win = reaper.JS_Window_Find("Lemerchand Testing", true)
 if win then reaper.JS_Window_AttachTopmostPin(win) end
 
@@ -35,9 +35,12 @@ end
 local btn_randomNotes = Button:Create(status.x+10, status.y+status.h+30, "Test")
 
 local cmd = TextField:Create(20, 250, status.w-20, 20, "Enter Some text: ", "", false, false)
-local t2 = Display:Create(20, 280, status.w-20,75, "Multiline", "", false, true)
+local t2 = Display:Create(20, 280, status.w-20,75)
 local log = Text:Create(20, 150, "", "", nil, nil, nil, nil, nil, false, status.w-20, 90)
 
+for tonka = 1, 12 do
+	t2:AddLine("Violin overdub: " .. tonka)
+end
 
 
 function main()
