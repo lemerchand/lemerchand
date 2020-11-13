@@ -1245,6 +1245,107 @@ end
 ------------------------------------------END: STATUS-----------------------------------------------------
 
 
+--------------------------------------------------------------------------------------------------------------
+----------------------------------CLASS: Display-----------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------
 
+Display = {}
+Display.__index = Display
+
+function Display:Create(x,y, w, h, txt, help, fontSized5, r, g, b, font, hide)
+
+	if font == nil then gfx.setfont(1, "Lucida Console", 13) end
+
+	if w == nil then 
+		ww,hh = gfx.measurestr(txt)
+		w = ww + 19
+	end
+
+	if h == nil then 
+		ww,hh = gfx.measurestr(txt)
+		h = hh + 17
+	end
+
+	local this = {
+		x = x or 10,
+		y = y or 10,
+		help = help or "",
+		w = w,
+		h = h,
+		txt = txt or "Some text.",
+		fontSize = fontSize or 12,
+		r = r or .7,
+		g = g or .7,
+		b = b or .7,
+		font = font or "Lucida Console",
+		hide = hide or false,
+		lines = {line={}, col={}, r={},g={},b={}}
+
+	}
+
+	setmetatable(this, Display)
+	table.insert(Elements, this)
+	return this
+end
+
+function Display:Draw()
+	self:ResetClicks()
+	if self.hide then return end
+	gfx.x, gfx.y = self.x, self.y
+	gfx.set(self.r, self.g, self.b, 1)
+	gfx.setfont(1, self.font, self.fontSize)
+	gfx.drawstr(self.txt)
+
+	if hovering(self.x, self.y, self.w, self.h-18) then
+		status:Display(self.help)
+		if gfx.mouse_cap == 1 then self.leftClick = true
+			elseif gfx.mouse_cap == 2 then self.rightClick = true
+			elseif gfx.mouse_cap == 5 then self.ctrlLeftClick = true
+			elseif gfx.mouse_cap == 9 then self.shiftLeftClick = true
+			elseif gfx.mouse_cap == 10 then self.shiftRightClick = true	
+			elseif gfx.mouse_cap == 17 then self.altLeftClick = true
+			elseif gfx.mouse_cap == 18 then self.altRightClick = true
+			elseif gfx.mouse_cap == 64 then self.middleClick = true
+			
+		end
+	end
+
+end
+
+function Display:ResetClicks()
+
+	self.leftClick = false
+	self.rightClick = false
+	self.middleClick = false
+	self.ctrlLeftClick = false
+	self.ctrlRightClick = false
+	self.shiftLeftClick = false
+	self.shiftRightClick = false
+	self.altLeftClick = false
+	self.altRightClick = false
+
+end
+
+function Display:AddLine(str, red, green, blue, column)
+
+	local red, green, blue = red, green, blue or .7, .7, .7
+	local column = column or -1
+
+
+	table.insert(self.lines[line], str)
+	table.insert(self.lines[col], column)
+	table.insert(self.lines[r], red)
+	table.insert(self.lines[b], blue)
+	table.insert(self.lines[g], green)
+
+
+
+end
+
+
+function Display:Reset()
+
+end
+----------------------------------END: Display------------------------------------------------------------------
 
 

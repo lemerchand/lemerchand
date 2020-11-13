@@ -35,8 +35,10 @@ end
 local btn_randomNotes = Button:Create(status.x+10, status.y+status.h+30, "Test")
 
 local cmd = TextField:Create(20, 250, status.w-20, 20, "Enter Some text: ", "", false, false)
-local t2 = TextField:Create(20, 280, status.w-20,75, "Multiline", "", false, true)
+local t2 = Display:Create(20, 280, status.w-20,75, "Multiline", "", false, true)
 local log = Text:Create(20, 150, "", "", nil, nil, nil, nil, nil, false, status.w-20, 90)
+
+
 
 function main()
 
@@ -52,7 +54,7 @@ function main()
 	else 
 		-- Send characters to the textfields
 		cmd:Change(char)
-		t2:Change(char)
+
 		-- if "/" then activate cmd
 		if char == 47 and cmd.active == false then cmd.active = true end
 		reaper.defer(main) 
@@ -99,7 +101,7 @@ function main()
 
 if btn_randomNotes.leftClick then insert_random_notes() end
 	if cmd.leftClick then cmd.active = true end
-	if t2.leftClick then t2.active = true end
+
 	if cmd.active and cmd.txt == "s" then 
 
 		-- for i=0, tracks-1 do
