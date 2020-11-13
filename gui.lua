@@ -1349,8 +1349,14 @@ function Display:AddLine(str, red, green, blue, column)
 	table.insert(self.lines.b, blue)
 	table.insert(self.lines.g, green)
 
+end
 
-
+function Display:ClearLines()
+	self.lines.line	= {}
+	self.lines.col	= {}
+	self.lines.r	= {}
+	self.lines.b	= {}
+	self.lines.g 	= {}
 end
 
 

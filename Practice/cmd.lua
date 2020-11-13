@@ -32,21 +32,19 @@ local cmd = TextField:Create(10, frame.y+frame.h, frame.w+1, 20, "", "", true, f
 cmd.alwaysActive = true
 
 --Create a text display for information
-local display = Text:Create(20, 30, "", "", nil, nil, nil, nil, nil, false, frame.w/3)
-local display2 = Text:Create(display.x+display.w, 30, "", "", nil, nil, nil, nil, nil, false, frame.w/3)
-local display3 = Text:Create(display2.x+display2.w, 30, "", "", nil, nil, nil, nil, nil, false, frame.w/3)
-local displays = {display, display2, display3}
+local display = Display:Create(frame.x+10, frame.y+10, frame.w-10, frame.h-10)
 
-local function reset_display()
-	display.txt = 	"\nPrefix commands:" ..
-					"\n       s        -       filter tracks" ..
-					"\n\nSuffix commands:" ..
-					"\n	       =o       -       solo track(s) " ..
-					"\n	       =m       -       mute track(s) " ..
-					"\n	       =a       -       arm track(s)" ..
-					"\n	       =b       -       bypass FX"..
-					"\n\n       +/-      -       On/Off"
-end
+
+-- local function reset_display()
+-- 	display.txt = 	"\nPrefix commands:" ..
+-- 					"\n       s        -       filter tracks" ..
+-- 					"\n\nSuffix commands:" ..
+-- 					"\n	       =o       -       solo track(s) " ..
+-- 					"\n	       =m       -       mute track(s) " ..
+-- 					"\n	       =a       -       arm track(s)" ..
+-- 					"\n	       =b       -       bypass FX"..
+-- 					"\n\n       +/-      -       On/Off"
+-- end
 
 --Handles resize whenever the refresh threshold is reached
 local function gui_size_update()
@@ -71,14 +69,7 @@ local function select_tracks(exclusive)
 
 	--reaper.PreventUIRefresh(10)
 	local excessTrackCount = 0
-	
-	--reset the displays
-	display.txt = "Selected:\n\n"
-	display2.txt = "\n\n"
-	display3.txt = "\n\n"
-
-	--Helps formats display with excessive track count
-	local displaySpacer = 0
+	display:ClearLines()
 
 	--Trim command from user input
 	local input = string.lower(cmd.txt:sub(3))
@@ -96,49 +87,27 @@ local function select_tracks(exclusive)
 		local t = reaper.GetTrack(0, i )
 		local retval, buf = reaper.GetTrackName( t )
 	
+		
 		--if the string is an exact match	
 		if string.lower(buf) == input or string.lower(buf .. " ") == input or string.lower(buf .. "  ") == input then 
 			reaper.SetTrackSelected( t, true ) 
-			displaySpacer = displaySpacer + 1
+			display:AddLine(buf:sub(1,16))
 
-			--Format and display selected tracks
-			if displaySpacer > 47 then 
-				excessTrackCount = excessTrackCount + 1
-			elseif displaySpacer > 32 then
-				display3.txt = display3.txt .. buf:sub(1,16) .. "\n"
-			elseif displaySpacer > 16 then
-				display2.txt = display2.txt .. buf:sub(1,16) .. "\n"
-			else
-				display.txt = display.txt .. buf:sub(1,16) .. "\n"
-			end
 		else 
-
 			--finds close matches
 			if string.lower(buf):match(input) and string.lower(buf .. " ") ~= input then 
 				reaper.SetTrackSelected( t, true ) 
-				displaySpacer = displaySpacer + 1
-
-
-				--Format and display selected tracks
-				if displaySpacer > 47 then 
-					excessTrackCount = excessTrackCount + 1
-				elseif displaySpacer > 32 then
-					display3.txt = display3.txt .. buf:sub(1,16) .. "\n"
-				elseif displaySpacer > 16 then
-					display2.txt = display2.txt .. buf:sub(1,16) .. "\n"
-				else
-					gfx.set(1,0,0)
-					display.txt = display.txt .. buf:sub(1,16) .. "\n"
-				end
+				display:AddLine(buf:sub(1,16))
 			--if i is not a match deselect
 			else 
 				reaper.SetTrackSelected( t, false) 
+
 		end
 
 	end
 	
 end
-	if excessTrackCount > 0 then display3.txt = display3.txt .. excessTrackCount-1 .. " more..." end
+	
 	--reaper.PreventUIRefresh(-10)
 end
 
@@ -205,8 +174,6 @@ local function update_cmd(char)
 		c.cmd[c.prev] = cmd.txt
 
 
-		--If the commit is "hello"
-		if cmd.txt == "hello" then display.txt = "HI!" end
 
 		--Look for mute 
 		if c.flags:find("m%-") then set_selected_tracks('B_MUTE', 0, false)
@@ -289,7 +256,7 @@ function main()
 		-- if ctrl+backspace or the user clears out the cmd then clear text and restore the selected tracks
 		elseif (char == 8 and gfx.mouse_cap == 04) or (c.engaged and cmd.txt == "" ) then 
 			cmd.txt = ""
-			for d, dd in ipairs(displays) do dd.txt="" end
+			
 			restore_selected_tracks()
 			c.engaged = false
 	
@@ -321,7 +288,7 @@ function main()
 			-- Send characters to the textfield
 			cmd:Change(char)
 			update_cmd(char)
-			if not c.engaged then reset_display() end
+			--if not c.engaged then reset_display() end
 
 			--if the user isn't scrolling through the history then set c.cmd[1]
 			if c.recall == count_table(c.cmd)+1 then c.cmd[1] = cmd.txt end
