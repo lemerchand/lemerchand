@@ -4,15 +4,30 @@ reaperDoFile('../cf.lua')
 reaper.ClearConsole()
 
 --Create window, add pin-to-top and get last focused window
-gfx.init("Console", 400,320, false, 1400,400)
+
+local mousex, mousey = reaper.GetMousePosition()
+
+gfx.init("Console", 400, 300, false, mousex+50,mousey-200)
 local win = reaper.JS_Window_Find("Console", true)
 if win then reaper.JS_Window_AttachTopmostPin(win) end
+
+--Let's define some colors!
+
+local default = {r=.7, g=.7, b=.7}
+local white = {r=.8, g=.8, b=.8}
+local red = {r=.7, g=.1, b=.2}
+local green = {r=.25, g=.7, b=.15}
+local blue = {r=.25, g=.5, b=.9}
+local grey = {r=.41, g=.4, b=.37}
+local yellow = {r=.75, g=.7, b=.3}
+local something = {r=.6, g=.2, b=.35}
+
 
 --Counter for refreshing gui after resize
 local refresh = 0
 
 --Common properties for the comman line
-local c = {engaged = false, exitOnCommand = false, flags="", recall = 0, prev=1, cmd = {}}
+local c = {engaged = false, exitOnCommand = false, flags="", recall = 0, prev=1, cmd = {}, naming = nil}
 c.cmd[1] = ""
 local exclusive = false
 
@@ -32,24 +47,15 @@ local cmd = TextField:Create(10, frame.y+frame.h, frame.w+1, 20, "", "", true, f
 cmd.alwaysActive = true
 
 --Create a text display for information
-local display = Display:Create(frame.x+10, frame.y+10, frame.w-10, frame.h-10)
+local display = Display:Create(frame.x+15, frame.y+20, frame.w-120, frame.h-70)
 
 
--- local function reset_display()
--- 	display.txt = 	"\nPrefix commands:" ..
--- 					"\n       s        -       filter tracks" ..
--- 					"\n\nSuffix commands:" ..
--- 					"\n	       =o       -       solo track(s) " ..
--- 					"\n	       =m       -       mute track(s) " ..
--- 					"\n	       =a       -       arm track(s)" ..
--- 					"\n	       =b       -       bypass FX"..
--- 					"\n\n       +/-      -       On/Off"
--- end
 
 --Handles resize whenever the refresh threshold is reached
 local function gui_size_update()
 	frame.w, frame.h = gfx.w-20, gfx.h-30
 	cmd.w, cmd.y = frame.w+1, frame.y+frame.h
+	display.h = frame.h-70
 end
 
 --Loads given table with currently selected tracks
@@ -71,33 +77,56 @@ local function select_tracks(exclusive)
 	local excessTrackCount = 0
 	display:ClearLines()
 
+
 	--Trim command from user input
 	local input = string.lower(cmd.txt:sub(3))
 
 	--look for and extract flags
 	--If a flag is found then trim input to just before flag
 	if cmd.txt:find("=") then 
-		local s, e = cmd.txt:find("=")
-		c.flags = cmd.txt:sub(s+1)
+		local s, e = cmd.txt:find('=')
+		c.flags = cmd.txt:sub(s+1, cmd.txt:find('"'))
 		input = cmd.txt:sub(3, cmd.txt:find("=")-1)
+	end
+
+	if cmd.txt:find('".*"') then 
+		local s, e = cmd.txt:find('".*"')
+		c.naming = cmd.txt:sub(s+1, e-1)
 	end
 		
 
 	for i=0, tracks-1 do
 		local t = reaper.GetTrack(0, i )
 		local retval, buf = reaper.GetTrackName( t )
-	
+		
+		local muted = reaper.GetMediaTrackInfo_Value(t, 'B_MUTE')
+		local soloed = reaper.GetMediaTrackInfo_Value(t, 'I_SOLO')
+		local armed = reaper.GetMediaTrackInfo_Value(t, 'I_RECARM')
+		local level = reaper.GetMediaTrackInfo_Value(t, 'I_FOLDERDEPTH')
+		local fxBypassed = reaper.GetMediaTrackInfo_Value(t, "I_FXEN")
+
+		local levelMod = ""
+		local r, g, b = 0,0,0
+		if soloed == 1 then r, g, b = yellow.r, yellow.g, yellow.b
+		elseif muted == 1  then r, g, b = red.r, red.g, red.b
+		elseif armed == 1 then r, g, b = green.r, green.g, green.b
+		elseif fxBypassed == 0 then r, g, b = grey.r, grey.g, grey.b
+		else r, g, b = default.r, default.g, default.b
+		end
+
+		if level == 1 then levelMod = " |F|" else levelMod = "" end
+
 		
 		--if the string is an exact match	
 		if string.lower(buf) == input or string.lower(buf .. " ") == input or string.lower(buf .. "  ") == input then 
 			reaper.SetTrackSelected( t, true ) 
-			display:AddLine(buf:sub(1,16))
+			display:AddLine(buf:sub(1,16) .. levelMod, r, g, b)
 
 		else 
 			--finds close matches
 			if string.lower(buf):match(input) and string.lower(buf .. " ") ~= input then 
 				reaper.SetTrackSelected( t, true ) 
-				display:AddLine(buf:sub(1,16))
+				display:AddLine(buf:sub(1,16) .. levelMod, r, g, b)
 			--if i is not a match deselect
 			else 
 				reaper.SetTrackSelected( t, false) 
@@ -174,6 +203,27 @@ local function update_cmd(char)
 		c.cmd[c.prev] = cmd.txt
 
 
+		--if there was an attempt to name (ie., ="sometext") then name the selected tracks
+		if c.naming and reaper.CountSelectedTracks(0) >= 1 then 
+			for i = 0, tracks-1 do
+				track = reaper.GetTrack(0, i)
+				if reaper.IsTrackSelected(track) then
+					reaper.GetSetMediaTrackInfo_String( reaper.GetTrack(0, i), 'P_NAME', c.naming, true )
+				end
+				
+			end
+			c.naming = nil 
+		end
+
+
+		if cmd.active and cmd.txt:sub(1,1) == "C" then
+			for i = 0, tracks - 1 do
+				track = reaper.GetTrack(0, i)
+				reaper.SetMediaTrackInfo_Value(track, 'B_MUTE', 0)
+				reaper.SetMediaTrackInfo_Value(track, 'I_SOLO', 0)
+				reaper.SetMediaTrackInfo_Value(track, 'I_RECARM', 0)
+			end
+		end
 
 		--Look for mute 
 		if c.flags:find("m%-") then set_selected_tracks('B_MUTE', 0, false)
@@ -207,7 +257,7 @@ local function update_cmd(char)
 		--commit the currently selected tracks to previous selected tracks
 		--reset recall 
 
-		reaper.SetMixerScroll( reaper.GetSelectedTrack(0, 0))
+		if reaper.CountSelectedTracks(0) >=1 then reaper.SetMixerScroll( reaper.GetSelectedTrack(0, 0)) end
 		cmd.txt = ""
 		cmd.returned = false
 
@@ -264,7 +314,8 @@ function main()
 		elseif char == 30064 then 
 			if c.recall - 1 == 1 then 
 				c.recall = 2 
-				cmd.txt = c.cmd[c.recall]
+				cmd.txt = c.cmd[c.recall] 
+			elseif c.recall == 0 then cmd.txt = ""
 			else 
 				c.recall = c.recall - 1
 				cmd.txt = c.cmd[c.recall]
@@ -289,11 +340,12 @@ function main()
 			cmd:Change(char)
 			update_cmd(char)
 			--if not c.engaged then reset_display() end
-
+			if not c.engaged then display:ClearLines() end
 			--if the user isn't scrolling through the history then set c.cmd[1]
 			if c.recall == count_table(c.cmd)+1 then c.cmd[1] = cmd.txt end
 		end
 		reaper.defer(main) 
+
 	end
 
 
