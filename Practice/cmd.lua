@@ -92,6 +92,7 @@ local function gui_size_update()
 	frame.w, frame.h = gfx.w-20, gfx.h-30
 	cmd.w, cmd.y = frame.w+1, frame.y+frame.h
 	display.h = frame.h-70
+	display2.y = frame.y+frame.h-40
 end
 
 --Loads given table with currently selected tracks
@@ -392,7 +393,9 @@ function main()
 			if c.recall - 1 == 1 then 
 				c.recall = 2 
 				cmd.txt = c.cmd[c.recall] 
-			elseif c.recall == 0 then cmd.txt = ""
+			elseif c.recall == 0 then 
+				cmd.txt = ""
+				c.recall = count_table(c.cmd)+1
 			else 
 				c.recall = c.recall - 1
 				cmd.txt = c.cmd[c.recall]
@@ -402,7 +405,7 @@ function main()
 		elseif char == 1685026670 then
 
 			if c.recall + 1 > count_table(c.cmd) then 
-				c.recall = count_table(c.cmd)
+				c.recall = count_table(c.cmd)+1
 				cmd.txt = c.cmd[1]
 			else
 				c.recall = c.recall + 1 
