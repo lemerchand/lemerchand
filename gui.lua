@@ -1284,24 +1284,26 @@ function Display:Draw()
 	gfx.setfont(1, self.font, self.fontSize)
 	
 	local offsetX = 0
+	local manualOffsetX = 0
 	local offsetY = 0
 	local heightCap = math.floor(self.h/self.fontSize)
 
 	for l = 1, count_table(self.lines.line) do
 			
+		if self.lines.col[l] ~= -1 then manualOffsetX = self.lines.col[l] else manualOffsetX = 0 end
+
 		local lineMod = l%heightCap
 		if lineMod == 0 then lineMod = heightCap end
 
-		--offsetY = l%math.floor(self.h/self.fontSize)*self.fontSize
-
 		gfx.set(self.lines.r[l], self.lines.g[l], self.lines.b[l])
-		gfx.x, gfx.y = self.x + offsetX, self.y + lineMod*self.fontSize
+		gfx.x, gfx.y = self.x + offsetX + manualOffsetX, self.y + lineMod*self.fontSize
 		gfx.drawstr(self.lines.line[l])
 		
 		if lineMod == heightCap then 
 			offsetX = offsetX +  self.w/(self.fontSize/6.5) 
 		end
-	
+
+
 
 	end
 

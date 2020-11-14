@@ -11,7 +11,9 @@ gfx.init("Console", 400, 300, false, mousex+50,mousey-200)
 local win = reaper.JS_Window_Find("Console", true)
 if win then reaper.JS_Window_AttachTopmostPin(win) end
 
---Let's define some colors!
+----------------------------
+--Custom Colors-------------
+----------------------------
 
 local default = {r=.7, g=.7, b=.7}
 local white = {r=.8, g=.8, b=.8}
@@ -20,8 +22,12 @@ local green = {r=.25, g=.7, b=.15}
 local blue = {r=.25, g=.5, b=.9}
 local grey = {r=.41, g=.4, b=.37}
 local yellow = {r=.75, g=.7, b=.3}
-local something = {r=.6, g=.2, b=.35}
+local something = {r=.65, g=.25, b=.35}
 
+
+-------------------------------
+--Variables and whatnot--------
+-------------------------------
 
 --Counter for refreshing gui after resize
 local refresh = 0
@@ -34,6 +40,11 @@ local exclusive = false
 --Table to hold selected tracks
 local prevSelectedTracks = {}
 local curSelectedTracks = {}
+
+
+-------------------------------
+--GUI Init---------------------
+--------------------------------
 
 --Create and hide dummy status
 status = Status:Create()
@@ -48,7 +59,32 @@ cmd.alwaysActive = true
 
 --Create a text display for information
 local display = Display:Create(frame.x+15, frame.y+20, frame.w-120, frame.h-70)
+local display2 = Display:Create(frame.x+15, frame.y+frame.h-40, frame.w-120, frame.h)
 
+
+-------------------------------
+--Special functions-------------
+-------------------------------
+local function main_display()
+
+	display:AddLine("PREFIX COMMANDS", yellow.r, yellow.g, yellow.b)
+	display:AddLine("")
+	display:AddLine("s     -  inclusively select tracks ", default.r, default.g, default.b, 60)
+	display:AddLine("S     -  exclusively select tracks ", default.r, default.g, default.b, 60)
+	display:AddLine("C     -  unmute, unarm, unsolo, unselect", default.r, default.g, default.b, 60)
+	display:AddLine("")
+
+	display:AddLine("SUFFIX COMMANDS", yellow.r, yellow.g, yellow.b)
+	display:AddLine("")
+	display:AddLine("=m    -  toggle mute", default.r, default.g, default.b, 60)
+	display:AddLine("=o    -  toggle solo", default.r, default.g, default.b, 60)
+	display:AddLine("=a    -  toggle arm", default.r, default.g, default.b, 60)
+	display:AddLine("=b    -  toggle FX", default.r, default.g, default.b, 60)
+	display:AddLine('="x"  -  rename track', default.r, default.g, default.b, 60)
+	display:AddLine("")
+	display:AddLine("+/- for enable/disable", default.r, default.g, default.b, 60)
+	display:AddLine("Capital Letters for exclusive", default.r, default.g, default.b, 60)
+end
 
 
 --Handles resize whenever the refresh threshold is reached
@@ -73,9 +109,10 @@ end
 local function select_tracks(exclusive)
 	update_active_arrange()
 
-	--reaper.PreventUIRefresh(10)
-	local excessTrackCount = 0
+	reaper.PreventUIRefresh(1)
+	local trackCount = 0
 	display:ClearLines()
+	display2:ClearLines()
 
 
 	--Trim command from user input
@@ -86,14 +123,16 @@ local function select_tracks(exclusive)
 	if cmd.txt:find("=") then 
 		local s, e = cmd.txt:find('=')
 		c.flags = cmd.txt:sub(s+1, cmd.txt:find('"'))
-		input = cmd.txt:sub(3, cmd.txt:find("=")-1)
+		input = string.lower(cmd.txt:sub(3, cmd.txt:find("=")-1))
 	end
 
+	--Look for quotes for naming 
 	if cmd.txt:find('".*"') then 
 		local s, e = cmd.txt:find('".*"')
 		c.naming = cmd.txt:sub(s+1, e-1)
 	end
-		
+	
+
 
 	for i=0, tracks-1 do
 		local t = reaper.GetTrack(0, i )
@@ -121,23 +160,58 @@ local function select_tracks(exclusive)
 		if string.lower(buf) == input or string.lower(buf .. " ") == input or string.lower(buf .. "  ") == input then 
 			reaper.SetTrackSelected( t, true ) 
 			display:AddLine(buf:sub(1,16) .. levelMod, r, g, b)
+			trackCount = trackCount + 1
 
 		else 
 			--finds close matches
 			if string.lower(buf):match(input) and string.lower(buf .. " ") ~= input then 
 				reaper.SetTrackSelected( t, true ) 
 				display:AddLine(buf:sub(1,16) .. levelMod, r, g, b)
+				trackCount = trackCount + 1
 			--if i is not a match deselect
 			else 
 				reaper.SetTrackSelected( t, false) 
 
-		end
+			end
 
+		end
+	
 	end
+
+	--Look for flags to add to commit preview
+	local commitPreview = ""
+	if c.flags:find("m%-") then commitPreview = commitPreview .. "Unmute, "
+	elseif c.flags:find("m%+") then commitPreview = commitPreview .. "Mute, "
+	elseif c.flags:find("m") then commitPreview = commitPreview .. "Toggle Mute, "
+	elseif c.flags:find("M") then commitPreview = commitPreview .. "Excl. Mute, "
+	end
+
+	--Look for solo
+	if c.flags:find("o%-") then commitPreview = commitPreview .. "Unsolo, "
+	elseif c.flags:find("o%+") then commitPreview = commitPreview .."Solo, "
+	elseif c.flags:find("o") then commitPreview = commitPreview .. "Toggle Solo, "
+	elseif c.flags:find("O") then commitPreview = commitPreview .. "Excl. Solo, "
+	end
+
+	--Look for arm
+	if c.flags:find("a%-") then commitPreview = commitPreview .. "Unarm, "
+	elseif c.flags:find("a%+") then commitPreview = commitPreview .."Arm, "
+	elseif c.flags:find("a") then commitPreview = commitPreview .. "Toggle Arm, "
+	elseif c.flags:find("A") then commitPreview = commitPreview .. "Excl. Arm, "
+	end
+
+	--Look for fx bypass
+	if c.flags:find("b%-") then commitPreview = commitPreview .. "Bypass FX, "
+	elseif c.flags:find("b%+") then commitPreview = commitPreview .. "Enable FX, "
+	elseif c.flags:find("b") then commitPreview = commitPreview .. "Toggle FX, "
+	end
+
+	if c.naming then commitPreview = commitPreview .. "Rename, " end
 	
-end
-	
-	--reaper.PreventUIRefresh(-10)
+	if commitPreview ~= "" then commitPreview = commitPreview:sub(1, -3) .. " " end
+	display2:AddLine("")
+	display2:AddLine(commitPreview .. trackCount .. " tracks...", something.r, something.g, something.b)
+	reaper.PreventUIRefresh(-1)
 end
 
 --Restores the selection if user cancels command
@@ -222,6 +296,8 @@ local function update_cmd(char)
 				reaper.SetMediaTrackInfo_Value(track, 'B_MUTE', 0)
 				reaper.SetMediaTrackInfo_Value(track, 'I_SOLO', 0)
 				reaper.SetMediaTrackInfo_Value(track, 'I_RECARM', 0)
+				reaper.SetTrackSelected(track, false)
+				exclusive = true
 			end
 		end
 
@@ -229,7 +305,8 @@ local function update_cmd(char)
 		if c.flags:find("m%-") then set_selected_tracks('B_MUTE', 0, false)
 		elseif c.flags:find("m%+") then set_selected_tracks('B_MUTE', 1, false)
 		elseif c.flags:find("m") then set_selected_tracks('B_MUTE',-1, false)
-		elseif c.flags:find("M") then set_selected_tracks('B_MUTE',1, true)
+		elseif c.flags:find("M") then set_selected_tracks('B_MUTE',-1, true)
+
 		end
 
 		--Look for solo
@@ -340,7 +417,11 @@ function main()
 			cmd:Change(char)
 			update_cmd(char)
 			--if not c.engaged then reset_display() end
-			if not c.engaged then display:ClearLines() end
+			if not c.engaged then 
+				display:ClearLines()
+				display2:ClearLines() 
+				main_display()
+			end
 			--if the user isn't scrolling through the history then set c.cmd[1]
 			if c.recall == count_table(c.cmd)+1 then c.cmd[1] = cmd.txt end
 		end
