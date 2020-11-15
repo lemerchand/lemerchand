@@ -225,6 +225,7 @@ local function select_tracks(exclusive)
 	elseif c.flags:find("b") then commitPreview = commitPreview .. "Toggle FX, "
 	end
 
+
 	if c.naming then commitPreview = commitPreview .. "Rename, " end
 	
 	if commitPreview ~= "" then commitPreview = commitPreview:sub(1, -3) .. " " end
@@ -318,6 +319,11 @@ local function update_cmd(char)
 				reaper.SetTrackSelected(track, false)
 				exclusive = true
 			end
+		end
+
+		if c.flags:find("c") then 
+			--TODO use sws color schemes
+
 		end
 
 		--Look for mute 
