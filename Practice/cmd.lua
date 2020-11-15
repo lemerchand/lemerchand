@@ -7,7 +7,7 @@ reaper.ClearConsole()
 
 local mousex, mousey = reaper.GetMousePosition()
 
-gfx.init("Console", 400, 300, false, mousex+50,mousey-200)
+gfx.init("Console", 425, 300, false, mousex+50,mousey-200)
 local win = reaper.JS_Window_Find("Console", true)
 if win then reaper.JS_Window_AttachTopmostPin(win) end
 
@@ -58,7 +58,7 @@ local cmd = TextField:Create(10, frame.y+frame.h, frame.w+1, 20, "", "", true, f
 cmd.alwaysActive = true
 
 --Create a text display for information
-local display = Display:Create(frame.x+15, frame.y+20, frame.w-120, frame.h-70)
+local display = Display:Create(frame.x+15, frame.y+20, frame.w-135, frame.h-70)
 local display2 = Display:Create(frame.x+15, frame.y+frame.h-40, frame.w-120, frame.h)
 
 
@@ -117,6 +117,7 @@ local function select_tracks(exclusive)
 
 	reaper.PreventUIRefresh(1)
 	local trackCount = 0
+	
 	display:ClearLines()
 	display2:ClearLines()
 
@@ -131,6 +132,10 @@ local function select_tracks(exclusive)
 		c.flags = cmd.txt:sub(s+1, cmd.txt:find('"'))
 		input = string.lower(cmd.txt:sub(3, cmd.txt:find("=")-1))
 	end
+
+
+	local trackNumber = tonumber(cmd.txt:match("%d+"))
+
 
 	--Look for quotes for naming 
 	if cmd.txt:find('".*"') then 
@@ -150,6 +155,7 @@ local function select_tracks(exclusive)
 		local level = reaper.GetMediaTrackInfo_Value(t, 'I_FOLDERDEPTH')
 		local fxBypassed = reaper.GetMediaTrackInfo_Value(t, "I_FXEN")
 
+
 		local levelMod = ""
 		local r, g, b = 0,0,0
 		if soloed == 1 then r, g, b = yellow.r, yellow.g, yellow.b
@@ -159,21 +165,28 @@ local function select_tracks(exclusive)
 		else r, g, b = default.r, default.g, default.b
 		end
 
+		
+
 		if level == 1 then levelMod = " |F|" else levelMod = "" end
 
-		
 		--if the string is an exact match	
 		if string.lower(buf) == input or string.lower(buf .. " ") == input or string.lower(buf .. "  ") == input then 
 			reaper.SetTrackSelected( t, true ) 
-			display:AddLine(buf:sub(1,16) .. levelMod, r, g, b)
+			display:AddLine(i+1 .. ": " .. buf:sub(1,14) .. levelMod, r, g, b)
 			trackCount = trackCount + 1
 
 		else 
 			--finds close matches
 			if string.lower(buf):match(input) and string.lower(buf .. " ") ~= input then 
 				reaper.SetTrackSelected( t, true ) 
-				display:AddLine(buf:sub(1,16) .. levelMod, r, g, b)
+				display:AddLine(i+1 .. ": " .. buf:sub(1,14) .. levelMod, r, g, b)
 				trackCount = trackCount + 1
+			
+			elseif (trackNumber and trackNumber == i+1) then 
+				reaper.SetTrackSelected( t, true ) 
+				display:AddLine(i+1 .. ": " .. buf:sub(1,14) .. levelMod, r, g, b)
+				trackCount = trackCount + 1
+
 			--if i is not a match deselect
 			else 
 				reaper.SetTrackSelected( t, false) 
