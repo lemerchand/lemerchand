@@ -134,7 +134,12 @@ local function select_tracks(exclusive)
 	end
 
 
-	local trackNumber = tonumber(cmd.txt:match("%d+"))
+	local trackNumber = cmd.txt:match("#%d+")
+	if cmd.txt:find("#") then 
+		if trackNumber ~= nil then 	trackNumber = tonumber(trackNumber:sub(2)) end
+		input = input:sub(1, input:find("#")-1)
+	end
+	--cons("-" .. tostring(trackNumber) .. "-", true)
 
 
 	--Look for quotes for naming 
@@ -143,7 +148,6 @@ local function select_tracks(exclusive)
 		c.naming = cmd.txt:sub(s+1, e-1)
 	end
 	
-
 
 	for i=0, tracks-1 do
 		local t = reaper.GetTrack(0, i )
@@ -169,31 +173,35 @@ local function select_tracks(exclusive)
 
 		if level == 1 then levelMod = " |F|" else levelMod = "" end
 
+		if (trackNumber and trackNumber == i+1)  then 
+				
+			reaper.SetOnlyTrackSelected(t)
+						
+			display:AddLine(i+1 .. ": " .. buf:sub(1,14) .. levelMod, r, g, b)
+			trackCount = trackCount + 1
+	
 		--if the string is an exact match	
-		if string.lower(buf) == input or string.lower(buf .. " ") == input or string.lower(buf .. "  ") == input then 
+		elseif trackNumber == nil and string.lower(buf) == input or string.lower(buf .. " ") == input or string.lower(buf .. "  ") == input then 
 			reaper.SetTrackSelected( t, true ) 
 			display:AddLine(i+1 .. ": " .. buf:sub(1,14) .. levelMod, r, g, b)
 			trackCount = trackCount + 1
 
 		else 
 			--finds close matches
-			if string.lower(buf):match(input) and string.lower(buf .. " ") ~= input then 
+			if trackNumber == nil and string.lower(buf):match(input) and string.lower(buf .. " ") ~= input then 
 				reaper.SetTrackSelected( t, true ) 
 				display:AddLine(i+1 .. ": " .. buf:sub(1,14) .. levelMod, r, g, b)
 				trackCount = trackCount + 1
 			
-			elseif (trackNumber and trackNumber == i+1) then 
-				reaper.SetTrackSelected( t, true ) 
-				display:AddLine(i+1 .. ": " .. buf:sub(1,14) .. levelMod, r, g, b)
-				trackCount = trackCount + 1
 
 			--if i is not a match deselect
-			else 
+			else
 				reaper.SetTrackSelected( t, false) 
 
 			end
-
 		end
+
+
 	
 	end
 
@@ -321,10 +329,10 @@ local function update_cmd(char)
 			end
 		end
 
-		if c.flags:find("c") then 
-			--TODO use sws color schemes
+		-- if c.flags:find("c") then 
+		-- 	--TODO use sws color schemes
 
-		end
+		-- end
 
 		--Look for mute 
 		if c.flags:find("m%-") then set_selected_tracks('B_MUTE', 0, false)
