@@ -120,14 +120,29 @@ local function create_track()
 	local input = string.lower(cmd.txt:sub(3))
 
 	tracksToCreate = {}
+	
+	if cmd.txt:find("=") then 
+		local s, e = cmd.txt:find('=')
+		c.flags = cmd.txt:sub(s+1)
+		input = string.lower(cmd.txt:sub(3, cmd.txt:find("=")-1))
+	end
+
+
+	if input:sub(string.len(input)-2):match("%s+") then 
+		
+		input = input:sub(1,-2) 
+	end
 	input = input .. ","
+
+	
 
 	for t in input:gmatch('"%a*%d*",') do
 		local tt = t:gsub('"', '')
 		tt = tt:gsub(",", "")
 		table.insert(tracksToCreate, tt)
-	
 	end
+
+
 
 end
 
@@ -272,10 +287,12 @@ end
 
 --Sets selected tracks param with state 
 local function set_selected_tracks(param, state, exclusive)
+	update_active_arrange()
 	for i = 0, tracks-1 do
 		if reaper.IsTrackSelected(reaper.GetTrack(0,i)) then 
 			if state == -1 then
 				reaper.SetMediaTrackInfo_Value(reaper.GetTrack(0, i), param, math.abs(reaper.GetMediaTrackInfo_Value( reaper.GetTrack(0,i), param)-1))
+
 			else
 				reaper.SetMediaTrackInfo_Value( reaper.GetTrack(0,i), param, state)
 			end
@@ -284,7 +301,9 @@ local function set_selected_tracks(param, state, exclusive)
 		--if exclusive mode then fuck this track in it's asshole
 		if reaper.IsTrackSelected(reaper.GetTrack(0,i)) == false and exclusive then 
 			reaper.SetMediaTrackInfo_Value( reaper.GetTrack(0,i), param, 0)
+
 		end
+		
 	end
 end
 
@@ -330,10 +349,21 @@ local function update_cmd(char)
 		--Look for create track
 		if cmd.txt:sub(1,1) == "n" then
 
+			exclusive = true
+
+			
+
+			for t = 0, tracks-1 do 
+				reaper.SetTrackSelected(reaper.GetTrack(0, t), false) 
+
+			end
+
 			for i = 1, count_table(tracksToCreate) do
 				local totalTracks = reaper.CountTracks(0)
 				reaper.InsertTrackAtIndex(totalTracks, true)
 				reaper.GetSetMediaTrackInfo_String( reaper.GetTrack(0, totalTracks), 'P_NAME', tracksToCreate[i], true )
+				reaper.SetTrackSelected(reaper.GetTrack(0, totalTracks), true)
+
 			end
 
 
