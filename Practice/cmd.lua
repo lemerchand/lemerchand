@@ -111,6 +111,30 @@ local function update_selected_tracks(selectedTracks)
 	end
 end
 
+--creates tracks
+local function create_track()
+
+	--Trim command from user input
+	local input = string.lower(cmd.txt:sub(3))
+
+	if cmd.txt:find("=") then 
+		local s, e = cmd.txt:find('=')
+		c.flags = cmd.txt:sub(s+1, cmd.txt:find('"'))
+
+	end
+
+
+	--Look for quotes for naming 
+	if cmd.txt:find('".*"') then 
+		local s, e = cmd.txt:find('".*"')
+		c.naming = cmd.txt:sub(s+1, e-1)
+	end
+
+
+
+end
+
+
 --Selects tracks by name
 local function select_tracks(exclusive)
 	update_active_arrange()
@@ -289,7 +313,8 @@ local function update_cmd(char)
 	elseif cmd.active and cmd.txt:sub(1,1) == "S" then
 		exclusive = true
 		select_tracks(true)
-
+	elseif cmd.active and cmd.txt:sub(1,1) == "n" then
+		create_track()
 	end
 
 
@@ -305,8 +330,16 @@ local function update_cmd(char)
 		c.cmd[c.prev] = cmd.txt
 
 
+		--Look for create track
+		if c.naming and cmd.txt:sub(1,1) == "n" then
+
+			local totalTracks = reaper.CountTracks(0)
+			reaper.InsertTrackAtIndex(totalTracks, true)
+			reaper.GetSetMediaTrackInfo_String( reaper.GetTrack(0, totalTracks), 'P_NAME', c.naming, true )
+
+
 		--if there was an attempt to name (ie., ="sometext") then name the selected tracks
-		if c.naming and reaper.CountSelectedTracks(0) >= 1 then 
+		elseif c.naming and (cmd.txt:sub(1,1) == "s" or cmd.txt:sub(1,1) == "S") and reaper.CountSelectedTracks(0) >= 1 then 
 			for i = 0, tracks-1 do
 				track = reaper.GetTrack(0, i)
 				if reaper.IsTrackSelected(track) then
@@ -361,6 +394,8 @@ local function update_cmd(char)
 		elseif c.flags:find("b%+") then set_selected_tracks('I_FXEN', 1, false)
 		elseif c.flags:find("b") then set_selected_tracks('I_FXEN',-1, false)
 		end
+
+
 
 
 		--Clear cmd, clear engage, clear returned, clear flags
