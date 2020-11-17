@@ -136,9 +136,10 @@ local function create_track()
 
 	
 
-	for t in input:gmatch('"%a*%d*",') do
-		local tt = t:gsub('"', '')
-		tt = tt:gsub(",", "")
+	for t in input:gmatch('%a*%d*,') do
+		--local tt = t:gsub('"', '')
+		--tt = tt:gsub(",", "")
+		local tt  = t:gsub(",", "")
 		table.insert(tracksToCreate, tt)
 	end
 
