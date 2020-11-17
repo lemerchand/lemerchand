@@ -32,10 +32,12 @@ local something = {r=.65, g=.25, b=.35}
 --Counter for refreshing gui after resize
 local refresh = 0
 
+
 --Common properties for the comman line
 local c = {engaged = false, exitOnCommand = false, flags="", recall = 0, prev=1, cmd = {}, naming = nil}
 c.cmd[1] = ""
 local exclusive = false
+local tracksToCreate = {}
 
 --Table to hold selected tracks
 local prevSelectedTracks = {}
@@ -117,20 +119,15 @@ local function create_track()
 	--Trim command from user input
 	local input = string.lower(cmd.txt:sub(3))
 
-	if cmd.txt:find("=") then 
-		local s, e = cmd.txt:find('=')
-		c.flags = cmd.txt:sub(s+1, cmd.txt:find('"'))
+	tracksToCreate = {}
+	input = input .. ","
 
+	for t in input:gmatch('"%a*%d*",') do
+		local tt = t:gsub('"', '')
+		tt = tt:gsub(",", "")
+		table.insert(tracksToCreate, tt)
+	
 	end
-
-
-	--Look for quotes for naming 
-	if cmd.txt:find('".*"') then 
-		local s, e = cmd.txt:find('".*"')
-		c.naming = cmd.txt:sub(s+1, e-1)
-	end
-
-
 
 end
 
@@ -331,11 +328,13 @@ local function update_cmd(char)
 
 
 		--Look for create track
-		if c.naming and cmd.txt:sub(1,1) == "n" then
+		if cmd.txt:sub(1,1) == "n" then
 
-			local totalTracks = reaper.CountTracks(0)
-			reaper.InsertTrackAtIndex(totalTracks, true)
-			reaper.GetSetMediaTrackInfo_String( reaper.GetTrack(0, totalTracks), 'P_NAME', c.naming, true )
+			for i = 1, count_table(tracksToCreate) do
+				local totalTracks = reaper.CountTracks(0)
+				reaper.InsertTrackAtIndex(totalTracks, true)
+				reaper.GetSetMediaTrackInfo_String( reaper.GetTrack(0, totalTracks), 'P_NAME', tracksToCreate[i], true )
+			end
 
 
 		--if there was an attempt to name (ie., ="sometext") then name the selected tracks
