@@ -128,19 +128,18 @@ local function create_track()
 	end
 
 
-	if input:sub(string.len(input)-2):match("%s+") then 
+	if input:sub(string.len(input)-1):match("%s+") then 
 		
-		input = input:sub(1,-2) 
+		input = input:sub(1,-1) 
 	end
 	input = input .. ","
 
-	
 
-	for t in input:gmatch('%a*%d*,') do
-		--local tt = t:gsub('"', '')
-		--tt = tt:gsub(",", "")
-		local tt  = t:gsub(",", "")
+	
+	for t in input:gmatch('[%a%s%d!@#-]*,') do
+		local tt = t:gsub(",", "")
 		table.insert(tracksToCreate, tt)
+		
 	end
 
 
