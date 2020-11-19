@@ -34,9 +34,7 @@ local refresh = 0
 
 
 --Common properties for the comman line
-local c = {engaged = false, exitOnCommand = false, flags="", recall = 0, prev=1, cmd = {}, naming = nil}
-c.cmd[1] = ""
-local tracksToCreate = {}
+
 
 --Table to hold selected tracks
 local prevSelectedTracks = {}
@@ -87,7 +85,8 @@ function CMD:Create()
 end
 
 function CMD:PrevCMD()
-	if self.historySeek - 1 == 0 then 
+	if self.historySeek == 0 then
+	elseif self.historySeek - 1 == 0 then 
 		self.historySeek = 1
 		cmd.txt = self.history[self.historySeek] 
 	elseif self.historySeek == 0 then
@@ -116,7 +115,7 @@ function CMD:Reset()
 	self.txt = ""
 	self.prefix = ""
 	self.suffix = ""
-	self.exitOnCommand = false
+	--self.exitOnCommand = false
 	self.engaged = false
 	self.targets = {}
 	self.renaming = nil
@@ -178,8 +177,9 @@ local function main_display()
 	display:AddLine("PREFIX COMMANDS", yellow.r, yellow.g, yellow.b)
 	display:AddLine("")
 	display:AddLine("s     -  inclusively select tracks ", default.r, default.g, default.b, 50)
-	display:AddLine("S     -  exclusively select tracks ", default.r, default.g, default.b, 50)
 	display:AddLine("C     -  unmute, unarm, unsolo, unselect", default.r, default.g, default.b, 50)
+	display:AddLine("D     -  delete selected tracks", default.r, default.g, default.b, 50)
+	display:AddLine("n     -  create new tracks", default.r, default.g, default.b, 50)
 	display:AddLine("")
 
 	display:AddLine("SUFFIX COMMANDS", yellow.r, yellow.g, yellow.b)
@@ -190,8 +190,7 @@ local function main_display()
 	display:AddLine("=b    -  toggle FX", default.r, default.g, default.b, 50)
 	display:AddLine('="x"  -  rename track', default.r, default.g, default.b, 50)
 	display:AddLine("")
-	display:AddLine("+/- for enable/disable", default.r, default.g, default.b, 50)
-	display:AddLine("Capital Letters for exclusive", default.r, default.g, default.b, 50)
+	display:AddLine("+/- for on/off. Upper Case makes exclusive", default.r, default.g, default.b, 50)
 	display:AddLine("")
 	-- display:AddLine('Ctrl + Enter to close after command', default.r, default.g, default.b, 50)
 	-- display:AddLine('Ctrl + Backspace to clear line', default.r, default.g, default.b, 50)
@@ -312,6 +311,8 @@ local function select_tracks()
 	elseif C.suffix:find("b") then commitPreview = commitPreview .. "Toggle FX, "
 	end
 
+	-- look for midi inputs
+
 
 	if C.prefix == "D" then commitPreview = "Delete, " end
 
@@ -382,9 +383,7 @@ local function update_cmd(char)
 		display2:AddLine("")
 		display2:AddLine("Create new track(s). Separate with a comma.", something.r, something.g, something.b)
 	elseif cmd.active and C.prefix == "D" then
-		
 		select_tracks()		
-
 	end
 
 
@@ -392,7 +391,7 @@ local function update_cmd(char)
 	--Committed Input Handling-----
 	-------------------------------
 	if cmd.returned then 
-
+		reaper.PreventUIRefresh(1)
 		reaper.Undo_BeginBlock()
 
 		--Adds the committed input to the history
@@ -402,7 +401,7 @@ local function update_cmd(char)
 
 		--Look for create track
 		if C.prefix == "n" then
-
+			
 			C.exclusive = true
 			
 			for t = 0, tracks-1 do 
@@ -414,11 +413,12 @@ local function update_cmd(char)
 				local totalTracks = reaper.CountTracks(0)
 				reaper.InsertTrackAtIndex(totalTracks, true)
 				reaper.GetSetMediaTrackInfo_String( reaper.GetTrack(0, totalTracks), 'P_NAME', C.targets[i], true )
+				reaper.GetSetMediaTrackInfo_String( reaper.GetTrack(0, totalTracks), 'I_RECMON', C.targets[i], 1 )
 				reaper.SetTrackSelected(reaper.GetTrack(0, totalTracks), true)
 
 			end
 
-
+			
 		--if there was an attempt to name (ie., ="sometext") then name the selected tracks
 		elseif C.renaming and (cmd.txt:sub(1,1) == "s" or cmd.txt:sub(1,1) == "S") and reaper.CountSelectedTracks(0) >= 1 then 
 			for i = 0, tracks-1 do
@@ -433,6 +433,7 @@ local function update_cmd(char)
 
 
 		if cmd.active and C.prefix == "C" then
+			
 			for i = 0, tracks - 1 do
 				track = reaper.GetTrack(0, i)
 				reaper.SetMediaTrackInfo_Value(track, 'B_MUTE', 0)
@@ -441,13 +442,15 @@ local function update_cmd(char)
 				reaper.SetTrackSelected(track, false)
 				C.exclusive = true
 			end
+			
 		end
 
 		if C.prefix == "D" then
-
+			
 			for tr = tracks-1, 0, -1 do
 				if reaper.IsTrackSelected(reaper.GetTrack(0,tr)) then reaper.DeleteTrack(reaper.GetTrack(0, tr)) end
-			end		
+			end	
+
 
 		end
 
@@ -479,9 +482,15 @@ local function update_cmd(char)
 		elseif C.suffix:find("b") then set_selected_tracks('I_FXEN',-1, false)
 		end
 
+		--look for record input
+		if C.suffix:find("i%d*") then 
+			local midiChannel = C.suffix:match("i%d+")
+			if midiChannel then midiChannel = midiChannel:sub(2) else midiChannel = 0 end
+			set_selected_tracks("I_RECINPUT", 6112 + midiChannel)
+			set_selected_tracks("I_RECMODE", 7)
+		end
 
-
-
+		reaper.PreventUIRefresh(-1)
 		--Clear cmd, clear engage, clear returned, clear flags
 		--commit the currently selected tracks to previous selected tracks
 		--reset recall 
@@ -560,6 +569,9 @@ function main()
 				display2:ClearLines() 
 				main_display()
 			end
+		--if the user isn't scrolling through the history then set c.cmd[1]
+			if C.historySeek == count_table(C.history)+1 then C.txt = cmd.txt end
+
 
 		end
 		reaper.defer(main) 
