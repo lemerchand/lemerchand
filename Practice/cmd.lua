@@ -36,7 +36,6 @@ local refresh = 0
 --Common properties for the comman line
 local c = {engaged = false, exitOnCommand = false, flags="", recall = 0, prev=1, cmd = {}, naming = nil}
 c.cmd[1] = ""
-local exclusive = false
 local tracksToCreate = {}
 
 --Table to hold selected tracks
@@ -62,6 +61,113 @@ cmd.alwaysActive = true
 --Create a text display for information
 local display = Display:Create(frame.x+15, frame.y+20, frame.w-135, frame.h-70)
 local display2 = Display:Create(frame.x+15, frame.y+frame.h-40, frame.w-120, frame.h)
+
+
+------------------------------
+--CMD Prompt Class-------------
+------------------------------
+CMD = {}
+CMD.__index = CMD
+
+function CMD:Create()
+	local this = {
+		engaged = false,
+		exitOnCommand = false,
+		txt = "",
+		prefix = "",
+		suffix = "",
+		targets = {},
+		history = {},
+		historySeek = 0,
+		renaming=nil,
+		exclusive = false
+	}
+	setmetatable(this, CMD)
+	return this
+end
+
+function CMD:PrevCMD()
+	if self.historySeek - 1 == 0 then 
+		self.historySeek = 1
+		cmd.txt = self.history[self.historySeek] 
+	elseif self.historySeek == 0 then
+		cmd.txt = ""
+		C.historySeek = count_table(C.history)+1
+	else 
+		self.historySeek = self.historySeek - 1
+		cmd.txt = self.history[self.historySeek]
+	end
+
+end
+
+function CMD:NextCMD()
+
+	if self.historySeek + 1 > count_table(self.history) then 
+		self.historySeek = count_table(self.history)
+		cmd.txt = ""
+	else
+		self.historySeek = self.historySeek + 1 
+		cmd.txt = self.history[self.historySeek]
+	end
+end
+
+function CMD:Reset()
+	self.historySeek = count_table(self.history)+1
+	self.txt = ""
+	self.prefix = ""
+	self.suffix = ""
+	self.exitOnCommand = false
+	self.engaged = false
+	self.targets = {}
+	self.renaming = nil
+end
+
+function CMD:Parse()
+
+	self.txt = cmd.txt
+	self.prefix = cmd.txt:sub(1,1)
+	local trackNumber = nil
+
+	--Trim command from user input
+	local input = string.lower(cmd.txt:sub(3))
+	self.targets = {}
+	self.renaming = nil
+		
+		--Look for quotes for naming 
+	if input:find('".*"') then 
+		local s, e = input:find('".*"')
+		self.renaming = input:sub(s+1, e-1)
+		input = input:gsub('".*"', '')
+	end
+
+	if input:find("=") then 
+		local s, e = input:find('=')
+		self.suffix = input:sub(s+1)
+		input = string.lower(input:sub(1, input:find("=")-1))
+	end
+
+
+	for n in input:gmatch("#%d+") do
+		if n ~= nil then trackNumber = tonumber(n:sub(2)) end
+		table.insert(self.targets, trackNumber)
+	end
+	input = input:gsub("#%d+,*", "")
+
+
+	if input:sub(string.len(input)-1):match("%s+") then 
+		input = input:sub(1,-1) 
+	end
+	input = input .. ","
+	
+	for t in input:gmatch('[%a%s%d!@#-]*,') do
+		local tt = t:gsub(",", "")
+		table.insert(self.targets, tt)
+	end
+
+end
+
+
+local C = CMD:Create()
 
 
 -------------------------------
@@ -113,42 +219,8 @@ local function update_selected_tracks(selectedTracks)
 	end
 end
 
---creates tracks
-local function create_track()
-
-	--Trim command from user input
-	local input = string.lower(cmd.txt:sub(3))
-
-	tracksToCreate = {}
-	
-	if cmd.txt:find("=") then 
-		local s, e = cmd.txt:find('=')
-		c.flags = cmd.txt:sub(s+1)
-		input = string.lower(cmd.txt:sub(3, cmd.txt:find("=")-1))
-	end
-
-
-	if input:sub(string.len(input)-1):match("%s+") then 
-		
-		input = input:sub(1,-1) 
-	end
-	input = input .. ","
-
-
-	
-	for t in input:gmatch('[%a%s%d!@#-]*,') do
-		local tt = t:gsub(",", "")
-		table.insert(tracksToCreate, tt)
-		
-	end
-
-
-
-end
-
-
 --Selects tracks by name
-local function select_tracks(exclusive)
+local function select_tracks()
 	update_active_arrange()
 
 	reaper.PreventUIRefresh(1)
@@ -157,33 +229,6 @@ local function select_tracks(exclusive)
 	display:ClearLines()
 	display2:ClearLines()
 
-
-	--Trim command from user input
-	local input = string.lower(cmd.txt:sub(3))
-
-	--look for and extract flags
-	--If a flag is found then trim input to just before flag
-	if cmd.txt:find("=") then 
-		local s, e = cmd.txt:find('=')
-		c.flags = cmd.txt:sub(s+1, cmd.txt:find('"'))
-		input = string.lower(cmd.txt:sub(3, cmd.txt:find("=")-1))
-	end
-
-
-	local trackNumber = cmd.txt:match("#%d+")
-	if cmd.txt:find("#") then 
-		if trackNumber ~= nil then 	trackNumber = tonumber(trackNumber:sub(2)) end
-		input = input:sub(1, input:find("#")-1)
-	end
-	--cons("-" .. tostring(trackNumber) .. "-", true)
-
-
-	--Look for quotes for naming 
-	if cmd.txt:find('".*"') then 
-		local s, e = cmd.txt:find('".*"')
-		c.naming = cmd.txt:sub(s+1, e-1)
-	end
-	
 
 	for i=0, tracks-1 do
 		local t = reaper.GetTrack(0, i )
@@ -209,29 +254,27 @@ local function select_tracks(exclusive)
 
 		if level == 1 then levelMod = " |F|" else levelMod = "" end
 
-		if (trackNumber and trackNumber == i+1)  then 
-				
-			reaper.SetOnlyTrackSelected(t)
-						
+	
+		if C.targets[1] == i+1 then 
+			reaper.SetTrackSelected( t, true ) 
 			display:AddLine(i+1 .. ": " .. buf:sub(1,14) .. levelMod, r, g, b)
 			trackCount = trackCount + 1
-	
 		--if the string is an exact match	
-		elseif trackNumber == nil and string.lower(buf) == input or string.lower(buf .. " ") == input or string.lower(buf .. "  ") == input then 
+		elseif string.lower(buf) == C.targets[1] or string.lower(buf .. " ") == C.targets[1] or string.lower(buf .. "  ") == C.targets[k] then 
 			reaper.SetTrackSelected( t, true ) 
 			display:AddLine(i+1 .. ": " .. buf:sub(1,14) .. levelMod, r, g, b)
 			trackCount = trackCount + 1
 
 		else 
 			--finds close matches
-			if trackNumber == nil and string.lower(buf):match(input) and string.lower(buf .. " ") ~= input then 
+			if string.lower(buf):match(C.targets[1]) and string.lower(buf .. " ") ~= C.targets[1] then 
 				reaper.SetTrackSelected( t, true ) 
 				display:AddLine(i+1 .. ": " .. buf:sub(1,14) .. levelMod, r, g, b)
 				trackCount = trackCount + 1
 			
 
 			--if i is not a match deselect
-			else
+			else 
 				reaper.SetTrackSelected( t, false) 
 
 			end
@@ -243,40 +286,45 @@ local function select_tracks(exclusive)
 
 	--Look for flags to add to commit preview
 	local commitPreview = ""
-	if c.flags:find("m%-") then commitPreview = commitPreview .. "Unmute, "
-	elseif c.flags:find("m%+") then commitPreview = commitPreview .. "Mute, "
-	elseif c.flags:find("m") then commitPreview = commitPreview .. "Toggle Mute, "
-	elseif c.flags:find("M") then commitPreview = commitPreview .. "Excl. Mute, "
+	if C.suffix:find("m%-") then commitPreview = commitPreview .. "Unmute, "
+	elseif C.suffix:find("m%+") then commitPreview = commitPreview .. "Mute, "
+	elseif C.suffix:find("m") then commitPreview = commitPreview .. "Toggle Mute, "
+	elseif C.suffix:find("M") then commitPreview = commitPreview .. "Excl. Mute, "
 	end
 
 	--Look for solo
-	if c.flags:find("o%-") then commitPreview = commitPreview .. "Unsolo, "
-	elseif c.flags:find("o%+") then commitPreview = commitPreview .."Solo, "
-	elseif c.flags:find("o") then commitPreview = commitPreview .. "Toggle Solo, "
-	elseif c.flags:find("O") then commitPreview = commitPreview .. "Excl. Solo, "
+	if C.suffix:find("o%-") then commitPreview = commitPreview .. "Unsolo, "
+	elseif C.suffix:find("o%+") then commitPreview = commitPreview .."Solo, "
+	elseif C.suffix:find("o") then commitPreview = commitPreview .. "Toggle Solo, "
+	elseif C.suffix:find("O") then commitPreview = commitPreview .. "Excl. Solo, "
 	end
 
 	--Look for arm
-	if c.flags:find("a%-") then commitPreview = commitPreview .. "Unarm, "
-	elseif c.flags:find("a%+") then commitPreview = commitPreview .."Arm, "
-	elseif c.flags:find("a") then commitPreview = commitPreview .. "Toggle Arm, "
-	elseif c.flags:find("A") then commitPreview = commitPreview .. "Excl. Arm, "
+	if C.suffix:find("a%-") then commitPreview = commitPreview .. "Unarm, "
+	elseif C.suffix:find("a%+") then commitPreview = commitPreview .."Arm, "
+	elseif C.suffix:find("a") then commitPreview = commitPreview .. "Toggle Arm, "
+	elseif C.suffix:find("A") then commitPreview = commitPreview .. "Excl. Arm, "
 	end
 
 	--Look for fx bypass
-	if c.flags:find("b%-") then commitPreview = commitPreview .. "Bypass FX, "
-	elseif c.flags:find("b%+") then commitPreview = commitPreview .. "Enable FX, "
-	elseif c.flags:find("b") then commitPreview = commitPreview .. "Toggle FX, "
+	if C.suffix:find("b%-") then commitPreview = commitPreview .. "Bypass FX, "
+	elseif C.suffix:find("b%+") then commitPreview = commitPreview .. "Enable FX, "
+	elseif C.suffix:find("b") then commitPreview = commitPreview .. "Toggle FX, "
 	end
 
 
-	if c.naming then commitPreview = commitPreview .. "Rename, " end
+	if C.prefix == "D" then commitPreview = "Delete, " end
+
+	if C.renaming then commitPreview = commitPreview .. "Rename, " end
 	
 	if commitPreview ~= "" then commitPreview = commitPreview:sub(1, -3) .. " " end
 	display2:AddLine("")
 	display2:AddLine(commitPreview .. trackCount .. " tracks...", something.r, something.g, something.b)
 	reaper.PreventUIRefresh(-1)
 end
+
+
+
 
 --Restores the selection if user cancels command
 local function restore_selected_tracks()
@@ -286,7 +334,7 @@ local function restore_selected_tracks()
 end
 
 --Sets selected tracks param with state 
-local function set_selected_tracks(param, state, exclusive)
+local function set_selected_tracks(param, state)
 	update_active_arrange()
 	for i = 0, tracks-1 do
 		if reaper.IsTrackSelected(reaper.GetTrack(0,i)) then 
@@ -299,7 +347,7 @@ local function set_selected_tracks(param, state, exclusive)
 		end
 
 		--if exclusive mode then fuck this track in it's asshole
-		if reaper.IsTrackSelected(reaper.GetTrack(0,i)) == false and exclusive then 
+		if reaper.IsTrackSelected(reaper.GetTrack(0,i)) == false and C.exclusive then 
 			reaper.SetMediaTrackInfo_Value( reaper.GetTrack(0,i), param, 0)
 
 		end
@@ -314,23 +362,29 @@ local function update_cmd(char)
 	--c.engaged means we can stop looking for commands
 	--so in this case, if we aren't engaged and the prompt is "" then the user
 	--cleared the prompt and we can restore the track selection from before they began typing
-	if not c.engaged and cmd.txt ~= "" then 
+	if not C.engaged and cmd.txt ~= "" then 
 		update_selected_tracks(prevSelectedTracks)
-		c.engaged = true
+		C.engaged = true
 	end
 
 	----------------------------
 	--While typing -------------
 	----------------------------
 	--Look for various prefix commands
-	if cmd.active and cmd.txt:sub(1,1) == "s" then 
-		select_tracks(false)
+	if cmd.active and C.prefix == "s" then 
+		select_tracks()
 
-	elseif cmd.active and cmd.txt:sub(1,1) == "S" then
-		exclusive = true
-		select_tracks(true)
-	elseif cmd.active and cmd.txt:sub(1,1) == "n" then
-		create_track()
+	elseif cmd.active and C.prefix == "S" then
+		C.exclusive = true
+		select_tracks()
+	elseif cmd.active and C.prefix == "n" then
+		display2:ClearLines()
+		display2:AddLine("")
+		display2:AddLine("Create new track(s). Separate with a comma.", something.r, something.g, something.b)
+	elseif cmd.active and C.prefix == "D" then
+		
+		select_tracks()		
+
 	end
 
 
@@ -342,86 +396,87 @@ local function update_cmd(char)
 		reaper.Undo_BeginBlock()
 
 		--Adds the committed input to the history
-		c.prev = c.prev + 1
-		c.cmd[c.prev] = cmd.txt
 
+		table.insert(C.history, cmd.txt)
+		C.historySeek = count_table(C.history)+1
 
 		--Look for create track
-		if cmd.txt:sub(1,1) == "n" then
+		if C.prefix == "n" then
 
-			exclusive = true
-
+			C.exclusive = true
 			
-
 			for t = 0, tracks-1 do 
 				reaper.SetTrackSelected(reaper.GetTrack(0, t), false) 
 
 			end
 
-			for i = 1, count_table(tracksToCreate) do
+			for i = 1, count_table(C.targets) do
 				local totalTracks = reaper.CountTracks(0)
 				reaper.InsertTrackAtIndex(totalTracks, true)
-				reaper.GetSetMediaTrackInfo_String( reaper.GetTrack(0, totalTracks), 'P_NAME', tracksToCreate[i], true )
+				reaper.GetSetMediaTrackInfo_String( reaper.GetTrack(0, totalTracks), 'P_NAME', C.targets[i], true )
 				reaper.SetTrackSelected(reaper.GetTrack(0, totalTracks), true)
 
 			end
 
 
 		--if there was an attempt to name (ie., ="sometext") then name the selected tracks
-		elseif c.naming and (cmd.txt:sub(1,1) == "s" or cmd.txt:sub(1,1) == "S") and reaper.CountSelectedTracks(0) >= 1 then 
+		elseif C.renaming and (cmd.txt:sub(1,1) == "s" or cmd.txt:sub(1,1) == "S") and reaper.CountSelectedTracks(0) >= 1 then 
 			for i = 0, tracks-1 do
 				track = reaper.GetTrack(0, i)
 				if reaper.IsTrackSelected(track) then
-					reaper.GetSetMediaTrackInfo_String( reaper.GetTrack(0, i), 'P_NAME', c.naming, true )
+					reaper.GetSetMediaTrackInfo_String( reaper.GetTrack(0, i), 'P_NAME', C.renaming, true )
 				end
 				
 			end
-			c.naming = nil 
+			C.renaming = nil 
 		end
 
 
-		if cmd.active and cmd.txt:sub(1,1) == "C" then
+		if cmd.active and C.prefix == "C" then
 			for i = 0, tracks - 1 do
 				track = reaper.GetTrack(0, i)
 				reaper.SetMediaTrackInfo_Value(track, 'B_MUTE', 0)
 				reaper.SetMediaTrackInfo_Value(track, 'I_SOLO', 0)
 				reaper.SetMediaTrackInfo_Value(track, 'I_RECARM', 0)
 				reaper.SetTrackSelected(track, false)
-				exclusive = true
+				C.exclusive = true
 			end
 		end
 
-		-- if c.flags:find("c") then 
-		-- 	--TODO use sws color schemes
+		if C.prefix == "D" then
 
-		-- end
+			for tr = tracks-1, 0, -1 do
+				if reaper.IsTrackSelected(reaper.GetTrack(0,tr)) then reaper.DeleteTrack(reaper.GetTrack(0, tr)) end
+			end		
+
+		end
 
 		--Look for mute 
-		if c.flags:find("m%-") then set_selected_tracks('B_MUTE', 0, false)
-		elseif c.flags:find("m%+") then set_selected_tracks('B_MUTE', 1, false)
-		elseif c.flags:find("m") then set_selected_tracks('B_MUTE',-1, false)
-		elseif c.flags:find("M") then set_selected_tracks('B_MUTE',-1, true)
+		if C.suffix:find("m%-") then set_selected_tracks('B_MUTE', 0, false)
+		elseif C.suffix:find("m%+") then set_selected_tracks('B_MUTE', 1, false)
+		elseif C.suffix:find("m") then set_selected_tracks('B_MUTE',-1, false)
+		elseif C.suffix:find("M") then set_selected_tracks('B_MUTE',-1, true)
 
 		end
 
 		--Look for solo
-		if c.flags:find("o%-") then set_selected_tracks("I_SOLO", 0, false)
-		elseif c.flags:find("o%+") then set_selected_tracks('I_SOLO', 1, false)
-		elseif c.flags:find("o") then set_selected_tracks('I_SOLO',-1, false)
-		elseif c.flags:find("O") then set_selected_tracks('I_SOLO', 1, true)
+		if C.suffix:find("o%-") then set_selected_tracks("I_SOLO", 0, false)
+		elseif C.suffix:find("o%+") then set_selected_tracks('I_SOLO', 1, false)
+		elseif C.suffix:find("o") then set_selected_tracks('I_SOLO',-1, false)
+		elseif C.suffix:find("O") then set_selected_tracks('I_SOLO', 1, true)
 		end
 
 		--Look for arm
-		if c.flags:find("a%-") then set_selected_tracks("I_RECARM", 0, false)
-		elseif c.flags:find("a%+") then set_selected_tracks('I_RECARM', 1, false)
-		elseif c.flags:find("a") then set_selected_tracks('I_RECARM',-1, false)
-		elseif c.flags:find("A") then set_selected_tracks('I_RECARM', 1, true)
+		if C.suffix:find("a%-") then set_selected_tracks("I_RECARM", 0, false)
+		elseif C.suffix:find("a%+") then set_selected_tracks('I_RECARM', 1, false)
+		elseif C.suffix:find("a") then set_selected_tracks('I_RECARM',-1, false)
+		elseif C.suffix:find("A") then set_selected_tracks('I_RECARM', 1, true)
 		end
 
 		--Look for fx bypass
-		if c.flags:find("b%-") then set_selected_tracks("I_FXEN", 0, false)
-		elseif c.flags:find("b%+") then set_selected_tracks('I_FXEN', 1, false)
-		elseif c.flags:find("b") then set_selected_tracks('I_FXEN',-1, false)
+		if C.suffix:find("b%-") then set_selected_tracks("I_FXEN", 0, false)
+		elseif C.suffix:find("b%+") then set_selected_tracks('I_FXEN', 1, false)
+		elseif C.suffix:find("b") then set_selected_tracks('I_FXEN',-1, false)
 		end
 
 
@@ -435,7 +490,7 @@ local function update_cmd(char)
 		cmd.txt = ""
 		cmd.returned = false
 
-		if not exclusive then 
+		if not C.exclusive then 
 			update_selected_tracks(curSelectedTracks)
 			for i = 0, tracks -1 do
 				if prevSelectedTracks[i] == true or curSelectedTracks[i] == true then
@@ -447,11 +502,8 @@ local function update_cmd(char)
 		end
 
 		update_selected_tracks(prevSelectedTracks)
-		c.engaged = false
-		c.flags = ""
-		c.recall = count_table(c.cmd)+1
-		exclusive = false
-
+		C:Reset()
+		C.historySeek = count_table(C.history)+1
 
 	end
 
@@ -465,7 +517,7 @@ function main()
 
 
 	local char = gfx.getchar()
-	if char == 27 or char == -1  or c.exitOnCommand then 
+	if char == 27 or char == -1  or C.exitOnCommand then 
 		reaper.atexit(reaper.JS_Window_SetFocus(last_window))
 		return
 	-- Otherwise keep window open
@@ -478,51 +530,37 @@ function main()
 		elseif char == 26 then reaper.Main_OnCommand(40029, 0)
 
 		-- if ctrl+backspace or the user clears out the cmd then clear text and restore the selected tracks
-		elseif (char == 8 and gfx.mouse_cap == 04) or (c.engaged and cmd.txt == "" ) then 
+		elseif (char == 8 and gfx.mouse_cap == 04) or (C.engaged and cmd.txt == "" ) then 
 			cmd.txt = ""
 			
 			restore_selected_tracks()
-			c.engaged = false
+			C.engaged = false
 	
 		--if up arrow
 		elseif char == 30064 then 
-			if c.recall - 1 == 1 then 
-				c.recall = 2 
-				cmd.txt = c.cmd[c.recall] 
-			elseif c.recall == 0 then 
-				cmd.txt = ""
-				c.recall = count_table(c.cmd)+1
-			else 
-				c.recall = c.recall - 1
-				cmd.txt = c.cmd[c.recall]
-			end
+			C:PrevCMD()
 			
 		--if down arrow	
 		elseif char == 1685026670 then
 
-			if c.recall + 1 > count_table(c.cmd) then 
-				c.recall = count_table(c.cmd)+1
-				cmd.txt = c.cmd[1]
-			else
-				c.recall = c.recall + 1 
-				cmd.txt = c.cmd[c.recall]
-			end
+			C:NextCMD()
 			
 		else --user is typing
 			--if the user presses ctrl+enter then exit after commit
-			if gfx.mouse_cap == 04 and char == 13 then c.exitOnCommand = true end
+			if gfx.mouse_cap == 04 and char == 13 then C.exitOnCommand = true end
 
 			-- Send characters to the textfield
 			cmd:Change(char)
 			update_cmd(char)
+			C:Parse()
+
 			--if not c.engaged then reset_display() end
-			if not c.engaged then 
+			if not C.engaged then 
 				display:ClearLines()
 				display2:ClearLines() 
 				main_display()
 			end
-			--if the user isn't scrolling through the history then set c.cmd[1]
-			if c.recall == count_table(c.cmd)+1 then c.cmd[1] = cmd.txt end
+
 		end
 		reaper.defer(main) 
 
@@ -541,6 +579,16 @@ function main()
 		refresh = refresh+1 
 	end
 	
+	-- reaper.ClearConsole()
+	-- cons("\nText: " .. C.txt)
+	-- if C.prefix then cons("\nPrefix: " .. C.prefix) end
+	-- if C.suffix then cons("\nSuffix: " .. C.suffix) end
+	-- if C.targets then
+	-- 	for t=1, count_table(C.targets) do
+	-- 		cons("\n Target " .. t .. ": " .. C.targets[t])
+	-- 	end
+	-- end
+
 end
 main()
 reaper.Undo_EndBlock("Something wicked", -1)
