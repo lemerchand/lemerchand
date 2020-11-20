@@ -178,7 +178,7 @@ local function select_tracks(exclusive)
 	--cons("-" .. tostring(trackNumber) .. "-", true)
 
 
-	--Look for quotes for naming 
+	--Look for quotes "d" naming 
 	if cmd.txt:find('".*"') then 
 		local s, e = cmd.txt:find('".*"')
 		c.naming = cmd.txt:sub(s+1, e-1)
