@@ -75,6 +75,7 @@ function CMD:Create()
 		prefix = "",
 		suffix = "",
 		targets = {},
+		trackNumbers = {},
 		history = {},
 		historySeek = 0,
 		renaming=nil,
@@ -119,6 +120,7 @@ function CMD:Reset()
 	self.engaged = false
 	self.targets = {}
 	self.renaming = nil
+	self.trackNumbers = {}
 end
 
 function CMD:Parse()
@@ -130,6 +132,7 @@ function CMD:Parse()
 	--Trim command from user input
 	local input = string.lower(cmd.txt:sub(3))
 	self.targets = {}
+	self.trackNumbers = {}
 	self.renaming = nil
 		
 		--Look for quotes for naming 
@@ -148,9 +151,9 @@ function CMD:Parse()
 
 	for n in input:gmatch("#%d+") do
 		if n ~= nil then trackNumber = tonumber(n:sub(2)) end
-		table.insert(self.targets, trackNumber)
+		table.insert(self.trackNumbers, trackNumber)
 	end
-	input = input:gsub("#%d+,*", "")
+	input = input:gsub("#%d+*", "")
 
 
 	if input:sub(string.len(input)-1):match("%s+") then 
@@ -254,7 +257,7 @@ local function select_tracks()
 		if level == 1 then levelMod = " |F|" else levelMod = "" end
 
 	
-		if C.targets[1] == i+1 then 
+		if C.trackNumbers[1] == i+1 then 
 			reaper.SetTrackSelected( t, true ) 
 			display:AddLine(i+1 .. ": " .. buf:sub(1,14) .. levelMod, r, g, b)
 			trackCount = trackCount + 1
@@ -486,7 +489,7 @@ local function update_cmd(char)
 		if C.suffix:find("i%d*") then 
 			local midiChannel = C.suffix:match("i%d+")
 			if midiChannel then midiChannel = midiChannel:sub(2) else midiChannel = 0 end
-			set_selected_tracks("I_RECINPUT", 6112 + midiChannel)
+			set_selected_tracks("I_RECINPUT", 4096 | midiChannel | (63 << 5))
 			set_selected_tracks("I_RECMODE", 7)
 		end
 
