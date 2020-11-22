@@ -154,7 +154,7 @@ function CMD:Parse()
 			local s, e = destinationInput:find('=')
 			self.destinationSuffix = destinationInput:sub(s+1)
 			destinationInput = string.lower(destinationInput:sub(1, destinationInput:find("=")-1))
-			cons(self.destinationSuffix)
+
 		end
 
 
@@ -516,6 +516,18 @@ local function update_cmd(char)
 			if midiChannel then midiChannel = midiChannel:sub(2) else midiChannel = 0 end
 			set_selected_tracks("I_RECINPUT", 4096 | midiChannel | (63 << 5))
 			set_selected_tracks("I_RECMODE", 7)
+		end
+
+
+		-- Look for routing
+		if C.destinationSuffix:find("m%d*") then
+			local midiChannel = C.suffix:match("i%d+")
+			if midiChannel then midiChannel = midiChannel:sub(2) else midiChannel = 0 end
+			for tr = 0, tracks-1 do
+				--if C.targets[tr] = reaper
+				--reaper.CreateTrackSend(tr,  )
+
+			end
 		end
 
 		reaper.PreventUIRefresh(-1)
