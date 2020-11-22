@@ -520,15 +520,15 @@ local function update_cmd(char)
 
 
 		-- Look for routing
-		if C.destinationSuffix:find("m%d*") then
-			local midiChannel = C.suffix:match("i%d+")
-			if midiChannel then midiChannel = midiChannel:sub(2) else midiChannel = 0 end
-			for tr = 0, tracks-1 do
-				--if C.targets[tr] = reaper
-				--reaper.CreateTrackSend(tr,  )
+		-- if C.destinationSuffix:find("m%d*") then
+		-- 	local midiChannel = C.suffix:match("i%d+")
+		-- 	if midiChannel then midiChannel = midiChannel:sub(2) else midiChannel = 0 end
+		-- 	for tr = 0, tracks-1 do
+		-- 		--if C.targets[tr] = reaper
+		-- 		--reaper.CreateTrackSend(tr,  )
 
-			end
-		end
+		-- 	end
+		-- end
 
 		reaper.PreventUIRefresh(-1)
 		--Clear cmd, clear engage, clear returned, clear flags
