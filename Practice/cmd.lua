@@ -76,6 +76,8 @@ function CMD:Create()
 		suffix = "",
 		targets = {},
 		trackNumbers = {},
+		destinations = {},
+		desitinationSuffix = "",
 		history = {},
 		historySeek = 0,
 		renaming=nil,
@@ -122,6 +124,8 @@ function CMD:Reset()
 	self.renaming = nil
 	self.trackNumbers = {}
 	self.exclusive = false
+	self.destinations = {}
+	self.destinationSuffix =""
 end
 
 function CMD:Parse()
@@ -132,10 +136,30 @@ function CMD:Parse()
 
 	--Trim command from user input
 	local input = string.lower(cmd.txt:sub(3))
+	local destinationInput = ""
 	self.targets = {}
 	self.trackNumbers = {}
 	self.renaming = nil
-		
+	self.destinations = {}
+
+
+	-- If the routing symbol is found, it must be process separately from the rest of the commnand
+	-- Strip it from the main input var and give it over to destinationInput
+
+	if input:find(">") then 
+		destinationInput = input:sub(input:find(">")+1)
+		input = input:sub(1, input:find(">")-1)
+
+		if destinationInput:find("=") then 
+			local s, e = destinationInput:find('=')
+			self.destinationSuffix = destinationInput:sub(s+1)
+			destinationInput = string.lower(destinationInput:sub(1, destinationInput:find("=")-1))
+			cons(self.destinationSuffix)
+		end
+
+
+	end
+
 		--Look for quotes for naming 
 	if input:find('".*"') then 
 		local s, e = input:find('".*"')
