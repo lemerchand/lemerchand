@@ -121,6 +121,7 @@ function CMD:Reset()
 	self.targets = {}
 	self.renaming = nil
 	self.trackNumbers = {}
+	self.exclusive = false
 end
 
 function CMD:Parse()
