@@ -707,7 +707,7 @@ function InputBox:Draw()
 	--gfx.x, gfx.y = self.x+4, self.y+2
 	gfx.drawstr(self.value, 1 | 4, self.x+self.w, self.y+self.h)
 
-	if hovering(self.x, self.y, self.w, self.h) then 
+	if self.block == false and hovering(self.x, self.y, self.w, self.h) then 
 
 		status:Display(self.help)
 		if gfx.mouse_cap >= 1 and self.mouseDown == false then 
@@ -872,7 +872,7 @@ function Toggle:Draw()
 		gfx.drawstr(self.txt, 1 | 4, self.w+self.x, self.h+self.y+2)
 
 
-	if hovering(self.x, self.y, self.w, self.h) then 
+	if self.block == false and hovering(self.x, self.y, self.w, self.h) then 
 		self.mouseOver = true 
 
 		status:Display(self.help)

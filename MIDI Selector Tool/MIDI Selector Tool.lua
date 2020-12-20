@@ -1,7 +1,7 @@
 -------------------------------------------------------------------------------
 --						MST3K
 -------------------------------------------------------------------------------
---  Modified: 2020.10.27 at 09:57
+--  Modified:  2020.12.19 @ 4pm
 --	TODO: 
 -- 		+ Add window position capture to floatAtPos on right-click
 --		+ Scales
@@ -21,8 +21,8 @@
 --		+ 
 --		+ 
 ------------------------------------------------------------------------------
-local _version = " v.998"
-local _name = "MST3K"
+local _version = " v1.0"
+local _name = "MST5k"
 
 
 --Load UI Library
@@ -58,7 +58,7 @@ local function update_settings(filename)
 end
 update_settings(reaper.GetResourcePath() .. '/Scripts/lemerchand/MIDI Selector Tool/lament.config')
 
-
+local presets= {"Presets", "one", "two", "three", "Big Poppa Robbie", "tester", "blister"}
 
 gfx.init(_name .. " " .. _version, 248, 680, dockOnStart, window_xPos, window_yPos)
 
@@ -194,8 +194,8 @@ local ib_maxNote = InputBox:Create(frm_pitch.x + 10, frm_pitch.y + 41, "G10", ht
 local ib_minNote = InputBox:Create(frm_pitch.x + 10, frm_pitch.y + 70, "C0", htMinNote, ib_maxNote.w)
 local group_noteRange ={ib_minNote, ib_maxNote}
 
-local lbl_minNote = Text:Create(ib_minNote.x+4, ib_minNote.y + 24, "MAX")
-local lbl_maxNote = Text:Create(ib_maxNote.x+4, ib_maxNote.y -13, "MIN")
+local lbl_minNote = Text:Create(ib_minNote.x+4, ib_minNote.y + 24, "MIN")
+local lbl_maxNote = Text:Create(ib_maxNote.x+4, ib_maxNote.y -13, "MAX")
 
 
 
@@ -296,6 +296,8 @@ status = Status:Create(10, frm_time.y + frm_time.h + 27, 227, 60, "INFO", nil, n
 local ddwn_scaleName = Dropdown:Create(frm_pitch.x+60, frm_pitch.y+frm_pitch.h-15, nil, nil, scaleName, 1, 1, htDdwnScales)
 
 
+local ddwn_presets = Dropdown:Create(frm_general.x+10, btn_select.y+40, frm_general.w-20, nil, presets, 1, 1, htPresets)
+
 
 function main()
 
@@ -353,9 +355,8 @@ function main()
 	--NOTE RANGES------------------
 	-------------------------------
 	if ib_minNote.rightClick or ib_maxNote.rightClick then group_exec(group_noteRange, 'reset') end
-	if ib_minNote.shiftLeftClick or ib_maxNote.shiftLeftClick then
-		set_from_selected(true, true, false, false, false, nil, nil, ib_minNote, ib_maxNote) 
-	end
+	if ib_minNote.shiftLeftClick then set_from_selected(true, false, false, false, false, nil, nil, ib_minNote)  end
+	if ib_maxNote.shiftLeftClick then set_from_selected(false, true, false, false, false, nil, nil, nil, ib_maxNote) end
 
 	-------------------------------
 	--PITCH Toggles----------------
@@ -521,15 +522,39 @@ function main()
 	if ddwn_scaleName.choicesHide == false then
 		wait = 0
 		group_exec(group_velSliders, 'block')
+		group_exec(group_beatsToggles, 'block')
+		group_exec(group_lengthToggles, 'block')
+		group_exec(group_pitchToggles, 'block')
+		group_exec(group_noteRange, 'block')
 	elseif ddwn_scaleName.choicesHide == true then 
 		if wait == 5 then 
 			group_exec(group_velSliders, 'unblock')
+			group_exec(group_beatsToggles, 'unblock')
+			group_exec(group_lengthToggles, 'unblock')
+			group_exec(group_pitchToggles, 'unblock')
+			group_exec(group_noteRange, 'unblock')
 		else
 			wait = wait + 1
 		end
 	end
-	
-
+	if ddwn_presets.choicesHide == false then
+		wait = 0
+		group_exec(group_velSliders, 'block')
+		group_exec(group_beatsToggles, 'block')
+		group_exec(group_lengthToggles, 'block')
+		group_exec(group_pitchToggles, 'block')
+		group_exec(group_noteRange, 'block')
+	elseif ddwn_presets.choicesHide == true then 
+		if wait == 5 then 
+			group_exec(group_velSliders, 'unblock')
+			group_exec(group_beatsToggles, 'unblock')
+			group_exec(group_lengthToggles, 'unblock')
+			group_exec(group_pitchToggles, 'unblock')
+			group_exec(group_noteRange, 'unblock')
+			else
+			wait = wait + 1
+		end
+	end
 
 
 
