@@ -33,10 +33,54 @@ function get_presets()
 		if fn then table.insert(presets, fn:sub(1, fn:find('.dat')-1)) end
 		fi = fi + 1
 	until not fn
-	return presets
+
+	return presets 
 end
 
-function save_presets(filename, group_pitchToggles, group_noteRange, group_lengthToggles, group_beatsToggles, group_velSliders, sldr_timeThreshold)
+function load_preset(preset)
+	if preset == "..." then
+		reaper.ShowMessageBox("Save a preset before trying to load one!", "Nope!", 0)
+		return
+	end
+	local file = io.open(reaper.GetResourcePath() .. '/Scripts/lemerchand/MIDI Selector Tool/presets/' .. preset .. '.dat', 'r')
+	io.input()
+	for i, e in ipairs(group_pitchToggles) do
+		if file:read() == "true" then
+			e.state = true 
+		else e.state = false
+		end
+	end
+
+	for i, e in ipairs(group_noteRange) do
+		e.value = file:read()
+	end
+
+	ddwn_scaleName = file:read()
+
+	for i, e in ipairs(group_lengthToggles) do
+		if file:read() == "true" then
+			e.state = true 
+		else e.state = false
+		end
+	end
+
+	for i, e in ipairs(group_beatsToggles) do
+		if file:read() == "true" then
+			e.state = true 
+		else e.state = false
+		end
+	end
+
+	for i, e in ipairs(group_velSliders) do
+		e.value = tonumber(file:read())
+	end
+
+	sldr_timeThreshold.value = tonumber(file:read())
+
+	file:close()
+end
+
+function save_presets(filename)
 	local file = io.open(filename, 'w')
 	io.output()
 	for i, e in ipairs(group_pitchToggles) do
@@ -46,6 +90,8 @@ function save_presets(filename, group_pitchToggles, group_noteRange, group_lengt
 	for i, e in ipairs(group_noteRange) do
 		file:write(e.value .. "\n")
 	end
+
+	ddwn_scaleName = file:read()
 
 	for i, e in ipairs(group_lengthToggles) do
 		file:write(tostring(e.state) .. "\n")

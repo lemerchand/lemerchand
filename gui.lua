@@ -1030,7 +1030,7 @@ Dropdown = {}
 Dropdown.__index = Dropdown
 
 
-function Dropdown:Create(x,y,w,h,choices, default, selected, help)
+function Dropdown:Create(x,y,w,h,choices, default, selected, help, func)
 	
 	if choices == nil then choices = {} end
 	if font == nil then gfx.setfont(3, "Lucida Console", 11) end
@@ -1067,7 +1067,8 @@ function Dropdown:Create(x,y,w,h,choices, default, selected, help)
 		rightClick = false,
 		choicesHide = true,
 		hide = false,
-		block = false
+		block = false,
+		func = func or nil
 	}
 	setmetatable(this, Dropdown)
 	table.insert(Elements, this)
@@ -1157,7 +1158,9 @@ function Dropdown:DrawChoices()
 		 self.selected = c
 		 for wait = 0, 10000 do end
 		 self.choicesHide = true
+		 if self.func then self.func(choice) end
 		end
+
 
 		gfx.drawstr(choice)
 		choice_pos_y = choice_pos_y + 12
@@ -1178,7 +1181,9 @@ function Dropdown:ResetClicks()
 	self.altRightClick = false
 
 end
-
+function Dropdown:Add(choice)
+	table.insert(self.choices, choice)
+end
 function Dropdown:Reset()
 end
 ------------------------------------------END: DROPWDOWN-----------------------------------------------------

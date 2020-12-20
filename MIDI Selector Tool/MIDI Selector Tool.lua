@@ -21,7 +21,7 @@
 --		+ 
 --		+ 
 ------------------------------------------------------------------------------
-local _version = " v1.0"
+local _version = " v.99"
 local _name = "MST5k"
 
 
@@ -58,7 +58,8 @@ local function update_settings(filename)
 end
 update_settings(reaper.GetResourcePath() .. '/Scripts/lemerchand/MIDI Selector Tool/lament.config')
 
-local presets = get_presets()
+local presets = get_presets() 
+if presets[1] == nil then presets = {"..."} end
 
 gfx.init(_name .. " " .. _version, 248, 680, dockOnStart, window_xPos, window_yPos)
 
@@ -174,7 +175,7 @@ local frm_pitch = Frame:Create(10, frm_general.y + frm_general.h + 27, 227, 120,
 
 local ib_maxNote = InputBox:Create(frm_pitch.x + 10, frm_pitch.y + 41, "G10", htMaxNote)
 local ib_minNote = InputBox:Create(frm_pitch.x + 10, frm_pitch.y + 70, "C0", htMinNote, ib_maxNote.w)
-local group_noteRange ={ib_minNote, ib_maxNote}
+group_noteRange ={ib_minNote, ib_maxNote}
 
 local lbl_minNote = Text:Create(ib_minNote.x+4, ib_minNote.y + 24, "MIN")
 local lbl_maxNote = Text:Create(ib_maxNote.x+4, ib_maxNote.y -13, "MAX")
@@ -183,7 +184,7 @@ local lbl_maxNote = Text:Create(ib_maxNote.x+4, ib_maxNote.y -13, "MAX")
 
 local tgl_pitch = {}
 local pitchTglOffset = frm_pitch.x+42
-local group_pitchToggles = {}
+group_pitchToggles = {}
 
 for pe = 1, 6 do
 	 tgl_pitch[pe] = Toggle:Create(frm_pitch.x + pitchTglOffset, frm_pitch.y+41, note_names[pe], htPitchTgl, true, 25, nil)
@@ -216,7 +217,7 @@ local frm_time = Frame:Create(10, frm_velocity.y + frm_velocity.h + 27, 227, 162
 
 local tgl_beats = {}
 local beatsTglOffset = frm_time.x+97
-local group_beatsToggles = {}
+group_beatsToggles = {}
 
 for be = 1, 4 do
 	 tgl_beats[be] = Toggle:Create(frm_time.x + beatsTglOffset, frm_time.y+30, be, htbeatsTgl,false, 25)
@@ -252,7 +253,7 @@ end
 
 local tgl_length = {}
 local lengthTglOffset = frm_time.y + 30
-local group_lengthToggles = {}
+group_lengthToggles = {}
 
 for te = 1, 4 do
 	tgl_length[te] = Toggle:Create(frm_time.x+10, lengthTglOffset, lengths_txt[te], htLengthTgle, false, 40)
@@ -268,17 +269,17 @@ for te = 5, 8 do
 	table.insert(group_lengthToggles, tgl_length[te])
 end
 
-local sldr_timeThreshold = H_slider:Create(frm_time.x + 10, frm_time.y+frm_time.h - 20, frm_time.w - 20, nil,"PPQ Threshold", htTimeThreshold, 0, 100, 30, false)
+sldr_timeThreshold = H_slider:Create(frm_time.x + 10, frm_time.y+frm_time.h - 20, frm_time.w - 20, nil,"PPQ Threshold", htTimeThreshold, 0, 100, 30, false)
 
 
 --Status bar
 --For now status needs to be global
 status = Status:Create(10, frm_time.y + frm_time.h + 27, 227, 60, "INFO", nil, nil, "Hover over a control for more info!")
 
-local ddwn_scaleName = Dropdown:Create(frm_pitch.x+52, frm_pitch.y+frm_pitch.h-15, frm_pitch.w-62 , nil, scaleName, 1, 1, htDdwnScales)
+ddwn_scaleName = Dropdown:Create(frm_pitch.x+52, frm_pitch.y+frm_pitch.h-15, frm_pitch.w-62 , nil, scaleName, 1, 1, htDdwnScales)
 
 
-local ddwn_presets = Dropdown:Create(frm_general.x+10, btn_select.y+43, frm_general.w-20, nil, presets, 1, 1, htPresets)
+local ddwn_presets = Dropdown:Create(frm_general.x+10, btn_select.y+43, frm_general.w-20, nil, presets, 1, 1, htPresets, load_preset)
 
 
 ---Handle tabs
@@ -555,16 +556,17 @@ function main()
 	---------------------------------
 	--PRESETS Dropdown----------------
 	---------------------------------
-	if ddwn_presets.shiftLeftClick then 
+
+
+	if ddwn_presets.shiftLeftClick  then 
 		local retval, retvals_csv, v = reaper.GetUserInputs("Save Preset", 1, "Name:", "Preset")
 		save_presets(reaper.GetResourcePath() .. '/Scripts/lemerchand/MIDI Selector Tool/presets/' .. retvals_csv .. '.dat', group_pitchToggles, group_noteRange, group_lengthToggles, group_beatsToggles, group_velSliders, sldr_timeThreshold)
-
+		ddwn_presets:Add(retvals_csv)
 	end
 
+
+
 end
-
-
-
 
 
 main()
