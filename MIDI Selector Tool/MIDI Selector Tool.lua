@@ -58,8 +58,8 @@ local function update_settings(filename)
 end
 update_settings(reaper.GetResourcePath() .. '/Scripts/lemerchand/MIDI Selector Tool/lament.config')
 
+
 local presets = get_presets() 
-if presets[1] == nil then presets = {"..."} end
 
 gfx.init(_name .. " " .. _version, 248, 680, dockOnStart, window_xPos, window_yPos)
 
@@ -88,7 +88,7 @@ local htFloatAtPos 		= "Choose x/y coordinates\nfor the window to load."
 local htLengthTgle		= "Filter by note length.\nR-click to reset.\nCtrl+L-click: exclusive select."
 local htTimeThreshold	= "Threshold in ppq to catch notes\nwith imperfect lengths or times."
 local htDdwnScales		= "Select a scale then Alt+L-Click\na note to set pitches."
-
+local htDdwnPresets		= "Select a preset or \nShift+L-Click to save."
 
 -------------------------------
 --Midi Note and BeatsThangs---
@@ -279,7 +279,7 @@ status = Status:Create(10, frm_time.y + frm_time.h + 27, 227, 60, "INFO", nil, n
 ddwn_scaleName = Dropdown:Create(frm_pitch.x+52, frm_pitch.y+frm_pitch.h-15, frm_pitch.w-62 , nil, scaleName, 1, 1, htDdwnScales)
 
 
-local ddwn_presets = Dropdown:Create(frm_general.x+10, btn_select.y+43, frm_general.w-20, nil, presets, 1, 1, htPresets, load_preset)
+local ddwn_presets = Dropdown:Create(frm_general.x+10, btn_select.y+43, frm_general.w-20, nil, presets, 1, 1, htDdwnPresets, load_preset)
 
 
 ---Handle tabs
@@ -517,14 +517,14 @@ function main()
 	--SCALES Dropdown----------------
 	---------------------------------
 
-	if ddwn_scaleName.choicesHide == false then
+	if ddwn_scaleName.choicesHide == false or ddwn_presets.choicesHide == false then
 		wait = 0
 		group_exec(group_velSliders, 'block')
 		group_exec(group_beatsToggles, 'block')
 		group_exec(group_lengthToggles, 'block')
 		group_exec(group_pitchToggles, 'block')
 		group_exec(group_noteRange, 'block')
-	elseif ddwn_scaleName.choicesHide == true then 
+	elseif ddwn_scaleName.choicesHide == true or ddwn_presets.choiceHide == true then 
 		if wait == 5 then 
 			group_exec(group_velSliders, 'unblock')
 			group_exec(group_beatsToggles, 'unblock')
@@ -535,24 +535,7 @@ function main()
 			wait = wait + 1
 		end
 	end
-	if ddwn_presets.choicesHide == false then
-		wait = 0
-		group_exec(group_velSliders, 'block')
-		group_exec(group_beatsToggles, 'block')
-		group_exec(group_lengthToggles, 'block')
-		group_exec(group_pitchToggles, 'block')
-		group_exec(group_noteRange, 'block')
-	elseif ddwn_presets.choicesHide == true then 
-		if wait == 5 then 
-			group_exec(group_velSliders, 'unblock')
-			group_exec(group_beatsToggles, 'unblock')
-			group_exec(group_lengthToggles, 'unblock')
-			group_exec(group_pitchToggles, 'unblock')
-			group_exec(group_noteRange, 'unblock')
-			else
-			wait = wait + 1
-		end
-	end
+	
 	---------------------------------
 	--PRESETS Dropdown----------------
 	---------------------------------
@@ -562,6 +545,7 @@ function main()
 		local retval, retvals_csv, v = reaper.GetUserInputs("Save Preset", 1, "Name:", "Preset")
 		save_presets(reaper.GetResourcePath() .. '/Scripts/lemerchand/MIDI Selector Tool/presets/' .. retvals_csv .. '.dat', group_pitchToggles, group_noteRange, group_lengthToggles, group_beatsToggles, group_velSliders, sldr_timeThreshold)
 		ddwn_presets:Add(retvals_csv)
+		ddwn_presets.selected = #presets
 	end
 
 

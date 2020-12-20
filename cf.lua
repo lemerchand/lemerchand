@@ -38,10 +38,6 @@ function get_presets()
 end
 
 function load_preset(preset)
-	if preset == "..." then
-		reaper.ShowMessageBox("Save a preset before trying to load one!", "Nope!", 0)
-		return
-	end
 	local file = io.open(reaper.GetResourcePath() .. '/Scripts/lemerchand/MIDI Selector Tool/presets/' .. preset .. '.dat', 'r')
 	io.input()
 	for i, e in ipairs(group_pitchToggles) do
@@ -55,7 +51,7 @@ function load_preset(preset)
 		e.value = file:read()
 	end
 
-	ddwn_scaleName = file:read()
+	ddwn_scaleName.selected = tonumber(file:read())
 
 	for i, e in ipairs(group_lengthToggles) do
 		if file:read() == "true" then
@@ -91,7 +87,7 @@ function save_presets(filename)
 		file:write(e.value .. "\n")
 	end
 
-	ddwn_scaleName = file:read()
+	file:write(ddwn_scaleName.selected .. '\n')
 
 	for i, e in ipairs(group_lengthToggles) do
 		file:write(tostring(e.state) .. "\n")
