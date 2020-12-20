@@ -1062,6 +1062,8 @@ function Dropdown:Create(x,y,w,h,choices, default, selected, help)
 		font = "Lucida Console",
 		fontSize = fontSize or 11,
 		leftClick = false,
+		shiftLeftClick = false,
+		ctrlLeftClick = false,
 		rightClick = false,
 		choicesHide = true,
 		hide = false,

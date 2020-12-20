@@ -58,7 +58,7 @@ local function update_settings(filename)
 end
 update_settings(reaper.GetResourcePath() .. '/Scripts/lemerchand/MIDI Selector Tool/lament.config')
 
-local presets= {"Presets", "one", "two", "three", "Big Poppa Robbie", "tester", "blister"}
+local presets = get_presets()
 
 gfx.init(_name .. " " .. _version, 248, 680, dockOnStart, window_xPos, window_yPos)
 
@@ -275,10 +275,10 @@ local sldr_timeThreshold = H_slider:Create(frm_time.x + 10, frm_time.y+frm_time.
 --For now status needs to be global
 status = Status:Create(10, frm_time.y + frm_time.h + 27, 227, 60, "INFO", nil, nil, "Hover over a control for more info!")
 
-local ddwn_scaleName = Dropdown:Create(frm_pitch.x+60, frm_pitch.y+frm_pitch.h-15, nil, nil, scaleName, 1, 1, htDdwnScales)
+local ddwn_scaleName = Dropdown:Create(frm_pitch.x+52, frm_pitch.y+frm_pitch.h-15, frm_pitch.w-62 , nil, scaleName, 1, 1, htDdwnScales)
 
 
-local ddwn_presets = Dropdown:Create(frm_general.x+10, btn_select.y+40, frm_general.w-20, nil, presets, 1, 1, htPresets)
+local ddwn_presets = Dropdown:Create(frm_general.x+10, btn_select.y+43, frm_general.w-20, nil, presets, 1, 1, htPresets)
 
 
 ---Handle tabs
@@ -552,8 +552,14 @@ function main()
 			wait = wait + 1
 		end
 	end
+	---------------------------------
+	--PRESETS Dropdown----------------
+	---------------------------------
+	if ddwn_presets.shiftLeftClick then 
+		local retval, retvals_csv, v = reaper.GetUserInputs("Save Preset", 1, "Name:", "Preset")
+		save_presets(reaper.GetResourcePath() .. '/Scripts/lemerchand/MIDI Selector Tool/presets/' .. retvals_csv .. '.dat', group_pitchToggles, group_noteRange, group_lengthToggles, group_beatsToggles, group_velSliders, sldr_timeThreshold)
 
-
+	end
 
 end
 

@@ -25,6 +25,45 @@ function count_table(t)
 	return n
 end
 
+function get_presets()
+	local presets = {}
+	local fi = 0
+	repeat
+		fn = reaper.EnumerateFiles(reaper.GetResourcePath() .. '/Scripts/lemerchand/MIDI Selector Tool/presets/', fi)
+		if fn then table.insert(presets, fn:sub(1, fn:find('.dat')-1)) end
+		fi = fi + 1
+	until not fn
+	return presets
+end
+
+function save_presets(filename, group_pitchToggles, group_noteRange, group_lengthToggles, group_beatsToggles, group_velSliders, sldr_timeThreshold)
+	local file = io.open(filename, 'w')
+	io.output()
+	for i, e in ipairs(group_pitchToggles) do
+		file:write(tostring(e.state) .. "\n")
+	end
+
+	for i, e in ipairs(group_noteRange) do
+		file:write(e.value .. "\n")
+	end
+
+	for i, e in ipairs(group_lengthToggles) do
+		file:write(tostring(e.state) .. "\n")
+	end
+
+	for i, e in ipairs(group_beatsToggles) do
+		file:write(tostring(e.state) .. "\n")
+	end
+
+	for i, e in ipairs(group_velSliders) do
+		file:write(e.value .. "\n")
+	end
+
+	file:write(sldr_timeThreshold.value)
+
+	file:close()
+end
+
 function restore_default_settings(filename)
 	local file = io.open(filename, 'r')
 	io.input()
