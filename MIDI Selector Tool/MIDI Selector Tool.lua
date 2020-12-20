@@ -169,24 +169,6 @@ local ib_floatAtMouseY = InputBox:Create(frm_general.w-34, txt_floatAtMouse.y-2,
 local btn_save = Button:Create(frm_general.x+12, frm_general.h+frm_general.y-10, "Save", htSaveSettings, frm_general.w-20, 20)
 
 
-
-local tab_main = Tabs:AddTab("Main", true, htMainTab)
-tab_main_elements = {btn_select, btn_clear, btn_capture}
-frm_general:AttatchTab(tab_main)
-tab_main:AttatchElements(tab_main_elements)
-
-local tab_settings = Tabs:AddTab("Settings", false, htSettingsTab)
-tab_settings_elements = {tgl_dockOnStart, txt_dockOnStart, tgl_floatAtMouse, tgl_floatAtPos, txt_floatAtPos, 
-						txt_floatAtMouse, ib_floatAtPosX, ib_floatAtPosY, ib_floatAtMouseX, ib_floatAtMouseY, btn_save}
-frm_general:AttatchTab(tab_settings)
-tab_settings:AttatchElements(tab_settings_elements)
-
-
-
-
-
-
-
 --Pitch frame
 local frm_pitch = Frame:Create(10, frm_general.y + frm_general.h + 27, 227, 120, "PITCH")
 
@@ -297,6 +279,21 @@ local ddwn_scaleName = Dropdown:Create(frm_pitch.x+60, frm_pitch.y+frm_pitch.h-1
 
 
 local ddwn_presets = Dropdown:Create(frm_general.x+10, btn_select.y+40, frm_general.w-20, nil, presets, 1, 1, htPresets)
+
+
+---Handle tabs
+
+local tab_main = Tabs:AddTab("Main", true, htMainTab)
+tab_main_elements = {btn_select, btn_clear, btn_capture, ddwn_presets}
+frm_general:AttatchTab(tab_main)
+tab_main:AttatchElements(tab_main_elements)
+
+local tab_settings = Tabs:AddTab("Settings", false, htSettingsTab)
+tab_settings_elements = {tgl_dockOnStart, txt_dockOnStart, tgl_floatAtMouse, tgl_floatAtPos, txt_floatAtPos, 
+						txt_floatAtMouse, ib_floatAtPosX, ib_floatAtPosY, ib_floatAtMouseX, ib_floatAtMouseY, btn_save}
+frm_general:AttatchTab(tab_settings)
+tab_settings:AttatchElements(tab_settings_elements)
+
 
 
 function main()
