@@ -76,7 +76,9 @@ function CMD:Create()
 		suffix = "",
 		targets = {},
 		trackNumbers = {},
-		destinations = {},
+		destinationInput = "",
+		destination = "",
+		destinationNumber = nil,
 		desitinationSuffix = "",
 		history = {},
 		historySeek = 0,
@@ -124,8 +126,9 @@ function CMD:Reset()
 	self.renaming = nil
 	self.trackNumbers = {}
 	self.exclusive = false
-	self.destinations = {}
-	self.destinationSuffix =""
+	self.destinationInput = ""
+	self.destination = ""
+	self.destinationSuffix = ""
 end
 
 function CMD:Parse()
@@ -140,7 +143,7 @@ function CMD:Parse()
 	self.targets = {}
 	self.trackNumbers = {}
 	self.renaming = nil
-	self.destinations = {}
+	
 
 
 	-- If the routing symbol is found, it must be process separately from the rest of the commnand
@@ -154,9 +157,11 @@ function CMD:Parse()
 			local s, e = destinationInput:find('=')
 			self.destinationSuffix = destinationInput:sub(s+1)
 			destinationInput = string.lower(destinationInput:sub(1, destinationInput:find("=")-1))
-
 		end
 
+		if destinationInput:sub(1,1) == (" ") then destinationInput = destinationInput:sub(2) end
+		self.destinationInput = destinationInput
+		cons(self.destination .. ".", true)
 
 	end
 
@@ -352,7 +357,108 @@ local function select_tracks()
 	reaper.PreventUIRefresh(-1)
 end
 
+--Selects destination by name
+local function select_destination()
+	update_active_arrange()
 
+	reaper.PreventUIRefresh(1)
+	local trackCount = 0
+	
+	display:ClearLines()
+	display2:ClearLines()
+
+
+	for i=0, tracks-1 do
+		local t = reaper.GetTrack(0, i )
+		local retval, buf = reaper.GetTrackName( t )
+		
+		local muted = reaper.GetMediaTrackInfo_Value(t, 'B_MUTE')
+		local soloed = reaper.GetMediaTrackInfo_Value(t, 'I_SOLO')
+		local armed = reaper.GetMediaTrackInfo_Value(t, 'I_RECARM')
+		local level = reaper.GetMediaTrackInfo_Value(t, 'I_FOLDERDEPTH')
+		local fxBypassed = reaper.GetMediaTrackInfo_Value(t, "I_FXEN")
+
+
+		local levelMod = ""
+		local r, g, b = 0,0,0
+		if soloed == 1 then r, g, b = yellow.r, yellow.g, yellow.b
+		elseif muted == 1  then r, g, b = red.r, red.g, red.b
+		elseif armed == 1 then r, g, b = green.r, green.g, green.b
+		elseif fxBypassed == 0 then r, g, b = grey.r, grey.g, grey.b
+		else r, g, b = default.r, default.g, default.b
+		end
+
+		
+
+		if level == 1 then levelMod = " |F|" else levelMod = "" end
+
+	
+		if C.destinationNumber == i+1 then 
+			reaper.SetTrackSelected( t, true ) 
+			display:AddLine(i+1 .. ": " .. buf:sub(1,14) .. levelMod, r, g, b)
+			trackCount = trackCount + 1
+		--if the string is an exact match	
+		elseif string.lower(buf) == C.destinationInput or string.lower(buf .. " ") == C.destinationInput or string.lower(buf .. "  ") == C.destinationInput then 
+			reaper.SetTrackSelected( t, true ) 
+			display:AddLine(i+1 .. ": " .. buf:sub(1,14) .. levelMod, r, g, b)
+			trackCount = trackCount + 1
+
+		else 
+			--finds close matches
+			if string.lower(buf):match(C.destinationInput) and string.lower(buf .. " ") ~= C.destinationInput then 
+				reaper.SetTrackSelected( t, true ) 
+				display:AddLine(i+1 .. ": " .. buf:sub(1,14) .. levelMod, r, g, b)
+				trackCount = trackCount + 1
+			
+
+			--if i is not a match deselect
+			else 
+				reaper.SetTrackSelected( t, false) 
+
+			end
+		end
+
+
+	
+	end
+
+	--Look for flags to add to commit preview
+	local commitPreview = ""
+	if C.suffix:find("m%-") then commitPreview = commitPreview .. "Unmute, "
+	elseif C.suffix:find("m%+") then commitPreview = commitPreview .. "Mute, "
+	elseif C.suffix:find("m") then commitPreview = commitPreview .. "Toggle Mute, "
+	elseif C.suffix:find("M") then commitPreview = commitPreview .. "Excl. Mute, "
+	end
+
+	--Look for solo
+	if C.suffix:find("o%-") then commitPreview = commitPreview .. "Unsolo, "
+	elseif C.suffix:find("o%+") then commitPreview = commitPreview .."Solo, "
+	elseif C.suffix:find("o") then commitPreview = commitPreview .. "Toggle Solo, "
+	elseif C.suffix:find("O") then commitPreview = commitPreview .. "Excl. Solo, "
+	end
+
+	--Look for arm
+	if C.suffix:find("a%-") then commitPreview = commitPreview .. "Unarm, "
+	elseif C.suffix:find("a%+") then commitPreview = commitPreview .."Arm, "
+	elseif C.suffix:find("a") then commitPreview = commitPreview .. "Toggle Arm, "
+	elseif C.suffix:find("A") then commitPreview = commitPreview .. "Excl. Arm, "
+	end
+
+	--Look for fx bypass
+	if C.suffix:find("b%-") then commitPreview = commitPreview .. "Bypass FX, "
+	elseif C.suffix:find("b%+") then commitPreview = commitPreview .. "Enable FX, "
+	elseif C.suffix:find("b") then commitPreview = commitPreview .. "Toggle FX, "
+	end
+
+	-- look for midi inputs
+
+
+
+	if commitPreview ~= "" then commitPreview = commitPreview:sub(1, -3) .. " " end
+	display2:AddLine("")
+	display2:AddLine(commitPreview .. trackCount .. " tracks...", something.r, something.g, something.b)
+	reaper.PreventUIRefresh(-1)
+end
 
 
 --Restores the selection if user cancels command
@@ -414,6 +520,9 @@ local function update_cmd(char)
 		select_tracks()		
 	end
 
+	if cmd.active and cmd.txt:find(">") then
+		select_destination()
+	end
 
 	-------------------------------
 	--Committed Input Handling-----
@@ -520,15 +629,15 @@ local function update_cmd(char)
 
 
 		-- Look for routing
-		-- if C.destinationSuffix:find("m%d*") then
-		-- 	local midiChannel = C.suffix:match("i%d+")
-		-- 	if midiChannel then midiChannel = midiChannel:sub(2) else midiChannel = 0 end
-		-- 	for tr = 0, tracks-1 do
-		-- 		--if C.targets[tr] = reaper
-		-- 		--reaper.CreateTrackSend(tr,  )
+		if C.destinationSuffix and C.destinationSuffix:find("m%d*") then
+			local midiChannel = C.destinationSuffix:match("i%d+")
+			if midiChannel then midiChannel = midiChannel:sub(2) else midiChannel = 0 end
+			for tr = 0, tracks-1 do
+				--if C.targets[tr] = reaper
+				--reaper.CreateTrackSend(tr,  )
 
-		-- 	end
-		-- end
+			end
+		end
 
 		reaper.PreventUIRefresh(-1)
 		--Clear cmd, clear engage, clear returned, clear flags
