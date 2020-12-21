@@ -19,8 +19,8 @@ local name = "MST5k"
 
 --Load UI Library
 function reaperDoFile(file) local info = debug.getinfo(1,'S'); script_path = info.source:match[[^@?(.*[\/])[^\/]-$]]; dofile(script_path .. file); end
-reaperDoFile('../libs/gui.lua')
-reaperDoFile('../libs/cf.lua')
+reaperDoFile('libs/gui.lua')
+reaperDoFile('libs/cf.lua')
 
 ----------------------------------
 --Window Mngmt & Settings --------
