@@ -55,7 +55,7 @@ local presets = get_presets()
 gfx.init(name .. " " .. v, 248, 680, dockOnStart, window_xPos, window_yPos)
 
 -- Keep on top
-local win = reaper.JS_Window_Find(name .. " " .. version, true)
+local win = reaper.JS_Window_Find(name .. " " .. v, true)
 if win then reaper.JS_Window_AttachTopmostPin(win) end
 
 ----------------------
