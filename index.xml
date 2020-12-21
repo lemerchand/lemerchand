@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" commit="763e28b114b13d1b99030d39df24c96c3ab8d5c4">
+<index version="1" commit="ee61f3b15e8b6a8eb62ede714dbeaf0e5f15e1e0">
   <category name="MIDI Selector Tool">
     <reapack name="MIDI Selector Tool.lua" type="script">
       <version name="1.0.3b" time="2020-12-21T23:32:05Z">
         <source main="main">https://github.com/lemerchand/lemerchand/raw/763e28b114b13d1b99030d39df24c96c3ab8d5c4/MIDI%20Selector%20Tool/MIDI%20Selector%20Tool.lua</source>
+      </version>
+      <version name="1.0.4b" author="Lemerchad" time="2020-12-21T23:57:56Z">
+        <source main="main">https://github.com/lemerchand/lemerchand/raw/ee61f3b15e8b6a8eb62ede714dbeaf0e5f15e1e0/MIDI%20Selector%20Tool/MIDI%20Selector%20Tool.lua</source>
+        <source file="presets/Default Preset.dat">https://github.com/lemerchand/lemerchand/raw/ee61f3b15e8b6a8eb62ede714dbeaf0e5f15e1e0/MIDI%20Selector%20Tool/presets/Default%20Preset.dat</source>
       </version>
     </reapack>
   </category>
