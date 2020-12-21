@@ -1,9 +1,9 @@
 -- @version 1.0
--- @provides [main] MIDI Selector Tool.lua
+-- @provides 
 -- lament.config
 -- default_lament.config
 -- presets/*.dat
--- [nomain] libs/*.lua
+-- libs/*.lua
 -- 
 -- @author Lemerchand
 -- @about
@@ -13,7 +13,7 @@
 --  	Added Presets 
 --		Added triplet detection
 local v = " v1.0b"
-local name = "MST5k"
+local name = "MST5K"
 
 
 --Load UI Library

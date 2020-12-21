@@ -3,13 +3,6 @@
   <category name="MIDI Selector Tool">
     <reapack name="MIDI Selector Tool.lua" type="script">
       <metadata>
-        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 Courier;}}
-{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
-\widowctrl\hyphauto
-
-{\pard \ql \f0 \sa180 \li0 \fi0 \b \fs36 MST5K Advanced MIDI Note Selector\par}
-}
-]]></description>
       </metadata>
       <version name="1.0b" author="Lemerchand" time="2020-12-21T18:03:26Z">
         <changelog><![CDATA[Added Presets ]]></changelog>
