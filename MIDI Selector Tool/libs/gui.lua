@@ -1,35 +1,6 @@
 -- @version 1.0
 -- @noindex
--------------------------------------------------------------------------
---				
---							GUI Library v1 Rev 2
---
--------------------------------------------------------------------------
--- LAST MODIFIED: 2020.10.27
---
---USAGE:
---		- Read the comments, especially parameters
---		- Skip parameters when defining an object to allow the library to 
---			define them for you.
---
---		- Pass 'nil' if you need to skip a parameter that is inbetween two defined parameters
---			eg., btn = Button:Create(10, 10, "Buttong, nil, 100")
---
---		- Group elements in tables for easier manipulation
---
---		- Many elements have the ability to respond to:
---			- (Ctrl/Alt/Shift) Left Mouse clicks
---			- (Ctrl/Alt/Sh2020.10.25 at 10:21ift) Right Mouse clicks
---			- See the individual element's :Create() if unsure
---
---TODO:
---		+ Make pretty
---		+ Fix dropdown draw issue when dropdown choices overlap another dropdown
--- 				- Temporary fix: create after everything else
---		+ Vertical Sliderr
---
 
--------------------------------------------------------------------------
 
 new_val = nil
 
