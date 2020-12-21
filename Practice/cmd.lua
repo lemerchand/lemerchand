@@ -138,14 +138,14 @@ function CMD:Parse()
 	local trackNumber = nil
 
 	--Trim command from user input
-	local input = string.lower(cmd.txt:sub(3))
+	local input = cmd.txt:sub(3)
 	local destinationInput = ""
 	self.targets = {}
 	self.trackNumbers = {}
 	self.renaming = nil
 	
 
-
+	--YOOOOWZA
 	-- If the routing symbol is found, it must be process separately from the rest of the commnand
 	-- Strip it from the main input var and give it over to destinationInput
 
@@ -160,7 +160,7 @@ function CMD:Parse()
 		end
 
 		if destinationInput:sub(1,1) == (" ") then destinationInput = destinationInput:sub(2) end
-		self.destinationInput = destinationInput
+		self.destinationInput = string.lower(destinationInput)
 		cons(self.destination .. ".", true)
 
 	end

@@ -1,5 +1,5 @@
 
-## MIDI Selection Tool v.998b
+## MIDI Selection Tool v1.0b
 
 ![Demo](https://t2361428.p.clickup-attachments.com/t2361428/3f5587aa-833f-4cab-8b80-c9cc140aa938/dem.gif?view=open)
 
@@ -10,11 +10,11 @@ A tool for quickly selecting midi notes in REAPER. Filters for events such as:
 		- Note Range
 		- Pitch (including scales!)
 		- Min/Max Velocity 
-		- Note length (no triplets or dotted yet)
+		- Note length (no dotted yet)
 		- Beat position in 16th notes (sorry--no odd time signatures)
 
 **Cool Features:**
-
+		- Save your favorite settings into presets!
 		- Right-click "Select" to restrict to the time selection
 		- Shift-click "Select" to invert the filter
 		- Right-click 'Clear' for a global reset
@@ -31,7 +31,7 @@ A tool for quickly selecting midi notes in REAPER. Filters for events such as:
 
 		- Entering an invalid note range isn't error-handled
 		- Some issues might occure with saving.
-			- If they do, simply reload the default config
+			- If they do, simply reload the default config (Right-click "Save" under "Settings")
 
 **Some things I want to add:**
 
@@ -77,6 +77,9 @@ Note Lengths
 
 Scales
 ![Scales](https://t2361428.p.clickup-attachments.com/t2361428/a77b90d7-9e67-46ae-8ff1-728899d465cb/scales.gif?view=open)
+
+
+**Backup your presets and config files before updating!**
 
 **Contact:**
 
