@@ -1,4 +1,4 @@
--- @version 1.0
+-- @version 1.0.1
 -- @noindex
 --Returns the index of the note under mouse cursor
 function note_under_mouse_index()

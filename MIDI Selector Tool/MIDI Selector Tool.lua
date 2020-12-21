@@ -1,4 +1,4 @@
--- @version 1.0
+-- @version 1.0.1
 -- @provides 
 -- lament.config
 -- default_lament.config
@@ -6,7 +6,7 @@
 -- libs/*.lua
 -- 
 
-local v = " v1.0b"
+local v = " v1.0.1b"
 local name = "MST5K"
 
 
