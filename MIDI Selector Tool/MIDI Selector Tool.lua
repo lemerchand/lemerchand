@@ -1,8 +1,8 @@
--- @version 1.0.3b
--- @provides
--- presets/*.dat
+-- @version 1.0.4b
+-- @author Lemerchad
+-- @provides presets/*.dat
 
-local v = " v1.0.3b"
+local v = " v1.0.4b"
 local name = "MST5K"
 
 
