@@ -1,5 +1,5 @@
 -- @version 1.0.3b
--- @provides 
+-- @provides
 -- presets/*.dat
 
 local v = " v1.0.3b"
