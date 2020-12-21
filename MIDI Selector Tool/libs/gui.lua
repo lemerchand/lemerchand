@@ -1,4 +1,4 @@
-
+--@noindex
 new_val = nil
 
 --All elements get loaded into this table to make drawing and reseting easier
