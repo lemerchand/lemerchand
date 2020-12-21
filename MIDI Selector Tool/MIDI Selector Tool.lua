@@ -1,26 +1,12 @@
--------------------------------------------------------------------------------
---						MST3K
--------------------------------------------------------------------------------
---  Modified:  2020.12.19 @ 4pm
---	TODO: 
--- 		+ Add window position capture to floatAtPos on right-click
---		+ Scales
---		+ Note length
---		+ Snapshots
---		+ Bad input handling
---
--- RECENT CHANGES:
---		+ Added PPQ Threshold
---		+ Added 1-1/64 notes filter
---		+ Moved over to new GUI lib
---		+ Section-specific capture
---		+ Toggle button swipe
---
---
---- KNOWN ISSUES:
---		+ 
---		+ 
-------------------------------------------------------------------------------
+-- @description MST5K Advanced MIDI Note Selector
+-- @version 1.0b
+-- @author Lemerchand
+-- @about
+--   # MST5K Advanced MIDI Note Selector
+--   
+-- @changelog
+--  	Added Presets 
+--		Added triplet detection
 local _version = " v1.0b"
 local _name = "MST5k"
 

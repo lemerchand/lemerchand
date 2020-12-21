@@ -1,3 +1,13 @@
+-- @description Console 
+-- @version .1
+-- @author Lemerchand
+-- @about
+--   # Your Package's Title
+--   Longer description/documentation for this package in *markdown*.
+-- @changelog
+--   Changed the button label to just "OK"
+--   Fixed a typo in the popup dialog's text
+
 function reaperDoFile(file) local info = debug.getinfo(1,'S'); script_path = info.source:match[[^@?(.*[\/])[^\/]-$]]; dofile(script_path .. file); end
 reaperDoFile('../gui.lua')
 reaperDoFile('../cf.lua')
