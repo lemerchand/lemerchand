@@ -5,13 +5,7 @@
 -- presets/*.dat
 -- libs/*.lua
 -- 
--- @author Lemerchand
--- @about
---   # MST5K Advanced MIDI Note Selector
---   
--- @changelog
---  	Added Presets 
---		Added triplet detection
+
 local v = " v1.0b"
 local name = "MST5K"
 
