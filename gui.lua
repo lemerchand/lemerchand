@@ -1086,7 +1086,7 @@ function Dropdown:Draw()
 
 	gfx.set(.2,.21,.24)
 	gfx.rect(self.x+1, self.y+1, self.w-2, self.h-2, true)
-	gfx.x, gfx.y = self.x+6, self.y+5
+	gfx.x, gfx.y = self.x+6, self.y+6
 	gfx.set(.7,.7,.7)
 	gfx.drawstr(self.choices[self.selected])
 	gfx.x, gfx.y = self.x+self.w-13, self.y+5
@@ -1133,8 +1133,6 @@ end
 function Dropdown:DrawChoices()
 
 	local choice_height = 0
-
-
 
 	for c, choice in ipairs(self.choices) do
 		local w,h = gfx.measurestr(choice)

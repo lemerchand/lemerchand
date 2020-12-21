@@ -210,11 +210,22 @@ function matches_selected_beats(startppqpos, threshold)
 end
 
 function matches_selected_lengths(startppqpos, endppqpos, threshold)
-	for lll = 7, 1, -1 do
-
-		if lengths[lll] == 1 and (endppqpos-startppqpos) >= lengths_in_ppq[lll] - threshold and (endppqpos-startppqpos) <= lengths_in_ppq[lll] + threshold then
-			
-			return true
+	
+	if lengths[8] == 1 then
+		for lll = 7, 1, -1 do
+	
+			if lengths[lll] == 1 and (endppqpos-startppqpos) >= lengths_in_ppq_triplets[lll] - threshold 
+				and (endppqpos-startppqpos) <= lengths_in_ppq_triplets[lll] + threshold then
+				return true
+			end
+		end
+	else
+		for lll = 7, 1, -1 do
+		
+			if lengths[lll] == 1 and (endppqpos-startppqpos) >= lengths_in_ppq[lll] - threshold 
+				and (endppqpos-startppqpos) <= lengths_in_ppq[lll] + threshold then
+				return true
+			end
 		end
 	end
 	

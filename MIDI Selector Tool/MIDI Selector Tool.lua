@@ -70,25 +70,25 @@ if win then reaper.JS_Window_AttachTopmostPin(win) end
 ----------------------
 --Help Text-----------
 ---------------------
-local htSelect			= "Select notes based on settings.\nR-click: select in time selection.\nShift+L-click to invert filter."
-local htClear 			= "Clear Selection. \nR-click for global reset.\nHotkeys: (Shift+) Backspace"
+local htSelect			= "Select notes based on settings.\nR-click: select in time selection.\nShift+L-click: invert filter."
+local htClear 			= "Clear Selection. \nR-click: global reset.\nHotkeys: (Shift+) Backspace"
 local htCapture 		= "Set parameters from selected notes.\nOr Shift+L-Click a parameter to\ncapture only that."
-local htMinNote 		= "Sets lowest possible note.\nR-click to reset."
-local htMaxNote 		= "Sets highest possible note.\nR-click to reset."
-local htPitchTgl 		= "Toggles pitches.\nR-click to reset.\nCtrl+L-click: exclusive select.\nAlt+L-Click to set to scale."
-local htVelSlider		= "Sets the lowest/highest velocity.\nR-click to reset.\nCtrl+L-click to slide both (beta)"
-local htbeatsTgl		= "Include/exclude specific beats.\nR-click to reset.\nCtrl+L-click: exclusive select."
+local htMinNote 		= "Sets lowest possible note.\nR-click: reset."
+local htMaxNote 		= "Sets highest possible note.\nR-click: reset."
+local htPitchTgl 		= "Toggles pitches.\nR-click: reset.\nCtrl+L-click: exclusive select.\nAlt+L-Click: set to scale."
+local htVelSlider		= "Sets the lowest/highest velocity.\nR-click: reset.\nCtrl+L-click: slide both (beta)"
+local htbeatsTgl		= "Include/exclude specific beats.\nR-click: reset.\nCtrl+L-click: exclusive select."
 local htDockOnStart		= "Enable to dock MST3K when summoned."
 local htMainTab			= "Main Controls."
 local htSettingsTab 	= "General Settings."
 local htDockOnStart		= "Enable docking at startup."
-local htSaveSettings	= "L-click to save current settings.\nR-click to restore defaults.\nClose and restart script."
+local htSaveSettings	= "L-click: save current settings.\nR-click: restore defaults.\nClose and restart script."
 local htFloatAtMouse 	= "Float the window at the mouse\ncursor with x/y offset."
 local htFloatAtPos 		= "Choose x/y coordinates\nfor the window to load."
-local htLengthTgle		= "Filter by note length.\nR-click to reset.\nCtrl+L-click: exclusive select."
+local htLengthTgle		= "Filter by note length.\nR-click: reset.\nCtrl+L-click: exclusive select."
 local htTimeThreshold	= "Threshold in ppq to catch notes\nwith imperfect lengths or times."
 local htDdwnScales		= "Select a scale then Alt+L-Click\na note to set pitches."
-local htDdwnPresets		= "Select a preset or \nShift+L-Click to save."
+local htDdwnPresets		= "Select a preset\nShift+L-Click: save preset.\nCtrl+L-click: delete current preset"
 
 -------------------------------
 --Midi Note and BeatsThangs---
@@ -115,7 +115,8 @@ scales[12] 	= {1,0,0,1,0,1,0,1,0,0,1,0}
 scales[13] 	= {1,0,0,1,0,1,1,1,0,0,1,0}
 
 lengths_in_ppq 	= {3840, 1920, 960, 480, 240, 120, 60, -1}
-lengths_txt 	= {"1", "1/2", "1/4", "1/8", "1/16", "1/32", "1/64", "R"}
+lengths_in_ppq_triplets = {7680/3, 3840/3, 1920/3, 960/3, 480/3, 240/3, 120/3, 60/3, -1}
+lengths_txt 	= {"1", "1/2", "1/4", "1/8", "1/16", "1/32", "1/64", "T"}
 lengths 		= {0,0,0,0,0,0,0,0,0}
 
 function default_vars()
@@ -548,6 +549,17 @@ function main()
 		ddwn_presets.selected = #presets
 	end
 
+	if ddwn_presets.ctrlLeftClick then
+		if ddwn_presets.selected == 1 then reaper.ShowMessageBox("Default Preset cannot be deleted.", "Presets", 0)
+			return
+		end
+		local d = reaper.ShowMessageBox("Delete " .. ddwn_presets.choices[ddwn_presets.selected] .. "?", "Presets", 4)
+		if d == 6 then
+			os.remove(reaper.GetResourcePath() .. '/Scripts/lemerchand/MIDI Selector Tool/presets/' .. ddwn_presets.choices[ddwn_presets.selected] .. ".dat")
+			table.remove(ddwn_presets.choices, ddwn_presets.selected)
+			ddwn_presets.selected = 1
+		end		
+	end
 
 
 end
