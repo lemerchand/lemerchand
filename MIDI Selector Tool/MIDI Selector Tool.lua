@@ -1,10 +1,9 @@
--- @description MST5K Advanced MIDI Note Selector
 -- @version 1.0
--- @provides  
+-- @provides [main] MIDI Selector Tool.lua
 -- lament.config
 -- default_lament.config
 -- presets/*.dat
--- libs/*.lua
+-- [nomain] libs/*.lua
 -- 
 -- @author Lemerchand
 -- @about
@@ -13,7 +12,7 @@
 -- @changelog
 --  	Added Presets 
 --		Added triplet detection
-local version = " v1.0b"
+local v = " v1.0b"
 local name = "MST5k"
 
 
@@ -53,7 +52,7 @@ update_settings(reaper.GetResourcePath() .. '/Scripts/lemerchand/MIDI Selector T
 
 local presets = get_presets() 
 
-gfx.init(name .. " " .. version, 248, 680, dockOnStart, window_xPos, window_yPos)
+gfx.init(name .. " " .. v, 248, 680, dockOnStart, window_xPos, window_yPos)
 
 -- Keep on top
 local win = reaper.JS_Window_Find(name .. " " .. version, true)
