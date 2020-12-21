@@ -1,10 +1,10 @@
 -- @description MST5K Advanced MIDI Note Selector
 -- @version 1.0
 -- @provides  
--- libs/*.lua
--- MIDI Selector Tool/lament.config
--- MIDI Selector Tool/default_lament.config
+-- lament.config
+-- default_lament.config
 -- presets/*.dat
+-- libs/*.lua
 -- 
 -- @author Lemerchand
 -- @about
