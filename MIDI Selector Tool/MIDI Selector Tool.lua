@@ -1,5 +1,12 @@
 -- @description MST5K Advanced MIDI Note Selector
--- @version 1.0b
+-- @version 1
+-- @provides  libs/gui.lua
+-- libs/cf.lua
+-- MIDI Selector Tool/lament.config
+-- MIDI Selector Tool/default_lament.config
+-- presets/*.dat
+
+-- 
 -- @author Lemerchand
 -- @about
 --   # MST5K Advanced MIDI Note Selector
@@ -7,14 +14,14 @@
 -- @changelog
 --  	Added Presets 
 --		Added triplet detection
-local _version = " v1.0b"
-local _name = "MST5k"
+local version = " v1.0b"
+local name = "MST5k"
 
 
 --Load UI Library
 function reaperDoFile(file) local info = debug.getinfo(1,'S'); script_path = info.source:match[[^@?(.*[\/])[^\/]-$]]; dofile(script_path .. file); end
-reaperDoFile('../gui.lua')
-reaperDoFile('../cf.lua')
+reaperDoFile('../libs/gui.lua')
+reaperDoFile('../libs/cf.lua')
 
 ----------------------------------
 --Window Mngmt & Settings --------
@@ -50,7 +57,7 @@ local presets = get_presets()
 gfx.init(_name .. " " .. _version, 248, 680, dockOnStart, window_xPos, window_yPos)
 
 -- Keep on top
-local win = reaper.JS_Window_Find(_name .. " " .. _version, true)
+local win = reaper.JS_Window_Find(name .. " " .. version, true)
 if win then reaper.JS_Window_AttachTopmostPin(win) end
 
 ----------------------
