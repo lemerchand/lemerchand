@@ -1,12 +1,12 @@
--- @version 1.0.1
+-- @version 1.0.2b
 -- @provides 
--- lament.config
--- default_lament.config
--- presets/*.dat
--- libs/*.lua
+--	lament.config
+--	default_lament.config
+--	presets/*.dat
+--	libs/*.lua
 -- 
 
-local v = " v1.0.1b"
+local v = " v1.0.2b"
 local name = "MST5K"
 
 

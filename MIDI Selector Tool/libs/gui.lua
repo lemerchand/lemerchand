@@ -1,6 +1,3 @@
--- @version 1.0.1
--- @noindex
-
 
 new_val = nil
 
