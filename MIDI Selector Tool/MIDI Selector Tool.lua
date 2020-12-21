@@ -1,10 +1,10 @@
 -- @description MST5K Advanced MIDI Note Selector
 -- @version 1
 -- @provides  libs/gui.lua
--- libs/cf.lua
--- MIDI Selector Tool/lament.config
--- MIDI Selector Tool/default_lament.config
--- presets/*.dat
+-- @provides libs/cf.lua
+-- @provides MIDI Selector Tool/lament.config
+-- @provides MIDI Selector Tool/default_lament.config
+-- @provides presets/*.dat
 
 -- 
 -- @author Lemerchand
@@ -54,7 +54,7 @@ update_settings(reaper.GetResourcePath() .. '/Scripts/lemerchand/MIDI Selector T
 
 local presets = get_presets() 
 
-gfx.init(_name .. " " .. _version, 248, 680, dockOnStart, window_xPos, window_yPos)
+gfx.init(name .. " " .. version, 248, 680, dockOnStart, window_xPos, window_yPos)
 
 -- Keep on top
 local win = reaper.JS_Window_Find(name .. " " .. version, true)
@@ -559,7 +559,7 @@ end
 
 
 main()
-reaper.Undo_EndBlock(_name .. "", -1)
+reaper.Undo_EndBlock(name .. "", -1)
 
 
 
