@@ -1,5 +1,5 @@
 -- @version 1.0.3b
--- @provides 
+-- @provides
 --	lament.config
 --	default_lament.config
 --	presets/*.dat
