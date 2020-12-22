@@ -1,5 +1,5 @@
 --[
--- @version 1.0.667b
+-- @version 1.0.777b
 -- @author Lemerchand
 -- @provides
 --	[main=midi_editor] .
@@ -8,7 +8,7 @@
 --	[nomain] *.config
 --]
 
-local v = " v1.0.667b"
+local v = " v1.0.777b"
 local name = "MST5K"
 local butthole = 2
 
