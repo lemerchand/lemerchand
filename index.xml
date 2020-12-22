@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Scripts by Lemerchand" commit="984e281438624dc8315cb5b9867439056bc5693e">
+<index version="1" name="Scripts by Lemerchand" commit="1c952f13ffb36674ea5a69f7380259a084fa854a">
   <category name="MIDI Selector Tool">
     <reapack name="MIDI Selector Tool.lua" type="script">
       <version name="1.0.777b" author="Lemerchand" time="2020-12-22T05:44:21Z">
@@ -66,6 +66,13 @@
         <source file="libs/gui.lua">https://github.com/lemerchand/lemerchand/raw/984e281438624dc8315cb5b9867439056bc5693e/MIDI%20Selector%20Tool/libs/gui.lua</source>
         <source file="default_lament.config">https://github.com/lemerchand/lemerchand/raw/984e281438624dc8315cb5b9867439056bc5693e/MIDI%20Selector%20Tool/default_lament.config</source>
         <source file="lament.config">https://github.com/lemerchand/lemerchand/raw/984e281438624dc8315cb5b9867439056bc5693e/MIDI%20Selector%20Tool/lament.config</source>
+      </version>
+    </reapack>
+  </category>
+  <category name="Misc MIDI Scripts">
+    <reapack name="Move selected notes to row under mouse.lua" type="script">
+      <version name="1.0" author="Lemerchand" time="2020-12-22T23:48:03Z">
+        <source main="midi_editor">https://github.com/lemerchand/lemerchand/raw/472b327f1f02449654fbe62b6c7a9329d5e90156/Misc%20MIDI%20Scripts/Move%20selected%20notes%20to%20row%20under%20mouse.lua</source>
       </version>
     </reapack>
   </category>
