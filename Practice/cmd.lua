@@ -1,8 +1,8 @@
--- @version 1.0.1b
+-- @version 0.5.1b
 -- @author Lemerchand
 -- @provides
 --     [main] .
---     [nomain] /libs/*.lua
+--     [nomain] /libss/*.lua
 
 function reaperDoFile(file) local info = debug.getinfo(1,'S'); script_path = info.source:match[[^@?(.*[\/])[^\/]-$]]; dofile(script_path .. file); end
 reaperDoFile('../libss/gui.lua')
