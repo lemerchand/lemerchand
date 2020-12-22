@@ -1,3 +1,8 @@
+-- @version 1.0
+-- @author Lemerchand
+-- @provides
+--     [main=midi_editor] .
+
 reaper.Undo_BeginBlock2(0)
 reaper.ClearConsole()
 
