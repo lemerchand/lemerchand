@@ -1,12 +1,13 @@
--- @version 1.0.66b
+-- @version 1.0.666b
 -- @author Lemerchand
 -- @provides
 -- [main=midi_editor] .
 -- [nomain] presets/*.dat
 -- [nomain] libs/*.lua
 
-local v = " v1.0.66b"
+local v = " v1.0.666b"
 local name = "MST5K"
+local butthole = 2
 
 
 --Load UI Library
