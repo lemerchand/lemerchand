@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Scripts by Lemerchand" commit="877b811438a2e1ad72646fe071ae2dff04738d81">
+<index version="1" name="Scripts by Lemerchand" commit="9d87ad4b61be6db0f2ec98429ecc4283f834fa8a">
   <category name="MIDI Selector Tool">
     <reapack name="MIDI Selector Tool.lua" type="script">
       <version name="1.0.777b" author="Lemerchand" time="2020-12-22T05:44:21Z">
@@ -34,6 +34,14 @@
         <source file="libs/gui.lua">https://github.com/lemerchand/lemerchand/raw/877b811438a2e1ad72646fe071ae2dff04738d81/MIDI%20Selector%20Tool/libs/gui.lua</source>
         <source file="default_lament.config">https://github.com/lemerchand/lemerchand/raw/877b811438a2e1ad72646fe071ae2dff04738d81/MIDI%20Selector%20Tool/default_lament.config</source>
         <source file="lament.config">https://github.com/lemerchand/lemerchand/raw/877b811438a2e1ad72646fe071ae2dff04738d81/MIDI%20Selector%20Tool/lament.config</source>
+      </version>
+      <version name="1.0.8b" author="Lemerchand" time="2020-12-22T13:37:42Z">
+        <source main="midi_editor">https://github.com/lemerchand/lemerchand/raw/9d87ad4b61be6db0f2ec98429ecc4283f834fa8a/MIDI%20Selector%20Tool/MIDI%20Selector%20Tool.lua</source>
+        <source file="presets/Default Preset.dat">https://github.com/lemerchand/lemerchand/raw/9d87ad4b61be6db0f2ec98429ecc4283f834fa8a/MIDI%20Selector%20Tool/presets/Default%20Preset.dat</source>
+        <source file="libs/cf.lua">https://github.com/lemerchand/lemerchand/raw/9d87ad4b61be6db0f2ec98429ecc4283f834fa8a/MIDI%20Selector%20Tool/libs/cf.lua</source>
+        <source file="libs/gui.lua">https://github.com/lemerchand/lemerchand/raw/9d87ad4b61be6db0f2ec98429ecc4283f834fa8a/MIDI%20Selector%20Tool/libs/gui.lua</source>
+        <source file="default_lament.config">https://github.com/lemerchand/lemerchand/raw/9d87ad4b61be6db0f2ec98429ecc4283f834fa8a/MIDI%20Selector%20Tool/default_lament.config</source>
+        <source file="lament.config">https://github.com/lemerchand/lemerchand/raw/9d87ad4b61be6db0f2ec98429ecc4283f834fa8a/MIDI%20Selector%20Tool/lament.config</source>
       </version>
     </reapack>
   </category>
