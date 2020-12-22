@@ -1,4 +1,4 @@
--- @version 1.0.778c
+-- @version 1.0.778d
 -- @author Lemerchand
 -- @provides
 --    [main=midi_editor] .
@@ -6,13 +6,13 @@
 --    [nomain] libs/*.lua
 --    [nomain] *.config
 --
-local v = " v1.0.778c"
+local v = " v1.0.778d"
 local name = "MST5K"
-
+local path = ""
 
 
 --Load UI Library
-function reaperDoFile(file) local info = debug.getinfo(1,'S'); script_path = info.source:match[[^@?(.*[\/])[^\/]-$]]; dofile(script_path .. file); end
+function reaperDoFile(file) local info = debug.getinfo(1,'S'); path = info.source:match[[^@?(.*[\/])[^\/]-$]]; dofile(path .. file); end
 reaperDoFile('libs/gui.lua')
 reaperDoFile('libs/cf.lua')
 
@@ -42,10 +42,10 @@ local function update_settings(filename)
 		window_yPos = mouse_y + floatAtMouseY
 	end
 end
-update_settings('/MIDI Selector Tool/lament.config')
+update_settings(path .. '/lament.config')
 
 
-local presets = get_presets() 
+local presets = get_presets(path) 
 
 gfx.init(name .. " " .. v, 248, 680, dockOnStart, window_xPos, window_yPos)
 
@@ -63,7 +63,7 @@ local htMinNote 		= "Sets lowest possible note.\nR-click: reset."
 local htMaxNote 		= "Sets highest possible note.\nR-click: reset."
 local htPitchTgl 		= "Toggles pitches.\nR-click: reset.\nCtrl+L-click: exclusive select.\nAlt+L-Click: set to scale."
 local htVelSlider		= "Sets the lowest/highest velocity.\nR-click: reset.\nCtrl+L-click: slide both (beta)"
-local htbeatsTgl		= "Include/exclude specific beats.\nR-click: reset.\nCtrl+L-click: exclusive select."
+local htbeatsTgl		= "Include/exclude specific beats.\nR-click: reset.\nCtrl+L-click: exclusive select.\nShift+R-Click: Save to slot"
 local htDockOnStart		= "Enable to dock MST3K when summoned."
 local htMainTab			= "Main Controls."
 local htSettingsTab 	= "General Settings."
@@ -73,8 +73,8 @@ local htFloatAtMouse 	= "Float the window at the mouse\ncursor with x/y offset."
 local htFloatAtPos 		= "Choose x/y coordinates\nfor the window to load."
 local htLengthTgle		= "Filter by note length.\nR-click: reset.\nCtrl+L-click: exclusive select."
 local htTimeThreshold	= "Threshold in ppq to catch notes\nwith imperfect lengths or times."
-local htDdwnScales		= "Select a scale then Alt+L-Click\na note to set pitches."
-local htDdwnPresets		= "Select a preset\nShift+L-Click: save preset.\nCtrl+L-click: delete current preset"
+local htDdwnScales		= "Select a scale then Shift+R-Click\na note to set pitches."
+local htDdwnPresets		= "Select a preset\nShift+R-Click: save preset.\nCtrl+L-click: delete current preset"
 
 -------------------------------
 --Midi Note and BeatsThangs---
@@ -266,7 +266,7 @@ status = Status:Create(10, frm_time.y + frm_time.h + 27, 227, 60, "INFO", nil, n
 ddwn_scaleName = Dropdown:Create(frm_pitch.x+52, frm_pitch.y+frm_pitch.h-15, frm_pitch.w-62 , nil, scaleName, 1, 1, htDdwnScales)
 
 
-local ddwn_presets = Dropdown:Create(frm_general.x+10, btn_select.y+43, frm_general.w-20, nil, presets, 1, 1, htDdwnPresets, load_preset)
+local ddwn_presets = Dropdown:Create(frm_general.x+10, btn_select.y+43, frm_general.w-20, nil, presets, 1, 1, htDdwnPresets, load_preset, path)
 
 
 ---Handle tabs
@@ -360,7 +360,7 @@ function main()
 		end
 
 		--Set scale
-		if pp.altLeftClick then 
+		if pp.shiftRightClick then 
 			for t = p, p+11 do
 				local modt = t%12
 				if modt == 0 then modt = 12 end
@@ -443,8 +443,8 @@ function main()
 			end
 		end
 		if pp.shiftRightClick then
-			save_beat_preset('/MIDI Selector Tool/lament.config', group_beatsToggles, p)
-			update_settings('/MIDI Selector Tool/lament.config')
+			save_beat_preset(path .. 'lament.config', group_beatsToggles, p)
+			update_settings(path .. 'lament.config')
 		end
 	end
 
@@ -494,10 +494,10 @@ function main()
 		if tgl_dockOnStart.state == true then dockOnStart = "1" else dockOnStart = "0" end
 		if tgl_floatAtPos.state == true then floatAtPos = "1" else floatAtPos = "0" end
 		if tgl_floatAtMouse.state == true then floatAtMouse = "1" else floatAtMouse = "0" end
-		set_settings('/MIDI Selector Tool/lament.config', dockOnStart, floatAtPos, ib_floatAtPosX.value, ib_floatAtPosY.value, floatAtMouse, ib_floatAtMouseX.value, ib_floatAtMouseY.value)	
+		set_settings(path .. 'lament.config', dockOnStart, floatAtPos, ib_floatAtPosX.value, ib_floatAtPosY.value, floatAtMouse, ib_floatAtMouseX.value, ib_floatAtMouseY.value)	
 	end
 	if btn_save.rightClick then 
-		restore_default_settings('/MIDI Selector Tool/default_lament.config', beatPresets)
+		restore_default_settings(path .. 'default_lament.config', beatPresets)
 	end
 
 	---------------------------------
@@ -528,9 +528,9 @@ function main()
 	---------------------------------
 
 
-	if ddwn_presets.shiftLeftClick  then 
+	if ddwn_presets.shiftRightClick  then 
 		local retval, retvals_csv, v = reaper.GetUserInputs("Save Preset", 1, "Name:", "Preset")
-		save_presets('/MIDI Selector Tool//presets/' .. retvals_csv .. '.dat', group_pitchToggles, group_noteRange, group_lengthToggles, group_beatsToggles, group_velSliders, sldr_timeThreshold)
+		save_presets(path .. '/presets/' .. retvals_csv .. '.dat', group_pitchToggles, group_noteRange, group_lengthToggles, group_beatsToggles, group_velSliders, sldr_timeThreshold)
 		ddwn_presets:Add(retvals_csv)
 		ddwn_presets.selected = #presets
 	end
@@ -541,7 +541,7 @@ function main()
 		end
 		local d = reaper.ShowMessageBox("Delete " .. ddwn_presets.choices[ddwn_presets.selected] .. "?", "Presets", 4)
 		if d == 6 then
-			os.remove('/MIDI Selector Tool//presets/' .. ddwn_presets.choices[ddwn_presets.selected] .. ".dat")
+			os.remove(path .. '/presets/' .. ddwn_presets.choices[ddwn_presets.selected] .. ".dat")
 			table.remove(ddwn_presets.choices, ddwn_presets.selected)
 			ddwn_presets.selected = 1
 		end		

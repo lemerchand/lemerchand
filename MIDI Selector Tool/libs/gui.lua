@@ -1000,7 +1000,7 @@ Dropdown = {}
 Dropdown.__index = Dropdown
 
 
-function Dropdown:Create(x,y,w,h,choices, default, selected, help, func)
+function Dropdown:Create(x,y,w,h,choices, default, selected, help, func, arg)
 	
 	if choices == nil then choices = {} end
 	if font == nil then gfx.setfont(3, "Lucida Console", 11) end
@@ -1038,7 +1038,8 @@ function Dropdown:Create(x,y,w,h,choices, default, selected, help, func)
 		choicesHide = true,
 		hide = false,
 		block = false,
-		func = func or nil
+		func = func or nil,
+		arg = arg
 	}
 	setmetatable(this, Dropdown)
 	table.insert(Elements, this)
@@ -1126,7 +1127,7 @@ function Dropdown:DrawChoices()
 		 self.selected = c
 		 for wait = 0, 10000 do end
 		 self.choicesHide = true
-		 if self.func then self.func(choice) end
+		 if self.func then self.func(self.arg, choice) end
 		end
 
 
