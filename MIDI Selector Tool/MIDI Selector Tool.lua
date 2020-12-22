@@ -1,4 +1,4 @@
--- @version 1.0.777b
+-- @version 1.0.778b
 -- @author Lemerchand
 -- @provides
 --    [main=midi_editor] .
@@ -6,9 +6,9 @@
 --    [nomain] libs/*.lua
 --    [nomain] *.config
 --
-local v = " v1.0.777b"
+local v = " v1.0.778b"
 local name = "MST5K"
-local butthole = 2
+
 
 
 --Load UI Library
@@ -42,7 +42,7 @@ local function update_settings(filename)
 		window_yPos = mouse_y + floatAtMouseY
 	end
 end
-update_settings(reaper.GetResourcePath() .. '/Scripts/lemerchand/MIDI Selector Tool/lament.config')
+update_settings('lament.config')
 
 
 local presets = get_presets() 
@@ -443,8 +443,8 @@ function main()
 			end
 		end
 		if pp.shiftRightClick then
-			save_beat_preset(reaper.GetResourcePath() .. '/Scripts/lemerchand/MIDI Selector Tool/lament.config', group_beatsToggles, p)
-			update_settings(reaper.GetResourcePath() .. '/Scripts/lemerchand/MIDI Selector Tool/lament.config')
+			save_beat_preset('lament.config', group_beatsToggles, p)
+			update_settings('lament.config')
 		end
 	end
 
@@ -494,10 +494,10 @@ function main()
 		if tgl_dockOnStart.state == true then dockOnStart = "1" else dockOnStart = "0" end
 		if tgl_floatAtPos.state == true then floatAtPos = "1" else floatAtPos = "0" end
 		if tgl_floatAtMouse.state == true then floatAtMouse = "1" else floatAtMouse = "0" end
-		set_settings(reaper.GetResourcePath() .. '/Scripts/lemerchand/MIDI Selector Tool/lament.config', dockOnStart, floatAtPos, ib_floatAtPosX.value, ib_floatAtPosY.value, floatAtMouse, ib_floatAtMouseX.value, ib_floatAtMouseY.value)	
+		set_settings('lament.config', dockOnStart, floatAtPos, ib_floatAtPosX.value, ib_floatAtPosY.value, floatAtMouse, ib_floatAtMouseX.value, ib_floatAtMouseY.value)	
 	end
 	if btn_save.rightClick then 
-		restore_default_settings(reaper.GetResourcePath() .. '/Scripts/lemerchand/MIDI Selector Tool/default_lament.config', beatPresets)
+		restore_default_settings('default_lament.config', beatPresets)
 	end
 
 	---------------------------------
@@ -530,7 +530,7 @@ function main()
 
 	if ddwn_presets.shiftLeftClick  then 
 		local retval, retvals_csv, v = reaper.GetUserInputs("Save Preset", 1, "Name:", "Preset")
-		save_presets(reaper.GetResourcePath() .. '/Scripts/lemerchand/MIDI Selector Tool/presets/' .. retvals_csv .. '.dat', group_pitchToggles, group_noteRange, group_lengthToggles, group_beatsToggles, group_velSliders, sldr_timeThreshold)
+		save_presets('/presets/' .. retvals_csv .. '.dat', group_pitchToggles, group_noteRange, group_lengthToggles, group_beatsToggles, group_velSliders, sldr_timeThreshold)
 		ddwn_presets:Add(retvals_csv)
 		ddwn_presets.selected = #presets
 	end
@@ -541,7 +541,7 @@ function main()
 		end
 		local d = reaper.ShowMessageBox("Delete " .. ddwn_presets.choices[ddwn_presets.selected] .. "?", "Presets", 4)
 		if d == 6 then
-			os.remove(reaper.GetResourcePath() .. '/Scripts/lemerchand/MIDI Selector Tool/presets/' .. ddwn_presets.choices[ddwn_presets.selected] .. ".dat")
+			os.remove('/presets/' .. ddwn_presets.choices[ddwn_presets.selected] .. ".dat")
 			table.remove(ddwn_presets.choices, ddwn_presets.selected)
 			ddwn_presets.selected = 1
 		end		

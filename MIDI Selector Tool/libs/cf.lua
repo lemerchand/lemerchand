@@ -29,7 +29,7 @@ function get_presets()
 	local presets = {}
 	local fi = 0
 	repeat
-		fn = reaper.EnumerateFiles(reaper.GetResourcePath() .. '/Scripts/lemerchand/MIDI Selector Tool/presets/', fi)
+		fn = reaper.EnumerateFiles('/presets/', fi)
 		if fn then table.insert(presets, fn:sub(1, fn:find('.dat')-1)) end
 		fi = fi + 1
 	until not fn
@@ -38,7 +38,7 @@ function get_presets()
 end
 
 function load_preset(preset)
-	local file = io.open(reaper.GetResourcePath() .. '/Scripts/lemerchand/MIDI Selector Tool/presets/' .. preset .. '.dat', 'r')
+	local file = io.open('/presets/' .. preset .. '.dat', 'r')
 	io.input()
 	for i, e in ipairs(group_pitchToggles) do
 		if file:read() == "true" then
@@ -112,7 +112,7 @@ function restore_default_settings(filename)
 	f = file:read("*a")
 	file:close()
 
-	local file = io.open(reaper.GetResourcePath() .. '/Scripts/lemerchand/MIDI Selector Tool/lament.config', 'w')
+	local file = io.open('lament.config', 'w')
 	io.output()
 	file:write(f)
 	file:close()
