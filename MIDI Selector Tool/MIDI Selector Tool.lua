@@ -1,11 +1,11 @@
--- @version 1.0.63b
+-- @version 1.0.65b
 -- @author Lemerchad
--- @provides 
+-- @provides
 -- [main=midi_editor] .
 -- [nomain] presets/*.dat
 -- [nomain] libs/*.lua
 
-local v = " v1.0.63b"
+local v = " v1.0.65b"
 local name = "MST5K"
 
 
