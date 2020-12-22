@@ -13,8 +13,8 @@ local path = ""
 
 --Load UI Library
 function reaperDoFile(file) local info = debug.getinfo(1,'S'); path = info.source:match[[^@?(.*[\/])[^\/]-$]]; dofile(path .. file); end
-reaperDoFile('../libss/gui.lua')
-reaperDoFile('../libss/cf.lua')
+reaperDoFile('libs/gui.lua')
+reaperDoFile('libs/cf.lua')
 
 ----------------------------------
 --Window Mngmt & Settings --------
