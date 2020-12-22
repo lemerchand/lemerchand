@@ -3,7 +3,7 @@
 -- @provides
 --    [main=midi_editor] .
 --    [nomain] presets/Default Preset.dat
---    [nomain] /libss/*.lua
+--    [nomain] /libs/*.lua
 --    [nomain] *.config
 --
 local v = " v1.1b"
