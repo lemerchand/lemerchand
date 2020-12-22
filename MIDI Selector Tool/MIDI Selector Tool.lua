@@ -1,7 +1,9 @@
 -- @version 1.0.5b
 -- @author Lemerchad
--- @provides presets/*.dat
--- lis/*.lua
+-- @provides 
+-- [main=midi_editor] .
+-- [nomain] presets/*.dat
+-- [nomain] lis/*.lua
 
 local v = " v1.0.5b"
 local name = "MST5K"
