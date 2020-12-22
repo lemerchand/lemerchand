@@ -1,20 +1,20 @@
--- @version 1.0.999c
+-- @version 1.1.b
 -- @author Lemerchand
 -- @provides
 --    [main=midi_editor] .
 --    [nomain] presets/Default Preset.dat
---    [nomain] libs/*.lua
+--    [nomain] /libss/*.lua
 --    [nomain] *.config
 --
-local v = " v1.0.999c"
+local v = " v1.1b"
 local name = "MST5K"
 local path = ""
 
 
 --Load UI Library
 function reaperDoFile(file) local info = debug.getinfo(1,'S'); path = info.source:match[[^@?(.*[\/])[^\/]-$]]; dofile(path .. file); end
-reaperDoFile('libs/gui.lua')
-reaperDoFile('libs/cf.lua')
+reaperDoFile('../libss/gui.lua')
+reaperDoFile('../libss/cf.lua')
 
 ----------------------------------
 --Window Mngmt & Settings --------
