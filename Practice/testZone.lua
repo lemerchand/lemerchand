@@ -4,7 +4,7 @@ reaperDoFile('../libss/cf.lua')
 
 
 
-gfx.init("Lemerchand Testing", 850,650, false, 100,500)
+gfx.init("Lemerchand Testing", 300,440, false, 100,500)
 local win = reaper.JS_Window_Find("Lemerchand Testing", true)
 if win then reaper.JS_Window_AttachTopmostPin(win) end
 
@@ -36,9 +36,6 @@ local btn_randomNotes = Button:Create(status.x+10, status.y+status.h+30, "Test")
 
 local cmd = TextField:Create(20, 250, status.w-20, 20, "Enter Some text: ", "", false, false)
 local t2 = Display:Create(20, 105, status.w-20,110)
-local log = Text:Create(20, 150, "", "", nil, nil, nil, nil, nil, false, status.w-20, 90)
-t2:AddLine("Violin overdub: " , 1, 0, 1)
-t2:AddLine("Hot Sauce FTW: " , 0,1,0)
 
 
 
@@ -82,14 +79,22 @@ function main()
 	if window == "midi_editor" then 
 		update_active_midi()
 		local selectedNotes = 0
+		local selectedNotesPPQ = {}
 
 		for i = 0, notes-1 do
 			retval, selected, muted, startppqpos, endppqpos, chan, pitch, vel = reaper.MIDI_GetNote(take, i)
-			if selected then selectedNotes = selectedNotes + 1 end
+			if selected then 
+				selectedNotes = selectedNotes + 1 
+				table.insert(selectedNotesPPQ, startppqpos)
+			end
 		end
 		statustext = statustext .. "\n\n             --== MIDI Editor ==--" ..
 								"\nTotal Notes: " .. notes .. 
-								"\nSelected Notes: " .. selectedNotes
+								"\nSelected Notes: " .. selectedNotes .. 
+								"\nSelected Notes Start PPQs: "
+		for i = 1, #selectedNotesPPQ do
+			statustext = statustext .. "\n" ..  selectedNotesPPQ[i]
+		end
 
 	end
 
