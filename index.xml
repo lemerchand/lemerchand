@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Scripts by Lemerchand" commit="1c952f13ffb36674ea5a69f7380259a084fa854a">
+<index version="1" name="Scripts by Lemerchand" commit="e1132ca428141e49839adec05894424e3f93a600">
   <category name="MIDI Selector Tool">
     <reapack name="MIDI Selector Tool.lua" type="script">
       <version name="1.0.777b" author="Lemerchand" time="2020-12-22T05:44:21Z">
@@ -73,6 +73,15 @@
     <reapack name="Move selected notes to row under mouse.lua" type="script">
       <version name="1.0" author="Lemerchand" time="2020-12-22T23:48:03Z">
         <source main="midi_editor">https://github.com/lemerchand/lemerchand/raw/472b327f1f02449654fbe62b6c7a9329d5e90156/Misc%20MIDI%20Scripts/Move%20selected%20notes%20to%20row%20under%20mouse.lua</source>
+      </version>
+    </reapack>
+  </category>
+  <category name="Practice">
+    <reapack name="cmd.lua" type="script">
+      <version name="0.5.1b" author="Lemerchand" time="2020-12-22T23:52:42Z">
+        <source main="main">https://github.com/lemerchand/lemerchand/raw/e1132ca428141e49839adec05894424e3f93a600/Practice/cmd.lua</source>
+        <source file="../libss/cf.lua">https://github.com/lemerchand/lemerchand/raw/e1132ca428141e49839adec05894424e3f93a600/libss/cf.lua</source>
+        <source file="../libss/gui.lua">https://github.com/lemerchand/lemerchand/raw/e1132ca428141e49839adec05894424e3f93a600/libss/gui.lua</source>
       </version>
     </reapack>
   </category>
