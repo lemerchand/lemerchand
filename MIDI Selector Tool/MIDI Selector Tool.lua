@@ -1,4 +1,3 @@
---[
 -- @version 1.0.777b
 -- @author Lemerchand
 -- @provides
@@ -6,8 +5,7 @@
 --	[nomain] presets/*.dat
 --	[nomain] libs/*.lua
 --	[nomain] *.config
---]
-
+--
 local v = " v1.0.777b"
 local name = "MST5K"
 local butthole = 2
