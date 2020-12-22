@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<index version="1" name="Scripts by Lemerchand" commit="984e281438624dc8315cb5b9867439056bc5693e">
+  <category name="MIDI Selector Tool">
+    <reapack name="MIDI Selector Tool.lua" type="script">
+      <version name="1.0.777b" author="Lemerchand" time="2020-12-22T05:44:21Z">
+        <source main="midi_editor">https://github.com/lemerchand/lemerchand/raw/e1ddbb8250a556ab200e22fe66a117a2a048693d/MIDI%20Selector%20Tool/MIDI%20Selector%20Tool.lua</source>
+        <source file="presets/Default Preset.dat">https://github.com/lemerchand/lemerchand/raw/e1ddbb8250a556ab200e22fe66a117a2a048693d/MIDI%20Selector%20Tool/presets/Default%20Preset.dat</source>
+        <source file="libs/cf.lua">https://github.com/lemerchand/lemerchand/raw/e1ddbb8250a556ab200e22fe66a117a2a048693d/MIDI%20Selector%20Tool/libs/cf.lua</source>
+        <source file="libs/gui.lua">https://github.com/lemerchand/lemerchand/raw/e1ddbb8250a556ab200e22fe66a117a2a048693d/MIDI%20Selector%20Tool/libs/gui.lua</source>
+        <source file="default_lament.config">https://github.com/lemerchand/lemerchand/raw/e1ddbb8250a556ab200e22fe66a117a2a048693d/MIDI%20Selector%20Tool/default_lament.config</source>
+        <source file="lament.config">https://github.com/lemerchand/lemerchand/raw/e1ddbb8250a556ab200e22fe66a117a2a048693d/MIDI%20Selector%20Tool/lament.config</source>
+      </version>
+      <version name="1.0.778b" author="Lemerchand" time="2020-12-22T05:56:07Z">
+        <source main="midi_editor">https://github.com/lemerchand/lemerchand/raw/15c99375808ec42b67cb57a5ac609e1dad895be9/MIDI%20Selector%20Tool/MIDI%20Selector%20Tool.lua</source>
+        <source file="presets/Default Preset.dat">https://github.com/lemerchand/lemerchand/raw/15c99375808ec42b67cb57a5ac609e1dad895be9/MIDI%20Selector%20Tool/presets/Default%20Preset.dat</source>
+        <source file="presets/df.dat">https://github.com/lemerchand/lemerchand/raw/15c99375808ec42b67cb57a5ac609e1dad895be9/MIDI%20Selector%20Tool/presets/df.dat</source>
+        <source file="libs/cf.lua">https://github.com/lemerchand/lemerchand/raw/15c99375808ec42b67cb57a5ac609e1dad895be9/MIDI%20Selector%20Tool/libs/cf.lua</source>
+        <source file="libs/gui.lua">https://github.com/lemerchand/lemerchand/raw/15c99375808ec42b67cb57a5ac609e1dad895be9/MIDI%20Selector%20Tool/libs/gui.lua</source>
+        <source file="default_lament.config">https://github.com/lemerchand/lemerchand/raw/15c99375808ec42b67cb57a5ac609e1dad895be9/MIDI%20Selector%20Tool/default_lament.config</source>
+        <source file="lament.config">https://github.com/lemerchand/lemerchand/raw/15c99375808ec42b67cb57a5ac609e1dad895be9/MIDI%20Selector%20Tool/lament.config</source>
+      </version>
+      <version name="1.0.778c" author="Lemerchand" time="2020-12-22T06:02:29Z">
+        <source main="midi_editor">https://github.com/lemerchand/lemerchand/raw/94d9984e684ebf4afbcbe61bc3a8a4731f8ca3c0/MIDI%20Selector%20Tool/MIDI%20Selector%20Tool.lua</source>
+        <source file="presets/Default Preset.dat">https://github.com/lemerchand/lemerchand/raw/94d9984e684ebf4afbcbe61bc3a8a4731f8ca3c0/MIDI%20Selector%20Tool/presets/Default%20Preset.dat</source>
+        <source file="libs/cf.lua">https://github.com/lemerchand/lemerchand/raw/94d9984e684ebf4afbcbe61bc3a8a4731f8ca3c0/MIDI%20Selector%20Tool/libs/cf.lua</source>
+        <source file="libs/gui.lua">https://github.com/lemerchand/lemerchand/raw/94d9984e684ebf4afbcbe61bc3a8a4731f8ca3c0/MIDI%20Selector%20Tool/libs/gui.lua</source>
+        <source file="default_lament.config">https://github.com/lemerchand/lemerchand/raw/94d9984e684ebf4afbcbe61bc3a8a4731f8ca3c0/MIDI%20Selector%20Tool/default_lament.config</source>
+        <source file="lament.config">https://github.com/lemerchand/lemerchand/raw/94d9984e684ebf4afbcbe61bc3a8a4731f8ca3c0/MIDI%20Selector%20Tool/lament.config</source>
+      </version>
+      <version name="1.0.778d" author="Lemerchand" time="2020-12-22T13:34:41Z">
+        <source main="midi_editor">https://github.com/lemerchand/lemerchand/raw/877b811438a2e1ad72646fe071ae2dff04738d81/MIDI%20Selector%20Tool/MIDI%20Selector%20Tool.lua</source>
+        <source file="presets/Default Preset.dat">https://github.com/lemerchand/lemerchand/raw/877b811438a2e1ad72646fe071ae2dff04738d81/MIDI%20Selector%20Tool/presets/Default%20Preset.dat</source>
+        <source file="libs/cf.lua">https://github.com/lemerchand/lemerchand/raw/877b811438a2e1ad72646fe071ae2dff04738d81/MIDI%20Selector%20Tool/libs/cf.lua</source>
+        <source file="libs/gui.lua">https://github.com/lemerchand/lemerchand/raw/877b811438a2e1ad72646fe071ae2dff04738d81/MIDI%20Selector%20Tool/libs/gui.lua</source>
+        <source file="default_lament.config">https://github.com/lemerchand/lemerchand/raw/877b811438a2e1ad72646fe071ae2dff04738d81/MIDI%20Selector%20Tool/default_lament.config</source>
+        <source file="lament.config">https://github.com/lemerchand/lemerchand/raw/877b811438a2e1ad72646fe071ae2dff04738d81/MIDI%20Selector%20Tool/lament.config</source>
+      </version>
+      <version name="1.0.8b" author="Lemerchand" time="2020-12-22T13:37:42Z">
+        <source main="midi_editor">https://github.com/lemerchand/lemerchand/raw/9d87ad4b61be6db0f2ec98429ecc4283f834fa8a/MIDI%20Selector%20Tool/MIDI%20Selector%20Tool.lua</source>
+        <source file="presets/Default Preset.dat">https://github.com/lemerchand/lemerchand/raw/9d87ad4b61be6db0f2ec98429ecc4283f834fa8a/MIDI%20Selector%20Tool/presets/Default%20Preset.dat</source>
+        <source file="libs/cf.lua">https://github.com/lemerchand/lemerchand/raw/9d87ad4b61be6db0f2ec98429ecc4283f834fa8a/MIDI%20Selector%20Tool/libs/cf.lua</source>
+        <source file="libs/gui.lua">https://github.com/lemerchand/lemerchand/raw/9d87ad4b61be6db0f2ec98429ecc4283f834fa8a/MIDI%20Selector%20Tool/libs/gui.lua</source>
+        <source file="default_lament.config">https://github.com/lemerchand/lemerchand/raw/9d87ad4b61be6db0f2ec98429ecc4283f834fa8a/MIDI%20Selector%20Tool/default_lament.config</source>
+        <source file="lament.config">https://github.com/lemerchand/lemerchand/raw/9d87ad4b61be6db0f2ec98429ecc4283f834fa8a/MIDI%20Selector%20Tool/lament.config</source>
+      </version>
+      <version name="1.0.8c" author="Lemerchand" time="2020-12-22T13:42:03Z">
+        <source main="midi_editor">https://github.com/lemerchand/lemerchand/raw/32effb106c02583894243bf6efb82eb4764c257a/MIDI%20Selector%20Tool/MIDI%20Selector%20Tool.lua</source>
+        <source file="presets/Default Preset.dat">https://github.com/lemerchand/lemerchand/raw/32effb106c02583894243bf6efb82eb4764c257a/MIDI%20Selector%20Tool/presets/Default%20Preset.dat</source>
+        <source file="libs/cf.lua">https://github.com/lemerchand/lemerchand/raw/32effb106c02583894243bf6efb82eb4764c257a/MIDI%20Selector%20Tool/libs/cf.lua</source>
+        <source file="libs/gui.lua">https://github.com/lemerchand/lemerchand/raw/32effb106c02583894243bf6efb82eb4764c257a/MIDI%20Selector%20Tool/libs/gui.lua</source>
+        <source file="default_lament.config">https://github.com/lemerchand/lemerchand/raw/32effb106c02583894243bf6efb82eb4764c257a/MIDI%20Selector%20Tool/default_lament.config</source>
+        <source file="lament.config">https://github.com/lemerchand/lemerchand/raw/32effb106c02583894243bf6efb82eb4764c257a/MIDI%20Selector%20Tool/lament.config</source>
+      </version>
+      <version name="1.0.88c" author="Lemerchand" time="2020-12-22T13:49:39Z">
+        <source main="midi_editor">https://github.com/lemerchand/lemerchand/raw/b7c2d75d4969ff481e49a11ef8d8426aabca0e3f/MIDI%20Selector%20Tool/MIDI%20Selector%20Tool.lua</source>
+        <source file="presets/Default Preset.dat">https://github.com/lemerchand/lemerchand/raw/b7c2d75d4969ff481e49a11ef8d8426aabca0e3f/MIDI%20Selector%20Tool/presets/Default%20Preset.dat</source>
+        <source file="libs/cf.lua">https://github.com/lemerchand/lemerchand/raw/b7c2d75d4969ff481e49a11ef8d8426aabca0e3f/MIDI%20Selector%20Tool/libs/cf.lua</source>
+        <source file="libs/gui.lua">https://github.com/lemerchand/lemerchand/raw/b7c2d75d4969ff481e49a11ef8d8426aabca0e3f/MIDI%20Selector%20Tool/libs/gui.lua</source>
+        <source file="default_lament.config">https://github.com/lemerchand/lemerchand/raw/b7c2d75d4969ff481e49a11ef8d8426aabca0e3f/MIDI%20Selector%20Tool/default_lament.config</source>
+        <source file="lament.config">https://github.com/lemerchand/lemerchand/raw/b7c2d75d4969ff481e49a11ef8d8426aabca0e3f/MIDI%20Selector%20Tool/lament.config</source>
+      </version>
+      <version name="1.0.999c" author="Lemerchand" time="2020-12-22T13:52:34Z">
+        <source main="midi_editor">https://github.com/lemerchand/lemerchand/raw/984e281438624dc8315cb5b9867439056bc5693e/MIDI%20Selector%20Tool/MIDI%20Selector%20Tool.lua</source>
+        <source file="presets/Default Preset.dat">https://github.com/lemerchand/lemerchand/raw/984e281438624dc8315cb5b9867439056bc5693e/MIDI%20Selector%20Tool/presets/Default%20Preset.dat</source>
+        <source file="libs/cf.lua">https://github.com/lemerchand/lemerchand/raw/984e281438624dc8315cb5b9867439056bc5693e/MIDI%20Selector%20Tool/libs/cf.lua</source>
+        <source file="libs/gui.lua">https://github.com/lemerchand/lemerchand/raw/984e281438624dc8315cb5b9867439056bc5693e/MIDI%20Selector%20Tool/libs/gui.lua</source>
+        <source file="default_lament.config">https://github.com/lemerchand/lemerchand/raw/984e281438624dc8315cb5b9867439056bc5693e/MIDI%20Selector%20Tool/default_lament.config</source>
+        <source file="lament.config">https://github.com/lemerchand/lemerchand/raw/984e281438624dc8315cb5b9867439056bc5693e/MIDI%20Selector%20Tool/lament.config</source>
+      </version>
+    </reapack>
+  </category>
+</index>
