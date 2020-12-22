@@ -112,7 +112,7 @@ function restore_default_settings(filename)
 	f = file:read("*a")
 	file:close()
 
-	local file = io.open('lament.config', 'w')
+	local file = io.open('/MIDI Selector Tool/lament.config', 'w')
 	io.output()
 	file:write(f)
 	file:close()
