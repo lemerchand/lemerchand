@@ -1,8 +1,9 @@
--- @version 1.0.4b
+-- @version 1.0.5b
 -- @author Lemerchad
 -- @provides presets/*.dat
+-- lis/*.lua
 
-local v = " v1.0.4b"
+local v = " v1.0.5b"
 local name = "MST5K"
 
 
