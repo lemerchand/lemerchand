@@ -4,6 +4,7 @@
 -- [main=midi_editor] .
 -- [nomain] presets/*.dat
 -- [nomain] libs/*.lua
+-- [nomain] *.config
 
 local v = " v1.0.666b"
 local name = "MST5K"
