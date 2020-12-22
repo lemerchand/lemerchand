@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" commit="6dc7c0d84e036ec38e1ad1f76a3d01671b3c5e7f">
+<index version="1" name="Lemerchand Scripts" commit="6dc7c0d84e036ec38e1ad1f76a3d01671b3c5e7f">
   <category name="MIDI Selector Tool">
     <reapack name="MIDI Selector Tool.lua" type="script">
       <version name="1.0.3b" time="2020-12-21T23:32:05Z">
