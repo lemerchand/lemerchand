@@ -1,3 +1,4 @@
+--[
 -- @version 1.0.667b
 -- @author Lemerchand
 -- @provides
@@ -5,6 +6,7 @@
 --	[nomain] presets/*.dat
 --	[nomain] libs/*.lua
 --	[nomain] *.config
+--]
 
 local v = " v1.0.667b"
 local name = "MST5K"
