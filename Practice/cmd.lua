@@ -1,4 +1,4 @@
--- @version .3
+-- @version 0.3
 -- @author Lemerchand
 -- @provides
 --     [main] .
