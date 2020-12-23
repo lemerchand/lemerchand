@@ -1,12 +1,16 @@
--- @version 1.1.b
+-- @version 1.2b
 -- @author Lemerchand
 -- @provides
 --    [main=midi_editor] .
 --    [nomain] presets/Default Preset.dat
 --    [nomain] libs/*.lua
 --    [nomain] *.config
---
-local v = " v1.1b"
+--    [nomain] preset_actions/preset_template.lua
+-- @changelog
+--    + Save Preset input box defaults to current preset name
+--    + MST can now save presets to the Actions List!
+
+local v = " v1.2b"
 local name = "MST5K"
 local path = ""
 
@@ -74,7 +78,7 @@ local htFloatAtPos 		= "Choose x/y coordinates\nfor the window to load."
 local htLengthTgle		= "Filter by note length.\nR-click: reset.\nCtrl+L-click: exclusive select."
 local htTimeThreshold	= "Threshold in ppq to catch notes\nwith imperfect lengths or times."
 local htDdwnScales		= "Select a scale then Shift+R-Click\na note to set pitches."
-local htDdwnPresets		= "Select a preset\nShift+R-Click: save preset.\nCtrl+L-click: delete current preset"
+local htDdwnPresets		= "Select a preset\nShift+R-Click: save preset.\nCtrl+L-click: delete current preset\nAlt+R-click: export to actions"
 
 -------------------------------
 --Midi Note and BeatsThangs---
@@ -529,7 +533,8 @@ function main()
 
 
 	if ddwn_presets.shiftRightClick  then 
-		local retval, retvals_csv, v = reaper.GetUserInputs("Save Preset", 1, "Name:", "Preset")
+		local retval, retvals_csv, v = reaper.GetUserInputs("Save Preset", 1, "Name:", ddwn_presets.choices[ddwn_presets.selected])
+		if not retval then return end
 		save_presets(path .. '/presets/' .. retvals_csv .. '.dat', group_pitchToggles, group_noteRange, group_lengthToggles, group_beatsToggles, group_velSliders, sldr_timeThreshold)
 		ddwn_presets:Add(retvals_csv)
 		ddwn_presets.selected = #presets
@@ -547,6 +552,9 @@ function main()
 		end		
 	end
 
+	if ddwn_presets.altRightClick then 
+		create_preset_action(path, ddwn_presets.choices[ddwn_presets.selected])
+	end
 
 end
 
