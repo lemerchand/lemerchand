@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Scripts by Lemerchand" commit="ce13ea67b7c568a03c45aef6f6e3e993ae397594">
+<index version="1" name="Scripts by Lemerchand" commit="0a535d43047a9d35524681963e121f0bdeaf99ff">
   <category name="MIDI Selector Tool">
     <reapack name="MIDI Selector Tool.lua" type="script">
       <version name="1.0.777b" author="Lemerchand" time="2020-12-22T05:44:21Z">
@@ -74,6 +74,17 @@
         <source file="libs/gui.lua">https://github.com/lemerchand/lemerchand/raw/ce13ea67b7c568a03c45aef6f6e3e993ae397594/MIDI%20Selector%20Tool/libs/gui.lua</source>
         <source file="default_lament.config">https://github.com/lemerchand/lemerchand/raw/ce13ea67b7c568a03c45aef6f6e3e993ae397594/MIDI%20Selector%20Tool/default_lament.config</source>
         <source file="lament.config">https://github.com/lemerchand/lemerchand/raw/ce13ea67b7c568a03c45aef6f6e3e993ae397594/MIDI%20Selector%20Tool/lament.config</source>
+      </version>
+      <version name="1.2b" author="Lemerchand" time="2020-12-23T14:57:36Z">
+        <changelog><![CDATA[+ Save Preset input box defaults to current preset name
++ MST can now save presets to the Actions List!]]></changelog>
+        <source main="midi_editor">https://github.com/lemerchand/lemerchand/raw/0a535d43047a9d35524681963e121f0bdeaf99ff/MIDI%20Selector%20Tool/MIDI%20Selector%20Tool.lua</source>
+        <source file="presets/Default Preset.dat">https://github.com/lemerchand/lemerchand/raw/0a535d43047a9d35524681963e121f0bdeaf99ff/MIDI%20Selector%20Tool/presets/Default%20Preset.dat</source>
+        <source file="libs/cf.lua">https://github.com/lemerchand/lemerchand/raw/0a535d43047a9d35524681963e121f0bdeaf99ff/MIDI%20Selector%20Tool/libs/cf.lua</source>
+        <source file="libs/gui.lua">https://github.com/lemerchand/lemerchand/raw/0a535d43047a9d35524681963e121f0bdeaf99ff/MIDI%20Selector%20Tool/libs/gui.lua</source>
+        <source file="default_lament.config">https://github.com/lemerchand/lemerchand/raw/0a535d43047a9d35524681963e121f0bdeaf99ff/MIDI%20Selector%20Tool/default_lament.config</source>
+        <source file="lament.config">https://github.com/lemerchand/lemerchand/raw/0a535d43047a9d35524681963e121f0bdeaf99ff/MIDI%20Selector%20Tool/lament.config</source>
+        <source file="preset_actions/preset_template.lua">https://github.com/lemerchand/lemerchand/raw/0a535d43047a9d35524681963e121f0bdeaf99ff/MIDI%20Selector%20Tool/preset_actions/preset_template.lua</source>
       </version>
     </reapack>
   </category>
