@@ -1,4 +1,4 @@
--- @version 1.0.999c
+-- @version 1.1.b
 -- @author Lemerchand
 -- @provides
 --    [main=midi_editor] .
@@ -6,7 +6,7 @@
 --    [nomain] libs/*.lua
 --    [nomain] *.config
 --
-local v = " v1.0.999c"
+local v = " v1.1b"
 local name = "MST5K"
 local path = ""
 
