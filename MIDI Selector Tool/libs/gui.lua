@@ -1035,6 +1035,7 @@ function Dropdown:Create(x,y,w,h,choices, default, selected, help, func, arg)
 		shiftLeftClick = false,
 		ctrlLeftClick = false,
 		rightClick = false,
+		altRightClick = false,
 		choicesHide = true,
 		hide = false,
 		block = false,

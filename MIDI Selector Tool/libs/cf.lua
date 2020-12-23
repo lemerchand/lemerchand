@@ -1,5 +1,27 @@
 --@noindex
 --Returns the index of the note under mouse cursor
+
+function create_preset_action(path, preset)
+	
+	local file = io.open(path .. 'preset_actions/preset_template.lua', 'r')
+	io.input()
+	local t = {}
+
+	for line in file:lines() do
+		 table.insert(t, line)
+	end
+	file:close()
+
+	local file = io.open(path .. '/preset_actions/' .. preset .. '.lua', 'w')
+	io.output()
+	file:write("local name = '" .. preset .. "'\n")
+	for i, line in pairs(t) do
+		file:write(line .. "\n") 
+	end
+	file:close()
+	reaper.AddRemoveReaScript(true,  32060, path .. '/preset_actions/' .. preset .. ".lua", true)
+end
+
 function note_under_mouse_index()
 	noteCount = reaper.MIDI_CountEvts(take)
 		
