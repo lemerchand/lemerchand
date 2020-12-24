@@ -1,3 +1,4 @@
+local name = 'Exc KS'
 local path = ""
 
 
