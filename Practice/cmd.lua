@@ -556,7 +556,7 @@ local function update_cmd(char)
 				local totalTracks = reaper.CountTracks(0)
 				reaper.InsertTrackAtIndex(totalTracks, true)
 				reaper.GetSetMediaTrackInfo_String( reaper.GetTrack(0, totalTracks), 'P_NAME', C.targets[i], true )
-				reaper.GetSetMediaTrackInfo_String( reaper.GetTrack(0, totalTracks), 'I_RECMON', C.targets[i], 1 )
+				reaper.SetMediaTrackInfo_Value( reaper.GetTrack(0, totalTracks), 'I_RECMON', 1 )
 				reaper.SetTrackSelected(reaper.GetTrack(0, totalTracks), true)
 
 			end

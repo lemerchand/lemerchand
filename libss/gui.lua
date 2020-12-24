@@ -330,6 +330,7 @@ function TextField:Create(x,y, w, h, txt, help, active, multiline, fontSize, r, 
 		multiline = multiline or false,
 		alwaysActive = false,
 		returned = false,
+		cpos = 0,
 		blink = 0
 
 	}
@@ -350,18 +351,27 @@ function TextField:Draw()
 	gfx.set(self.r, self.g, self.b, 1)
 	gfx.setfont(1, self.font, self.fontSize)
 	
+	local txtlen = string.len(self.txt)
+	local charwidth = gfx.measurestr("-")
 
 
 	if self.active  and self.blink <= 15 then 
-		gfx.drawstr(self.txt .. "_")
+		gfx.x = self.x+5 + (self.cpos * charwidth)
+		gfx.y = self.y+10
+		gfx.drawstr( "-")
 		self.blink = self.blink + 1
 	elseif self.active and  self.blink <=30 then
-		gfx.drawstr(self.txt .. " ")
+		gfx.x = self.x+10 + (self.cpos * charwidth)
+		gfx.drawstr( " ")
 		self.blink = self.blink + 1
 	else
-		gfx.drawstr(self.txt .. "")
-		self.blink = 0
+		gfx.x = self.x+10 + (self.cpos * charwidth)
+		gfx.drawstr( "")
+		self.blink = 1
 	end
+
+	gfx.x, gfx.y = self.x+5, self.y+5
+	gfx.drawstr(self.txt)
 
 
 
@@ -388,21 +398,43 @@ end
 function TextField:Change(char)
 	gfx.setfont(3, self.font, self.fontSize)
 
+	if self.txt == "" then self.cpos = 0 end
+
+	if self.active and char == 1919379572 and self.cpos < string.len(self.txt) then
+		self.cpos = self. cpos + 1
+	elseif self.active and char == 1818584692 and self.cpos >=1 then
+		self.cpos = self.cpos - 1
+	elseif self.active and char == 6647396 then self.cpos = string.len(self.txt)
+	elseif self.active and char == 1752132965 then self.cpos = 0
+	end
+
 
 	if self.active and gfx.measurestr(self.txt) + self.x <= self.w-10 then
-		if char >= 33 and char <= 126 then self.txt = self.txt .. string.char(char) 
-		elseif char == 32 then self.txt = self.txt .. " "
+		if char >= 33 and char <= 126 then 
+
+			self.txt = self.txt:sub(1,self.cpos) .. string.char(char) .. self.txt:sub(self.cpos+1)
+
+			--self.txt = self.txt .. string.char(char) 
+			self.cpos = self.cpos + 1
+		elseif char == 32 then 
+			self.txt = self.txt:sub(1, self.cpos) .. " " .. self.txt:sub(self.cpos+1)
+			self.cpos = self.cpos + 1
 		end
 	end
 
 
-	if self.active and char == 8 then self.txt = self.txt:sub(1,-2)
+	if self.active and char == 8 then 
+		self.txt = self.txt:sub(1, self.cpos-1) .. self.txt:sub(self.cpos+1)
+		self.cpos = self.cpos - 1
+	elseif self.active and char == 6579564 then
+		self.txt = self.txt:sub(1, self.cpos) .. self.txt:sub(self.cpos+2)
 	elseif self.active and char == 13 then 
 		if self.multiline then self.txt = self.txt .. "\n"
 		else
 			self.returned = true
 			if not self.alwaysActive then self.active = false end
 		end
+		self.cpos = 0
 	end
 end
 
