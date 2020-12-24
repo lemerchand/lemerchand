@@ -12,14 +12,14 @@ function create_preset_action(path, preset)
 	end
 	file:close()
 
-	local file = io.open(path .. '/preset_actions/' .. preset .. '.lua', 'w')
+	local file = io.open(path .. '/preset_actions/MST_' .. preset .. '.lua', 'w')
 	io.output()
 	file:write("local name = '" .. preset .. "'\n")
 	for i, line in pairs(t) do
 		file:write(line .. "\n") 
 	end
 	file:close()
-	reaper.AddRemoveReaScript(true,  32060, path .. '/preset_actions/' .. preset .. ".lua", true)
+	reaper.AddRemoveReaScript(true,  32060, path .. '/preset_actions/MST_' .. preset .. ".lua", true)
 end
 
 function note_under_mouse_index()
@@ -128,23 +128,29 @@ function save_presets(filename)
 	file:close()
 end
 
-function restore_default_settings(filename)
-	local file = io.open(filename, 'r')
-	io.input()
-	f = file:read("*a")
+function restore_default_settings(path, filename)
+	
+	local file = io.open(path .. filename, 'r')
+	io.input(file)
+	local f = file:read("*a")
 	file:close()
 
-	local file = io.open('lament.config', 'w')
-	io.output()
+	local file = io.open(path .. 'lament.config', 'w')
+	io.output(file)
 	file:write(f)
 	file:close()
 
 end
 
-function get_settings(filename, beatPresets)
+function get_settings(path, filename, beatPresets)
 
-	local file = io.open(filename, 'r')
+	local file = io.open(path .. filename, 'r')
 	io.input(file)
+	if file == nil then
+		restore_default_settings(path, 'default_lament.config')
+		file = io.open(path .. filename, 'r')
+		io.input(file)
+	end
 	local dockOnStart = file:read()
 	local floatAtPos = file:read()
 	local floatAtPosX = file:read()

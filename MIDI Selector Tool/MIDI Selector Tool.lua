@@ -1,16 +1,18 @@
--- @version 1.2b
+-- @version 1.2.1b
 -- @author Lemerchand
 -- @provides
 --    [main=midi_editor] .
 --    [nomain] presets/Default Preset.dat
 --    [nomain] libs/*.lua
---    [nomain] *.config
+--    [nomain] default_lament.config
 --    [nomain] preset_actions/preset_template.lua
 -- @changelog
+--    + Updating no longer overwrites user's settings
+--    + Exported presets now have 'MST_' as a prefix in Actions List
 --    + Save Preset input box defaults to current preset name
 --    + MST can now save presets to the Actions List!
 
-local v = " v1.2b"
+local v = " v1.2.1b"
 local name = "MST5K"
 local path = ""
 
@@ -27,9 +29,9 @@ reaperDoFile('libs/cf.lua')
 local lastWindow = reaper.JS_Window_GetFocus()
 
 --Load settings
-local function update_settings(filename)
+local function update_settings(path, filename)
 	beatPresets = {}
-	dockOnStart, floatAtPos, floatAtPosX, floatAtPosY, floatAtMouse, floatAtMouseX, floatAtMouseY = get_settings(filename, beatPresets) 
+	dockOnStart, floatAtPos, floatAtPosX, floatAtPosY, floatAtMouse, floatAtMouseX, floatAtMouseY = get_settings(path, filename, beatPresets) 
 	if dockOnStart == "1" then dockOnStart = true
 	elseif floatAtPos == "1" then 
 		floatAtPos = true
@@ -46,7 +48,7 @@ local function update_settings(filename)
 		window_yPos = mouse_y + floatAtMouseY
 	end
 end
-update_settings(path .. '/lament.config')
+update_settings(path, '/lament.config')
 
 
 local presets = get_presets(path) 
@@ -501,7 +503,7 @@ function main()
 		set_settings(path .. 'lament.config', dockOnStart, floatAtPos, ib_floatAtPosX.value, ib_floatAtPosY.value, floatAtMouse, ib_floatAtMouseX.value, ib_floatAtMouseY.value)	
 	end
 	if btn_save.rightClick then 
-		restore_default_settings(path .. 'default_lament.config', beatPresets)
+		restore_default_settings(path, 'default_lament.config', beatPresets)
 	end
 
 	---------------------------------
