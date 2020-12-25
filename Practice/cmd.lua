@@ -108,6 +108,8 @@ function CMD:PrevCMD()
 		cmd.txt = self.history[self.historySeek]
 	end
 
+	cmd.cpos = string.len(cmd.txt)
+
 end
 
 function CMD:NextCMD()
@@ -119,6 +121,7 @@ function CMD:NextCMD()
 		self.historySeek = self.historySeek + 1 
 		cmd.txt = self.history[self.historySeek]
 	end
+	cmd.cpos = string.len(cmd.txt)
 end
 
 function CMD:Reset()
@@ -199,7 +202,7 @@ function CMD:Parse()
 	
 	for t in input:gmatch('[%a%s%d!@#-]*,') do
 		local tt = t:gsub(",", "")
-		table.insert(self.targets, tt)
+		table.insert(self.targets, string.lower(tt))
 	end
 
 end
@@ -524,6 +527,10 @@ local function update_cmd(char)
 		display2:AddLine("Create new track(s). Separate with a comma.", something.r, something.g, something.b)
 	elseif cmd.active and C.prefix == "D" then
 		select_tracks()		
+	elseif cmd.active and C.prefix == "=" then 
+		C.suffix = cmd.txt:sub(cmd.txt:find("=")+1)
+		C:Parse()
+
 	end
 
 	if cmd.active and cmd.txt:find(">") then
@@ -574,6 +581,9 @@ local function update_cmd(char)
 			C.renaming = nil 
 		end
 
+		if cmd.active and C.prefix == "=" then
+
+		end
 
 		if cmd.active and C.prefix == "C" then
 			
