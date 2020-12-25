@@ -45,6 +45,7 @@ local refresh = 0
 --Table to hold selected tracks
 local prevSelectedTracks = {}
 local curSelectedTracks = {}
+local sources = {}
 
 
 -------------------------------
@@ -65,6 +66,7 @@ cmd.alwaysActive = true
 --Create a text display for information
 local display = Display:Create(frame.x+15, frame.y+20, frame.w-135, frame.h-70)
 local display2 = Display:Create(frame.x+15, frame.y+frame.h-40, frame.w-120, frame.h)
+
 
 
 ------------------------------
@@ -89,7 +91,8 @@ function CMD:Create()
 		history = {},
 		historySeek = 0,
 		renaming=nil,
-		exclusive = false
+		exclusive = false,
+
 	}
 	setmetatable(this, CMD)
 	return this
@@ -210,6 +213,59 @@ end
 
 local C = CMD:Create()
 
+function display2:CommitPreview(trackCount, sources)
+
+	local selectedSources = 0
+	if sources then 
+		for i = 0, #sources do
+			if sources[i] == true then selectedSources = selectedSources + 1 end
+		end
+	end
+
+	--Look for flags to add to commit preview
+	local commitPreview = ""
+	if C.suffix:find("m%-") then commitPreview = commitPreview .. "Unmute, "
+	elseif C.suffix:find("m%+") then commitPreview = commitPreview .. "Mute, "
+	elseif C.suffix:find("m") then commitPreview = commitPreview .. "Toggle Mute, "
+	elseif C.suffix:find("M") then commitPreview = commitPreview .. "Excl. Mute, "
+	end
+
+	--Look for solo
+	if C.suffix:find("o%-") then commitPreview = commitPreview .. "Unsolo, "
+	elseif C.suffix:find("o%+") then commitPreview = commitPreview .."Solo, "
+	elseif C.suffix:find("o") then commitPreview = commitPreview .. "Toggle Solo, "
+	elseif C.suffix:find("O") then commitPreview = commitPreview .. "Excl. Solo, "
+	end
+
+	--Look for arm
+	if C.suffix:find("a%-") then commitPreview = commitPreview .. "Unarm, "
+	elseif C.suffix:find("a%+") then commitPreview = commitPreview .."Arm, "
+	elseif C.suffix:find("a") then commitPreview = commitPreview .. "Toggle Arm, "
+	elseif C.suffix:find("A") then commitPreview = commitPreview .. "Excl. Arm, "
+	end
+
+	--Look for fx bypass
+	if C.suffix:find("b%-") then commitPreview = commitPreview .. "Bypass FX, "
+	elseif C.suffix:find("b%+") then commitPreview = commitPreview .. "Enable FX, "
+	elseif C.suffix:find("b") then commitPreview = commitPreview .. "Toggle FX, "
+	end
+
+	if C.renaming then commitPreview = commitPreview .. "Rename, " end
+
+	-- look for midi inputs
+
+
+
+	if commitPreview ~= "" then commitPreview = commitPreview:sub(1, -3) .. " " end
+	display2:AddLine("")
+	if trackCount == -1 then 
+		display2:AddLine("Route " .. selectedSources .. " tracks " .. "to...", something.r, something.g, something.b)
+	else
+		display2:AddLine(commitPreview .. trackCount .. " tracks...", something.r, something.g, something.b)
+	end
+	reaper.PreventUIRefresh(-1)
+
+end
 
 -------------------------------
 --Special functions-------------
@@ -320,58 +376,21 @@ local function select_tracks()
 
 			end
 		end
-
-
 	
 	end
 
-	--Look for flags to add to commit preview
-	local commitPreview = ""
-	if C.suffix:find("m%-") then commitPreview = commitPreview .. "Unmute, "
-	elseif C.suffix:find("m%+") then commitPreview = commitPreview .. "Mute, "
-	elseif C.suffix:find("m") then commitPreview = commitPreview .. "Toggle Mute, "
-	elseif C.suffix:find("M") then commitPreview = commitPreview .. "Excl. Mute, "
-	end
+	display2:CommitPreview(trackCount)
 
-	--Look for solo
-	if C.suffix:find("o%-") then commitPreview = commitPreview .. "Unsolo, "
-	elseif C.suffix:find("o%+") then commitPreview = commitPreview .."Solo, "
-	elseif C.suffix:find("o") then commitPreview = commitPreview .. "Toggle Solo, "
-	elseif C.suffix:find("O") then commitPreview = commitPreview .. "Excl. Solo, "
-	end
-
-	--Look for arm
-	if C.suffix:find("a%-") then commitPreview = commitPreview .. "Unarm, "
-	elseif C.suffix:find("a%+") then commitPreview = commitPreview .."Arm, "
-	elseif C.suffix:find("a") then commitPreview = commitPreview .. "Toggle Arm, "
-	elseif C.suffix:find("A") then commitPreview = commitPreview .. "Excl. Arm, "
-	end
-
-	--Look for fx bypass
-	if C.suffix:find("b%-") then commitPreview = commitPreview .. "Bypass FX, "
-	elseif C.suffix:find("b%+") then commitPreview = commitPreview .. "Enable FX, "
-	elseif C.suffix:find("b") then commitPreview = commitPreview .. "Toggle FX, "
-	end
-
-	-- look for midi inputs
-
-
-	if C.prefix == "D" then commitPreview = "Delete, " end
-
-	if C.renaming then commitPreview = commitPreview .. "Rename, " end
-	
-	if commitPreview ~= "" then commitPreview = commitPreview:sub(1, -3) .. " " end
-	display2:AddLine("")
-	display2:AddLine(commitPreview .. trackCount .. " tracks...", something.r, something.g, something.b)
-	reaper.PreventUIRefresh(-1)
 end
 
+
+
 --Selects destination by name
-local function select_destination()
+local function select_destination(sources)
 	update_active_arrange()
 
 	reaper.PreventUIRefresh(1)
-	local trackCount = 0
+	
 	
 	display:ClearLines()
 	display2:ClearLines()
@@ -405,19 +424,19 @@ local function select_destination()
 		if C.destinationNumber == i+1 then 
 			reaper.SetTrackSelected( t, true ) 
 			display:AddLine(i+1 .. ": " .. buf:sub(1,14) .. levelMod, r, g, b)
-			trackCount = trackCount + 1
+			
 		--if the string is an exact match	
 		elseif string.lower(buf) == C.destinationInput or string.lower(buf .. " ") == C.destinationInput or string.lower(buf .. "  ") == C.destinationInput then 
 			reaper.SetTrackSelected( t, true ) 
 			display:AddLine(i+1 .. ": " .. buf:sub(1,14) .. levelMod, r, g, b)
-			trackCount = trackCount + 1
+			
 
 		else 
 			--finds close matches
 			if string.lower(buf):match(C.destinationInput) and string.lower(buf .. " ") ~= C.destinationInput then 
 				reaper.SetTrackSelected( t, true ) 
 				display:AddLine(i+1 .. ": " .. buf:sub(1,14) .. levelMod, r, g, b)
-				trackCount = trackCount + 1
+				
 			
 
 			--if i is not a match deselect
@@ -431,42 +450,11 @@ local function select_destination()
 	
 	end
 
-	--Look for flags to add to commit preview
-	local commitPreview = ""
-	if C.suffix:find("m%-") then commitPreview = commitPreview .. "Unmute, "
-	elseif C.suffix:find("m%+") then commitPreview = commitPreview .. "Mute, "
-	elseif C.suffix:find("m") then commitPreview = commitPreview .. "Toggle Mute, "
-	elseif C.suffix:find("M") then commitPreview = commitPreview .. "Excl. Mute, "
-	end
-
-	--Look for solo
-	if C.suffix:find("o%-") then commitPreview = commitPreview .. "Unsolo, "
-	elseif C.suffix:find("o%+") then commitPreview = commitPreview .."Solo, "
-	elseif C.suffix:find("o") then commitPreview = commitPreview .. "Toggle Solo, "
-	elseif C.suffix:find("O") then commitPreview = commitPreview .. "Excl. Solo, "
-	end
-
-	--Look for arm
-	if C.suffix:find("a%-") then commitPreview = commitPreview .. "Unarm, "
-	elseif C.suffix:find("a%+") then commitPreview = commitPreview .."Arm, "
-	elseif C.suffix:find("a") then commitPreview = commitPreview .. "Toggle Arm, "
-	elseif C.suffix:find("A") then commitPreview = commitPreview .. "Excl. Arm, "
-	end
-
-	--Look for fx bypass
-	if C.suffix:find("b%-") then commitPreview = commitPreview .. "Bypass FX, "
-	elseif C.suffix:find("b%+") then commitPreview = commitPreview .. "Enable FX, "
-	elseif C.suffix:find("b") then commitPreview = commitPreview .. "Toggle FX, "
-	end
-
-	-- look for midi inputs
 
 
+	display2:CommitPreview(-1, sources)
+	
 
-	if commitPreview ~= "" then commitPreview = commitPreview:sub(1, -3) .. " " end
-	display2:AddLine("")
-	display2:AddLine(commitPreview .. trackCount .. " tracks...", something.r, something.g, something.b)
-	reaper.PreventUIRefresh(-1)
 end
 
 
@@ -527,15 +515,25 @@ local function update_cmd(char)
 		display2:AddLine("Create new track(s). Separate with a comma.", something.r, something.g, something.b)
 	elseif cmd.active and C.prefix == "D" then
 		select_tracks()		
-	elseif cmd.active and C.prefix == "=" then 
+	elseif cmd.active and C.prefix == "=" and cmd.txt ~= "" then 
 		C.suffix = cmd.txt:sub(cmd.txt:find("=")+1)
 		C:Parse()
 
 	end
 
-	if cmd.active and cmd.txt:find(">") then
-		select_destination()
+	if  not cmd.txt:find(">") then
+		update_selected_tracks(sources) 
 	end
+
+	if cmd.active and cmd.txt:find(">") then
+
+		select_destination(sources)
+	end
+
+	-- if cmd.active and C.prefix == "=" then
+			
+	-- 	display2:CommitPreview(reaper.CountSelectedTracks(0))
+	-- end
 
 	-------------------------------
 	--Committed Input Handling-----
@@ -581,9 +579,6 @@ local function update_cmd(char)
 			C.renaming = nil 
 		end
 
-		if cmd.active and C.prefix == "=" then
-
-		end
 
 		if cmd.active and C.prefix == "C" then
 			
@@ -595,7 +590,12 @@ local function update_cmd(char)
 				reaper.SetTrackSelected(track, false)
 				C.exclusive = true
 			end
-			
+		elseif cmd.active and C.prefix == "c" then
+			for i = 0, tracks - 1 do
+				track = reaper.GetTrack(0, i)
+				reaper.SetTrackSelected(track, false)
+				C.exclusive = true
+			end
 		end
 
 		if C.prefix == "D" then
@@ -675,11 +675,14 @@ local function update_cmd(char)
 			end
 		end
 
+
 		update_selected_tracks(prevSelectedTracks)
 		C:Reset()
 		C.historySeek = count_table(C.history)+1
 
 	end
+
+
 
 end
 
@@ -765,6 +768,7 @@ function main()
 	-- 		cons("\n Target " .. t .. ": " .. C.targets[t])
 	-- 	end
 	-- end
+
 
 end
 main()
