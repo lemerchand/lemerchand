@@ -1,5 +1,5 @@
 
-## MIDI Selection Tool v1.0b
+## MIDI Selection Tool v1.2.1b
 
 ![Demo](https://t2361428.p.clickup-attachments.com/t2361428/3f5587aa-833f-4cab-8b80-c9cc140aa938/dem.gif?view=open)
 
@@ -40,24 +40,12 @@ A tool for quickly selecting midi notes in REAPER. Filters for events such as:
 
 **Installation:**
 
+Add this reapack repo: https://discord.com/channels/694864147032309761/694864147606929440/792110092635078656 and install "MIDI Selector Tool"
+
 Dependencies: 
 	
 	- JS Reascript API (download from reapack)
-	- My gui.lua/cf.lua files 
-	- Directory structure must be your REAPER resource path then:
-		- /Scripts/lemerchand/Midi Selector Tool
-		- gui.lua/cf.lua in the lemerchand directory
 
-
-1. Goto: https://github.com/lemerchand/lemerchand
-
-2. Either clone the repo or if you don't use github then click the "code" button and select "Download Zip." Chose your REAPER resources path (usually something like c:/users/yourname/appdata/roaming/reaper) and unzip it in the 'Scripts' folder. 
-
-3. Rename the folder from "lemerchand - master" to "lemerchand"
-
-4. Bind it to a hotkey. Run the actions menu and select MIIDI Editor. Click 'Load Reascript' and navigate to the 'Lemerchand/MIDI Selector Tool' where you unzipped the files. Select "MIDI Selector Tool.lua" and choose a hotkey. 
-
-Finally, when in the midi editor, press said key and the GUI will pop up allowing you to select notes quickly. Be sure to read the help text in the "Info" frame. 
 
 
 **Usage:**
