@@ -88,6 +88,7 @@ function CMD:Create()
 		destination = "",
 		destinationNumber = nil,
 		desitinationSuffix = "",
+		destinationID = nil,
 		history = {},
 		historySeek = 0,
 		renaming=nil,
@@ -141,6 +142,7 @@ function CMD:Reset()
 	self.destinationInput = ""
 	self.destination = ""
 	self.destinationSuffix = ""
+	self.destinationID = nil
 end
 
 function CMD:Parse()
@@ -173,7 +175,7 @@ function CMD:Parse()
 
 		if destinationInput:sub(1,1) == (" ") then destinationInput = destinationInput:sub(2) end
 		self.destinationInput = string.lower(destinationInput)
-		cons(self.destination .. ".", true)
+		
 
 	end
 
@@ -424,11 +426,13 @@ local function select_destination(sources)
 		if C.destinationNumber == i+1 then 
 			reaper.SetTrackSelected( t, true ) 
 			display:AddLine(i+1 .. ": " .. buf:sub(1,14) .. levelMod, r, g, b)
+			C.destinationID = i
 			
 		--if the string is an exact match	
 		elseif string.lower(buf) == C.destinationInput or string.lower(buf .. " ") == C.destinationInput or string.lower(buf .. "  ") == C.destinationInput then 
 			reaper.SetTrackSelected( t, true ) 
 			display:AddLine(i+1 .. ": " .. buf:sub(1,14) .. levelMod, r, g, b)
+			C.destinationID = i
 			
 
 		else 
@@ -436,6 +440,7 @@ local function select_destination(sources)
 			if string.lower(buf):match(C.destinationInput) and string.lower(buf .. " ") ~= C.destinationInput then 
 				reaper.SetTrackSelected( t, true ) 
 				display:AddLine(i+1 .. ": " .. buf:sub(1,14) .. levelMod, r, g, b)
+				C.destinationID = i
 				
 			
 
@@ -530,10 +535,10 @@ local function update_cmd(char)
 		select_destination(sources)
 	end
 
-	-- if cmd.active and C.prefix == "=" then
-			
-	-- 	display2:CommitPreview(reaper.CountSelectedTracks(0))
-	-- end
+	if cmd.active and C.prefix == "=" then
+		display2:ClearLines()
+		display2:CommitPreview(reaper.CountSelectedTracks(0))
+	end
 
 	-------------------------------
 	--Committed Input Handling-----
@@ -646,14 +651,26 @@ local function update_cmd(char)
 
 		-- Look for routing
 		if C.destinationSuffix and C.destinationSuffix:find("m%d*") then
-			local midiChannel = C.destinationSuffix:match("i%d+")
-			if midiChannel then midiChannel = midiChannel:sub(2) else midiChannel = 0 end
+			local midiSourceChannel = C.destinationSuffix:match("m%d+")
+			local midiDestinationChannel = C.destinationSuffix:match(":%d+")
+
+			if midiSourceChannel then midiSourceChannel = midiSourceChannel:sub(2) else midiSourceChannel = 0 end
+			if midiDestinationChannel then midiDestinationChannel = midiDestinationChannel:sub(2) else midiDestinationChannel = 0 end
+
+			
 			for tr = 0, tracks-1 do
-				--if C.targets[tr] = reaper
-				--reaper.CreateTrackSend(tr,  )
+				if sources[tr] == true then 
+					reaper.CreateTrackSend(reaper.GetTrack(0, tr), reaper.GetTrack(0,C.destinationID))
+					reaper.BR_GetSetTrackSendInfo(reaper.GetTrack(0, tr), 0, reaper.GetTrackNumSends(reaper.GetTrack(0, C.destinationID), 0), 'I_MIDI_SRCCHAN', true, tonumber(midiSourceChannel)) 
+					reaper.BR_GetSetTrackSendInfo(reaper.GetTrack(0, tr), 0, reaper.GetTrackNumSends(reaper.GetTrack(0, C.destinationID), 0), 'I_MIDI_DSTCHAN', true, tonumber(midiDestinationChannel))
+
+				end
 
 			end
 		end
+
+
+
 
 		reaper.PreventUIRefresh(-1)
 		--Clear cmd, clear engage, clear returned, clear flags
