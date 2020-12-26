@@ -656,7 +656,7 @@ local function update_cmd(char)
 
 			if midiSourceChannel then midiSourceChannel = midiSourceChannel:sub(2) else midiSourceChannel = 0 end
 			if midiDestinationChannel then midiDestinationChannel = midiDestinationChannel:sub(2) else midiDestinationChannel = 0 end
-
+			update_selected_tracks(sources)
 			
 			for tr = 0, tracks-1 do
 				if sources[tr] == true then 
