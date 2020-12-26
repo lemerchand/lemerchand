@@ -1,4 +1,4 @@
--- @version 1.2.1b
+-- @version 1.2.2b
 -- @author Lemerchand
 -- @provides
 --    [main=midi_editor] .
@@ -7,12 +7,12 @@
 --    [nomain] default_lament.config
 --    [nomain] preset_actions/preset_template.lua
 -- @changelog
+--    + Improved behavior on Preset Overwrite
 --    + Updating no longer overwrites user's settings
 --    + Exported presets now have 'MST_' as a prefix in Actions List
---    + Save Preset input box defaults to current preset name
---    + MST can now save presets to the Actions List!
 
-local v = " v1.2.1b"
+
+local v = " v1.2.2b"
 local name = "MST5K"
 local path = ""
 
@@ -538,8 +538,10 @@ function main()
 		local retval, retvals_csv, v = reaper.GetUserInputs("Save Preset", 1, "Name:", ddwn_presets.choices[ddwn_presets.selected])
 		if not retval then return end
 		save_presets(path .. '/presets/' .. retvals_csv .. '.dat', group_pitchToggles, group_noteRange, group_lengthToggles, group_beatsToggles, group_velSliders, sldr_timeThreshold)
-		ddwn_presets:Add(retvals_csv)
-		ddwn_presets.selected = #presets
+		if retvals_csv ~= ddwn_presets.choices[ddwn_presets.selected] then 
+			ddwn_presets:Add(retvals_csv)
+			ddwn_presets.selected = #presets
+		end
 	end
 
 	if ddwn_presets.ctrlLeftClick then
