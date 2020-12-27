@@ -253,15 +253,37 @@ function display2:CommitPreview(trackCount, sources)
 	end
 
 	if C.renaming then commitPreview = commitPreview .. "Rename, " end
-
+	if C.prefix == "n" then 
+		if commitPreview == "" then
+			commitPreview = "Create new track(s), "
+		else
+			commitPreview = commitPreview:gsub("Toggle ", "") 
+			commitPreview = commitPreview:sub(1,-3)
+			
+			if C.suffix:find('b') then 
+				if string.len(C.suffix) < 2 then commitPreview = "New track(s)"
+				else
+					commitPreview = commitPreview .. "new track(s) "
+				end
+				commitPreview = commitPreview:gsub("FX", "") 
+				commitPreview = commitPreview .. " (FX Bypassed), " 
+			else
+				commitPreview = commitPreview .. " new tracks, "
+			end
+		end
+	end
 	-- look for midi inputs
 
 
 
 	if commitPreview ~= "" then commitPreview = commitPreview:sub(1, -3) .. " " end
 	display2:AddLine("")
-	if trackCount == -1 then 
-		display2:AddLine("Route " .. selectedSources .. " tracks " .. "to...", something.r, something.g, something.b)
+	if trackCount == -1 then
+		if cmd.txt:find(">")  then  
+			display2:AddLine("Route new track(s) " ..  "to...", something.r, something.g, something.b)
+		else
+			display2:AddLine(commitPreview , something.r, something.g, something.b)
+		end
 	else
 		display2:AddLine(commitPreview .. trackCount .. " tracks...", something.r, something.g, something.b)
 	end
@@ -474,7 +496,8 @@ end
 local function set_selected_tracks(param, state)
 	update_active_arrange()
 	for i = 0, tracks-1 do
-		if reaper.IsTrackSelected(reaper.GetTrack(0,i)) then 
+		if reaper.IsTrackSelected(reaper.GetTrack(0,i)) and i ~= C.destinationID then 
+
 			if state == -1 then
 				reaper.SetMediaTrackInfo_Value(reaper.GetTrack(0, i), param, math.abs(reaper.GetMediaTrackInfo_Value( reaper.GetTrack(0,i), param)-1))
 
@@ -515,9 +538,9 @@ local function update_cmd(char)
 		C.exclusive = true
 		select_tracks()
 	elseif cmd.active and C.prefix == "n" then
+		reaper.Main_OnCommand(40297, 0)
 		display2:ClearLines()
-		display2:AddLine("")
-		display2:AddLine("Create new track(s). Separate with a comma.", something.r, something.g, something.b)
+		display2:CommitPreview(-1, sources)
 	elseif cmd.active and C.prefix == "D" then
 		select_tracks()		
 	elseif cmd.active and C.prefix == "=" and cmd.txt ~= "" then 
@@ -557,10 +580,7 @@ local function update_cmd(char)
 			
 			C.exclusive = true
 			
-			for t = 0, tracks-1 do 
-				reaper.SetTrackSelected(reaper.GetTrack(0, t), false) 
 
-			end
 
 			for i = 1, count_table(C.targets) do
 				local totalTracks = reaper.CountTracks(0)
@@ -568,9 +588,8 @@ local function update_cmd(char)
 				reaper.GetSetMediaTrackInfo_String( reaper.GetTrack(0, totalTracks), 'P_NAME', C.targets[i], true )
 				reaper.SetMediaTrackInfo_Value( reaper.GetTrack(0, totalTracks), 'I_RECMON', 1 )
 				reaper.SetTrackSelected(reaper.GetTrack(0, totalTracks), true)
-
 			end
-
+			update_selected_tracks(sources)
 			
 		--if there was an attempt to name (ie., ="sometext") then name the selected tracks
 		elseif C.renaming and (cmd.txt:sub(1,1) == "s" or cmd.txt:sub(1,1) == "S") and reaper.CountSelectedTracks(0) >= 1 then 
@@ -612,6 +631,8 @@ local function update_cmd(char)
 
 		end
 
+
+
 		--Look for mute 
 		if C.suffix:find("m%-") then set_selected_tracks('B_MUTE', 0, false)
 		elseif C.suffix:find("m%+") then set_selected_tracks('B_MUTE', 1, false)
@@ -650,25 +671,39 @@ local function update_cmd(char)
 
 
 		-- Look for routing
-		if C.destinationSuffix and C.destinationSuffix:find("m%d*") then
-			local midiSourceChannel = C.destinationSuffix:match("m%d+")
-			local midiDestinationChannel = C.destinationSuffix:match(":%d+")
+		if C.destinationSuffix then
+			local midiSourceChannel = nil
+			local midiDestinationChannel = nil
+		
+			if C.destinationSuffix:find("c%d+") then
+				midiSourceChannel = C.destinationSuffix:match("c%d+")
+			end
+
+			if C.destinationSuffix:find(":%d+") then
+				midiDestinationChannel = C.destinationSuffix:match(":%d+")
+			end
+
+
 
 			if midiSourceChannel then midiSourceChannel = midiSourceChannel:sub(2) else midiSourceChannel = 0 end
 			if midiDestinationChannel then midiDestinationChannel = midiDestinationChannel:sub(2) else midiDestinationChannel = 0 end
-			update_selected_tracks(sources)
+			--update_selected_tracks(sources)
 			
 			for tr = 0, tracks-1 do
+
 				if sources[tr] == true then 
 					reaper.CreateTrackSend(reaper.GetTrack(0, tr), reaper.GetTrack(0,C.destinationID))
-					reaper.BR_GetSetTrackSendInfo(reaper.GetTrack(0, tr), 0, reaper.GetTrackNumSends(reaper.GetTrack(0, C.destinationID), 0), 'I_MIDI_SRCCHAN', true, tonumber(midiSourceChannel)) 
-					reaper.BR_GetSetTrackSendInfo(reaper.GetTrack(0, tr), 0, reaper.GetTrackNumSends(reaper.GetTrack(0, C.destinationID), 0), 'I_MIDI_DSTCHAN', true, tonumber(midiDestinationChannel))
+					reaper.BR_GetSetTrackSendInfo(reaper.GetTrack(0, tr), 0, reaper.GetTrackNumSends(reaper.GetTrack(0, C.destinationID), 0) , 'I_MIDI_SRCCHAN', true, tonumber(midiSourceChannel)) 
+					reaper.BR_GetSetTrackSendInfo(reaper.GetTrack(0, tr), 0, reaper.GetTrackNumSends(reaper.GetTrack(0, C.destinationID), 0) , 'I_MIDI_DSTCHAN', true, tonumber(midiDestinationChannel))
+
+					if C.destinationSuffix:find("%+:") then midiSourceChannel = midiSourceChannel + 1 end
+					if C.destinationSuffix:find(":%d+%+") then midiDestinationChannel = midiDestinationChannel + 1 end
 
 				end
 
 			end
+		
 		end
-
 
 
 
