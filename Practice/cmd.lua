@@ -674,30 +674,53 @@ local function update_cmd(char)
 		if C.destinationSuffix then
 			local midiSourceChannel = nil
 			local midiDestinationChannel = nil
-		
+
+			local audioSourceChannel = nil
+			local audioDestinationChannel = nil
+
+			-- look for midi routing
 			if C.destinationSuffix:find("c%d+") then
 				midiSourceChannel = C.destinationSuffix:match("c%d+")
 			end
 
-			if C.destinationSuffix:find(":%d+") then
+			if C.destinationSuffix:find("c%d+%+?:%d+") then
 				midiDestinationChannel = C.destinationSuffix:match(":%d+")
 			end
 
+			-- Look for audio routing
+			if C.destinationSuffix:find("a%d+") then
+				audioSourceChannel = C.destinationSuffix:match("a%d+")
+			end
+
+			if C.destinationSuffix:find("a%d+%+?:%d+") then
+				audioDestinationChannel = C.destinationSuffix:match(":%d+")
+			end
 
 
 			if midiSourceChannel then midiSourceChannel = midiSourceChannel:sub(2) else midiSourceChannel = 0 end
 			if midiDestinationChannel then midiDestinationChannel = midiDestinationChannel:sub(2) else midiDestinationChannel = 0 end
-			--update_selected_tracks(sources)
+
+			if audioSourceChannel then audioSourceChannel = audioSourceChannel:sub(2) else audioSourceChannel = 0 end
+			if audioDestinationChannel then audioDestinationChannel = audioDestinationChannel:sub(2) else audioDestinationChannel = 0 end
+			
 			
 			for tr = 0, tracks-1 do
 
 				if sources[tr] == true then 
 					reaper.CreateTrackSend(reaper.GetTrack(0, tr), reaper.GetTrack(0,C.destinationID))
+					
 					reaper.BR_GetSetTrackSendInfo(reaper.GetTrack(0, tr), 0, reaper.GetTrackNumSends(reaper.GetTrack(0, C.destinationID), 0) , 'I_MIDI_SRCCHAN', true, tonumber(midiSourceChannel)) 
 					reaper.BR_GetSetTrackSendInfo(reaper.GetTrack(0, tr), 0, reaper.GetTrackNumSends(reaper.GetTrack(0, C.destinationID), 0) , 'I_MIDI_DSTCHAN', true, tonumber(midiDestinationChannel))
 
-					if C.destinationSuffix:find("%+:") then midiSourceChannel = midiSourceChannel + 1 end
-					if C.destinationSuffix:find(":%d+%+") then midiDestinationChannel = midiDestinationChannel + 1 end
+					reaper.BR_GetSetTrackSendInfo(reaper.GetTrack(0, tr), 0, reaper.GetTrackNumSends(reaper.GetTrack(0, C.destinationID), 0) , 'I_SRCCHAN', true, tonumber(audioSourceChannel)) 
+					reaper.BR_GetSetTrackSendInfo(reaper.GetTrack(0, tr), 0, reaper.GetTrackNumSends(reaper.GetTrack(0, C.destinationID), 0) , 'I_DSTCHAN', true, tonumber(audioDestinationChannel))
+					
+
+					if C.destinationSuffix:find("c%d+%+:") then midiSourceChannel = midiSourceChannel + 1 end
+					if C.destinationSuffix:find("c%d+%+?:%d+%+") then midiDestinationChannel = midiDestinationChannel + 1 end
+
+					if C.destinationSuffix:find("a%d+%+:") then audioSourceChannel = audioSourceChannel + 1 end
+					if C.destinationSuffix:find("a%d+%+?:%d+%+") then audioDestinationChannel = audioDestinationChannel + 1 end
 
 				end
 
