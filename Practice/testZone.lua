@@ -74,7 +74,13 @@ function main()
 								"\nMouse Cap: " .. reaper.JS_Mouse_GetState(-1) ..
 								"\nLast Character: " .. lastChar .. 
 								"\nContext: " .. window ..
-								"\nTotal tracks: " .. tracks
+								"\nTotal tracks: " .. tracks ..
+								"\nTrack 1 send index: " .. reaper.GetTrackNumSends(reaper.GetTrack(0,0), 0) ..
+								"\nTrack 1 receive index: " .. reaper.GetTrackNumSends(reaper.GetTrack(0,0), -1) 
+
+	
+		
+
 
 	if window == "midi_editor" then 
 		update_active_midi()
