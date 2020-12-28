@@ -166,18 +166,19 @@ function CMD:Parse()
 	if input:find(">") then 
 		destinationInput = input:sub(input:find(">")+1)
 		input = input:sub(1, input:find(">")-1)
-
-		if destinationInput:find("=") then 
-			local s, e = destinationInput:find('=')
-			self.destinationSuffix = destinationInput:sub(s+1)
-			destinationInput = string.lower(destinationInput:sub(1, destinationInput:find("=")-1))
-		end
-
-		if destinationInput:sub(1,1) == (" ") then destinationInput = destinationInput:sub(2) end
-		self.destinationInput = string.lower(destinationInput)
-		
-
+	elseif input:find("<") then 
+		destinationInput = input:sub(input:find("<")+1)
+		input = input:sub(1, input:find("<")-1)
 	end
+	if destinationInput:find("=") then 
+		local s, e = destinationInput:find('=')
+		self.destinationSuffix = destinationInput:sub(s+1)
+		destinationInput = string.lower(destinationInput:sub(1, destinationInput:find("=")-1))
+	end
+
+	if destinationInput:sub(1,1) == (" ") then destinationInput = destinationInput:sub(2) end
+	self.destinationInput = string.lower(destinationInput)
+		
 
 		--Look for quotes for naming 
 	if input:find('".*"') then 
@@ -280,7 +281,10 @@ function display2:CommitPreview(trackCount, sources)
 	display2:AddLine("")
 	if trackCount == -1 then
 		if cmd.txt:find(">")  then  
-			display2:AddLine("Route new track(s) " ..  "to...", something.r, something.g, something.b)
+			display2:AddLine("Send new track(s) to...", something.r, something.g, something.b)
+		elseif cmd.txt:find("<")  then  
+			display2:AddLine("New track(s) recieve from...", something.r, something.g, something.b)
+
 		else
 			display2:AddLine(commitPreview , something.r, something.g, something.b)
 		end
@@ -549,12 +553,11 @@ local function update_cmd(char)
 
 	end
 
-	if  not cmd.txt:find(">") then
+	if  not cmd.txt:find(">") and not cmd.txt:find("<") then
 		update_selected_tracks(sources) 
 	end
 
-	if cmd.active and cmd.txt:find(">") then
-
+	if (cmd.active and cmd.txt:find(">")) or (cmd.active and cmd.txt:find("<")) then
 		select_destination(sources)
 	end
 
@@ -703,24 +706,44 @@ local function update_cmd(char)
 			if audioSourceChannel then audioSourceChannel = audioSourceChannel:sub(2) else audioSourceChannel = 0 end
 			if audioDestinationChannel then audioDestinationChannel = audioDestinationChannel:sub(2) else audioDestinationChannel = 0 end
 			
-			
+			audioSourceChannel = audioSourceChannel - 1
+			audioDestinationChannel = audioDestinationChannel - 1
+			audioSourceChannel = audioSourceChannel + audioSourceChannel
+			audioDestinationChannel = audioDestinationChannel + audioDestinationChannel
+			--cons(audioSourceChannel .. "\n" .. audioDestinationChannel, true)
 			for tr = 0, tracks-1 do
 
 				if sources[tr] == true then 
-					reaper.CreateTrackSend(reaper.GetTrack(0, tr), reaper.GetTrack(0,C.destinationID))
+										
+					if cmd.txt:find(">") then
+						reaper.CreateTrackSend(reaper.GetTrack(0, tr), reaper.GetTrack(0,C.destinationID))
+						reaper.BR_GetSetTrackSendInfo(reaper.GetTrack(0, tr), 0, reaper.GetTrackNumSends(reaper.GetTrack(0, C.destinationID), 0) , 'I_MIDI_SRCCHAN', true, tonumber(midiSourceChannel)) 
+						reaper.BR_GetSetTrackSendInfo(reaper.GetTrack(0, tr), 0, reaper.GetTrackNumSends(reaper.GetTrack(0, C.destinationID), 0) , 'I_MIDI_DSTCHAN', true, tonumber(midiDestinationChannel))
+						reaper.BR_GetSetTrackSendInfo(reaper.GetTrack(0, tr), 0, reaper.GetTrackNumSends(reaper.GetTrack(0, C.destinationID), 0) , 'I_SRCCHAN', true, tonumber(audioSourceChannel)) 
+						reaper.BR_GetSetTrackSendInfo(reaper.GetTrack(0, tr), 0, reaper.GetTrackNumSends(reaper.GetTrack(0, C.destinationID), 0) , 'I_DSTCHAN', true, tonumber(audioDestinationChannel))
+
+						if C.destinationSuffix:find("c%d+%+:") then midiSourceChannel = midiSourceChannel + 1 
+							cons('r')
+						end
+						if C.destinationSuffix:find("c%d+%+?:%d+%+") then midiDestinationChannel = midiDestinationChannel + 1 end
+
+						if C.destinationSuffix:find("a%d+%+:") then audioSourceChannel = audioSourceChannel + 2 end
+						if C.destinationSuffix:find("a%d+%+?:%d+%+") then audioDestinationChannel = audioDestinationChannel + 2 end
 					
-					reaper.BR_GetSetTrackSendInfo(reaper.GetTrack(0, tr), 0, reaper.GetTrackNumSends(reaper.GetTrack(0, C.destinationID), 0) , 'I_MIDI_SRCCHAN', true, tonumber(midiSourceChannel)) 
-					reaper.BR_GetSetTrackSendInfo(reaper.GetTrack(0, tr), 0, reaper.GetTrackNumSends(reaper.GetTrack(0, C.destinationID), 0) , 'I_MIDI_DSTCHAN', true, tonumber(midiDestinationChannel))
+					elseif cmd.txt:find("<") then
+						reaper.CreateTrackSend(reaper.GetTrack(0,C.destinationID), reaper.GetTrack(0, tr))
+						reaper.BR_GetSetTrackSendInfo(reaper.GetTrack(0, C.destinationID), 0, reaper.GetTrackNumSends(reaper.GetTrack(0, tr), 0) , 'I_MIDI_SRCCHAN', true, tonumber(midiSourceChannel)) 
+						reaper.BR_GetSetTrackSendInfo(reaper.GetTrack(0, C.destinationID), 0, reaper.GetTrackNumSends(reaper.GetTrack(0, tr), 0) , 'I_MIDI_DSTCHAN', true, tonumber(midiDestinationChannel))
+						reaper.BR_GetSetTrackSendInfo(reaper.GetTrack(0, C.destinationID), 0, reaper.GetTrackNumSends(reaper.GetTrack(0, tr), 0) , 'I_SRCCHAN', true, tonumber(audioSourceChannel)) 
+						reaper.BR_GetSetTrackSendInfo(reaper.GetTrack(0, C.destinationID), 0, reaper.GetTrackNumSends(reaper.GetTrack(0, tr), 0) , 'I_DSTCHAN', true, tonumber(audioDestinationChannel))
+						
+						if C.destinationSuffix:find("c%d+%+:") then midiDestinationChannel = midiDestinationChannel + 1 end
+						if C.destinationSuffix:find("c%d+%+?:%d+%+") then midiSourceChannel = midiSourceChannel + 1 end
 
-					reaper.BR_GetSetTrackSendInfo(reaper.GetTrack(0, tr), 0, reaper.GetTrackNumSends(reaper.GetTrack(0, C.destinationID), 0) , 'I_SRCCHAN', true, tonumber(audioSourceChannel)) 
-					reaper.BR_GetSetTrackSendInfo(reaper.GetTrack(0, tr), 0, reaper.GetTrackNumSends(reaper.GetTrack(0, C.destinationID), 0) , 'I_DSTCHAN', true, tonumber(audioDestinationChannel))
-					
+						if C.destinationSuffix:find("a%d+%+:") then audioDestinationChannel = audioDestinationChannel + 2 end	
+						if C.destinationSuffix:find("a%d+%+?:%d+%+") then audioSourceChannel = audioSourceChannel + 2 end						
 
-					if C.destinationSuffix:find("c%d+%+:") then midiSourceChannel = midiSourceChannel + 1 end
-					if C.destinationSuffix:find("c%d+%+?:%d+%+") then midiDestinationChannel = midiDestinationChannel + 1 end
-
-					if C.destinationSuffix:find("a%d+%+:") then audioSourceChannel = audioSourceChannel + 1 end
-					if C.destinationSuffix:find("a%d+%+?:%d+%+") then audioDestinationChannel = audioDestinationChannel + 1 end
+					end
 
 				end
 
