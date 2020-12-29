@@ -309,6 +309,17 @@ end
 -------------------------------
 --Special functions-------------
 -------------------------------
+
+local function save_on_exit()
+	local file = io.open(script_path .. "soe.dat", 'w')
+	io.output(file)
+	for h = 10, 1, -1 do
+		file:write(C.history[h] .. '\n')
+	end
+	file:close()
+end
+
+
 local function main_display(page)
 
 	if page == 0 then
@@ -343,6 +354,7 @@ local function main_display(page)
 		display:AddLine("=o    -  toggle solo", default.r, default.g, default.b, 50)
 		display:AddLine("=a    -  toggle arm", default.r, default.g, default.b, 50)
 		display:AddLine("=b    -  toggle FX", default.r, default.g, default.b, 50)
+		display:AddLine("=B    -  toggle FX (include Master)", default.r, default.g, default.b, 50)
 		display:AddLine("=i    -  set to MIDI input (all)", default.r, default.g, default.b, 50)
 		display:AddLine("=I    -  set to Audio Input", default.r, default.g, default.b, 50)
 		display:AddLine('="x"  -  rename track to "x"', default.r, default.g, default.b, 50)
@@ -450,6 +462,7 @@ local function select_tracks()
 		local armed = reaper.GetMediaTrackInfo_Value(t, 'I_RECARM')
 		local level = reaper.GetMediaTrackInfo_Value(t, 'I_FOLDERDEPTH')
 		local fxBypassed = reaper.GetMediaTrackInfo_Value(t, "I_FXEN")
+
 
 
 		local levelMod = ""
@@ -585,6 +598,9 @@ end
 --Sets selected tracks param with state 
 local function set_selected_tracks(param, state)
 	update_active_arrange()
+
+	if C.suffix:find('B') then reaper.SetMediaTrackInfo_Value(reaper.GetMasterTrack(0), param, math.abs(reaper.GetMediaTrackInfo_Value( reaper.GetMasterTrack(0), param)-1)) end
+
 	for i = 0, tracks-1 do
 		if reaper.IsTrackSelected(reaper.GetTrack(0,i)) and i ~= C.destinationID then 
 
@@ -749,6 +765,7 @@ local function update_cmd(char)
 		if C.suffix:find("b%-") then set_selected_tracks("I_FXEN", 0, false)
 		elseif C.suffix:find("b%+") then set_selected_tracks('I_FXEN', 1, false)
 		elseif C.suffix:find("b") then set_selected_tracks('I_FXEN',-1, false)
+		elseif C.suffix:find("B") then set_selected_tracks('I_FXEN', -1, false)
 		end
 
 		--look for record input
@@ -757,6 +774,12 @@ local function update_cmd(char)
 			if midiChannel then midiChannel = midiChannel:sub(2) else midiChannel = 0 end
 			set_selected_tracks("I_RECINPUT", 4096 | midiChannel | (63 << 5))
 			set_selected_tracks("I_RECMODE", 7)
+		end
+		if C.suffix:find("I%d*") then 
+			local midiChannel = C.suffix:match("i%d+")
+			if audioChannel then audioChannel = audioChannel:sub(2) else midiChannel = 0 end
+			set_selected_tracks("I_RECINPUT", 0)
+			set_selected_tracks("I_RECMODE", 0)
 		end
 
 
