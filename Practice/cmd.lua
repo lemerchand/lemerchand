@@ -13,7 +13,7 @@ reaper.ClearConsole()
 
 local mousex, mousey = reaper.GetMousePosition()
 
-gfx.init("Console", 425, 300, false, mousex+50,mousey-200)
+gfx.init("Console", 425, 310, false, mousex+50,mousey-200)
 local win = reaper.JS_Window_Find("Console", true)
 if win then reaper.JS_Window_AttachTopmostPin(win) end
 
@@ -24,7 +24,7 @@ if win then reaper.JS_Window_AttachTopmostPin(win) end
 local default = {r=.7, g=.7, b=.7}
 local white = {r=.8, g=.8, b=.8}
 local red = {r=.7, g=.1, b=.2}
-local green = {r=.25, g=.7, b=.15}
+local green = {r=.2, g=.65, b=.11}
 local blue = {r=.25, g=.5, b=.9}
 local grey = {r=.41, g=.4, b=.37}
 local yellow = {r=.75, g=.7, b=.3}
@@ -37,7 +37,7 @@ local something = {r=.65, g=.25, b=.35}
 
 --Counter for refreshing gui after resize
 local refresh = 0
-
+local helppage = 0
 
 --Common properties for the comman line
 
@@ -57,7 +57,7 @@ status = Status:Create()
 status.hide = true
 
 --Create GUI frame and make everything relative to it
-frame = Frame:Create(10, 0, gfx.w-20, gfx.h-30, "")
+frame = Frame:Create(10, 0, gfx.w-20, gfx.h-35, "")
 
 --Create the main text input field and set it to always active
 local cmd = TextField:Create(10, frame.y+frame.h, frame.w+1, 20, "", "", true, false)
@@ -66,6 +66,7 @@ cmd.alwaysActive = true
 --Create a text display for information
 local display = Display:Create(frame.x+15, frame.y+20, frame.w-135, frame.h-70)
 local display2 = Display:Create(frame.x+15, frame.y+frame.h-40, frame.w-120, frame.h)
+
 
 
 
@@ -275,7 +276,11 @@ function display2:CommitPreview(trackCount, sources)
 	end
 	-- look for midi inputs
 
-
+	if trackCount == -666 then
+		display2:AddLine("")
+		display2:AddLine("Press F1 to cycle through help pages...", something.r, something.g, something.b)
+		return
+	end
 
 	if commitPreview ~= "" then commitPreview = commitPreview:sub(1, -3) .. " " end
 	display2:AddLine("")
@@ -291,6 +296,8 @@ function display2:CommitPreview(trackCount, sources)
 	else
 		display2:AddLine(commitPreview .. trackCount .. " tracks...", something.r, something.g, something.b)
 	end
+
+
 	reaper.PreventUIRefresh(-1)
 
 end
@@ -298,30 +305,105 @@ end
 -------------------------------
 --Special functions-------------
 -------------------------------
-local function main_display()
+local function main_display(page)
 
-	display:AddLine("PREFIX COMMANDS", yellow.r, yellow.g, yellow.b)
-	display:AddLine("")
-	display:AddLine("s     -  inclusively select tracks ", default.r, default.g, default.b, 50)
-	display:AddLine("C     -  unmute, unarm, unsolo, unselect", default.r, default.g, default.b, 50)
-	display:AddLine("D     -  delete selected tracks", default.r, default.g, default.b, 50)
-	display:AddLine("n     -  create new tracks", default.r, default.g, default.b, 50)
-	display:AddLine("")
+	if page == 0 then
+		-- display:AddLine("TRACKS", yellow.r, yellow.g, yellow.b)
+		-- display:AddLine("")
+		-- display:AddLine("Total:", default.r, default.g, default.b, 20)
+		-- display:AddLine("")
+		-- display:AddLine('Selected:', default.r, default.g, default.b, 20)
 
-	display:AddLine("SUFFIX COMMANDS", yellow.r, yellow.g, yellow.b)
-	display:AddLine("")
-	display:AddLine("=m    -  toggle mute", default.r, default.g, default.b, 50)
-	display:AddLine("=o    -  toggle solo", default.r, default.g, default.b, 50)
-	display:AddLine("=a    -  toggle arm", default.r, default.g, default.b, 50)
-	display:AddLine("=b    -  toggle FX", default.r, default.g, default.b, 50)
-	display:AddLine('="x"  -  rename track', default.r, default.g, default.b, 50)
-	display:AddLine("")
-	display:AddLine("+/- for on/off. Upper Case makes exclusive", default.r, default.g, default.b, 50)
-	display:AddLine("")
-	-- display:AddLine('Ctrl + Enter to close after command', default.r, default.g, default.b, 50)
-	-- display:AddLine('Ctrl + Backspace to clear line', default.r, default.g, default.b, 50)
-	-- display:AddLine('Up/Down arrows to scroll through previous commands', default.r, default.g, default.b, 50)
+		-- display:AddLine("")
+		-- display:AddLine("")
+		-- display:AddLine("")
+		-- display:AddLine("F1     -  Press F1 to cycle through help ", something.r, something.g, something.b)
 
+		display2:CommitPreview(-666)
+
+	elseif page == 1 then 
+		display:AddLine("PREFIX COMMANDS", yellow.r, yellow.g, yellow.b)
+		display:AddLine("")
+		display:AddLine("s     -  Inclusively select tracks ", default.r, default.g, default.b, 50)
+		display:AddLine("S     -  Exclusively select tracks ", default.r, default.g, default.b, 50)
+		display:AddLine("c     -  Unselect all tracks", default.r, default.g, default.b, 50)
+		display:AddLine("c     -  Un-mute/solo/arm/unselect all", default.r, default.g, default.b, 50)
+		display:AddLine("D     -  delete selected tracks", default.r, default.g, default.b, 50)
+		display:AddLine("n     -  create new tracks", default.r, default.g, default.b, 50)
+		
+	elseif page == 2 then 
+
+		display:AddLine("SUFFIX COMMANDS", yellow.r, yellow.g, yellow.b)
+		display:AddLine("")
+		display:AddLine("=m    -  toggle mute", default.r, default.g, default.b, 50)
+		display:AddLine("=o    -  toggle solo", default.r, default.g, default.b, 50)
+		display:AddLine("=a    -  toggle arm", default.r, default.g, default.b, 50)
+		display:AddLine("=b    -  toggle FX", default.r, default.g, default.b, 50)
+		display:AddLine("=i    -  set to MIDI input (all)", default.r, default.g, default.b, 50)
+		display:AddLine("=I    -  set to Audio Input", default.r, default.g, default.b, 50)
+		display:AddLine('="x"  -  rename track to "x"', default.r, default.g, default.b, 50)
+		display:AddLine("")
+		display:AddLine("+/- to specify on or off", default.r, default.g, default.b, 50)
+		display:AddLine("Upper Case makes exclusive", default.r, default.g, default.b, 50)
+		
+	elseif page == 3 then
+		display:AddLine("ROUTING COMMANDS", yellow.r, yellow.g, yellow.b)
+		display:AddLine("")
+		display:AddLine(">     		-  send to", default.r, default.g, default.b, 50)
+		display:AddLine("<     		-  receive from", default.r, default.g, default.b, 50)
+		display:AddLine("")
+		display:AddLine("=ax:y  	-  route x to y (stereo)", default.r, default.g, default.b, 50)
+		display:AddLine("=cx:y 		-  route x to y (midi)", default.r, default.g, default.b, 50)
+		display:AddLine("")
+		display:AddLine("+			-  add to x or y to auto-increment", default.r, default.g, default.b, 50) 
+
+
+	elseif page == 4 then
+
+		display:AddLine("HOTKEYS", yellow.r, yellow.g, yellow.b)
+		display:AddLine("")
+		display:AddLine('Ctrl + Enter to close after command', default.r, default.g, default.b, 40)
+		display:AddLine("")
+		display:AddLine('Ctrl + Backspace to clear line', default.r, default.g, default.b, 40)
+		display:AddLine("")
+		display:AddLine('Up/Down arrows to load previous commands (beta)', default.r, default.g, default.b, 40)
+		display:AddLine("")
+		display:AddLine("ESC to close", default.r, default.g, default.b, 40)
+
+	elseif page == 5 then 
+		display:AddLine("EXAMPLES", yellow.r, yellow.g, yellow.b)
+		display:AddLine("")
+		display:AddLine('Select, toggle arm/solo, and enable FX on "Piano":', default.r, default.g, default.b, 0)
+		display:AddLine("")
+		display:AddLine('s Piano =ab+o', green.r, green.g, green.b, 50)
+		display:AddLine("")
+		display:AddLine('Send A, B, & Cs MIDI Ch 1 to Kontakt Ch 1, Ch2, Ch 3', default.r, default.g, default.b, 0)
+		display:AddLine("")
+		display:AddLine('s A, B, C > Kontakt=c1+:1', green.r, green.g, green.b, 50)
+		display:AddLine("")
+		display:AddLine('Receive Ch 3/4 from Kontakt to Piano 1/2', default.r, default.g, default.b, 0)
+		display:AddLine("")
+		display:AddLine('n Piano < Kontakt=a2:1', green.r, green.g, green.b, 50)
+	elseif page == 6 then
+		display:AddLine("TIPS & TRICKS", yellow.r, yellow.g, yellow.b)
+		display:AddLine("")
+		display:AddLine('Selected tracks are filtered as you type, therefore', default.r, default.g, default.b, 0)
+		display:AddLine('You can easily select multiple tracks, eg:', default.r, default.g, default.b)
+		display:AddLine("")
+		display:AddLine('s Gtr', green.r, green.g, green.b, 50)
+		display:AddLine("")
+		display:AddLine('Or continue typing to refine the result:')
+		display:AddLine("")
+		display:AddLine('s Gtr L', green.r, green.g, green.b, 50)
+		display:AddLine("")
+		display:AddLine('Track names are sensitive to spaces. Use this to your') 
+		display:AddLine('advantge by refining results. For instance,')
+		display:AddLine("")
+		display:AddLine('s a [space]', green.r, green.g, green.b, 50 )
+		display:AddLine("")
+		display:AddLine('Would differentiate between "Kontakt" and "Tuba')
+
+	end
 end
 
 
@@ -572,6 +654,7 @@ local function update_cmd(char)
 	if cmd.returned then 
 		reaper.PreventUIRefresh(1)
 		reaper.Undo_BeginBlock()
+		helppage = 0
 
 		--Adds the committed input to the history
 
@@ -780,9 +863,9 @@ local function update_cmd(char)
 
 	end
 
-
-
 end
+
+gui_size_update()
 
 function main()
 
@@ -833,7 +916,8 @@ function main()
 			if not C.engaged then 
 				display:ClearLines()
 				display2:ClearLines() 
-				main_display()
+				if char == 26161 then helppage = (helppage + 1)%7 end
+				main_display(helppage)
 			end
 		--if the user isn't scrolling through the history then set c.cmd[1]
 			if C.historySeek == count_table(C.history)+1 then C.txt = cmd.txt end
