@@ -687,7 +687,7 @@ function InputBox:Draw()
 				self.mouseDown = true
 				if gfx.mouse_cap == 1 then 
 					retval, retvals_csv, v = reaper.GetUserInputs( "Enter a value", 1, "", self.default)
-					self.value = string.upper(retvals_csv)
+					self.value = retvals_csv
 				elseif gfx.mouse_cap == 2 then self.rightClick = true
 				elseif gfx.mouse_cap == 5 then self.ctrlLeftClick = true
 				elseif gfx.mouse_cap == 9 then self.shiftLeftClick = true

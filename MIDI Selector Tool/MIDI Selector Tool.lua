@@ -1,4 +1,4 @@
--- @version 1.2.2b
+-- @version 1.2.3b
 -- @author Lemerchand
 -- @provides
 --    [main=midi_editor] .
@@ -7,12 +7,13 @@
 --    [nomain] default_lament.config
 --    [nomain] preset_actions/preset_template.lua
 -- @changelog
+--    + Added sharp/flat toggle
 --    + Improved behavior on Preset Overwrite
 --    + Updating no longer overwrites user's settings
 --    + Exported presets now have 'MST_' as a prefix in Actions List
 
 
-local v = " v1.2.2b"
+local v = " v1.2.3b"
 local name = "MST5K"
 local path = ""
 
@@ -67,7 +68,7 @@ local htClear 			= "Clear Selection. \nR-click: global reset.\nHotkeys: (Shift+)
 local htCapture 		= "Set parameters from selected notes.\nOr Shift+L-Click a parameter to\ncapture only that."
 local htMinNote 		= "Sets lowest possible note.\nR-click: reset."
 local htMaxNote 		= "Sets highest possible note.\nR-click: reset."
-local htPitchTgl 		= "Toggles pitches.\nR-click: reset.\nCtrl+L-click: exclusive select.\nShift+R-Click: set to scale."
+local htPitchTgl 		= "Toggles pitches.\nR-click: reset.\nCtrl+L-click: exclusive select.\nShift+R-Click: set to scale.\nAlt-L-Click: Sharp/Flat"
 local htVelSlider		= "Sets the lowest/highest velocity.\nR-click: reset.\nCtrl+L-click: slide both (beta)"
 local htbeatsTgl		= "Include/exclude specific beats.\nR-click: reset.\nCtrl+L-click: exclusive select.\nShift+R-Click: Save to slot"
 local htDockOnStart		= "Enable to dock MST3K when summoned."
@@ -86,9 +87,22 @@ local htDdwnPresets		= "Select a preset\nShift+R-Click: save preset.\nCtrl+L-cli
 --Midi Note and BeatsThangs---
 -------------------------------
 note_midi_n = {0,1,2,3,4,5,6,7,8,9,10,11}			--Covers all 12 notes (pitch%12)
-note_names 	= {'C','C#', 'D', 'D#', 'E',				--Note names for notes_list
-				'F','F#', 'G', 'G#', 'A', 
-				'A#','B'}
+sharp = restore_on_exit(path)
+
+
+function sharp_or_flat(sharp)
+	if sharp then 
+		note_names 	= {'C','C#', 'D', 'D#', 'E',				--Note names for notes_list
+					'F','F#', 'G', 'G#', 'A', 
+					'A#','B'}
+	else
+		note_names  =  {'C','Db', 'D', 'Eb', 'E',				--Note names for notes_list
+					'F','Gb', 'G', 'Ab', 'A', 
+					'Bb','B'}
+	end
+end
+sharp_or_flat(sharp)
+
 
 local scaleName = {"Major", "Minor", "Harmonic Minor", "Melodic Minor", "Dorian", "Phrygian", "Lydian", "Mixolydian", "Locrian", "Phrygian Dominant", "Major Pentatonic", "Minor Pentatonic", "Blues"}
 local scales = {}
@@ -267,7 +281,7 @@ sldr_timeThreshold = H_slider:Create(frm_time.x + 10, frm_time.y+frm_time.h - 20
 
 --Status bar
 --For now status needs to be global
-status = Status:Create(10, frm_time.y + frm_time.h + 27, 227, 60, "INFO", nil, nil, "Hover over a control for more info!")
+status = Status:Create(10, frm_time.y + frm_time.h + 27, 227, 65, "INFO", nil, nil, "Hover over a control for more info!")
 
 ddwn_scaleName = Dropdown:Create(frm_pitch.x+52, frm_pitch.y+frm_pitch.h-15, frm_pitch.w-62 , nil, scaleName, 1, 1, htDdwnScales)
 
@@ -299,6 +313,7 @@ function main()
 	-- Deal with key stokes
 	-- If char == ESC then close window`
 	if char == 27 or char == -1  then 
+		save_on_exit(path, sharp)
 		reaper.atexit(reaper.JS_Window_SetFocus(lastWindow))
 		return
 	-- Otherwise keep window open
@@ -345,6 +360,8 @@ function main()
 	-------------------------------
 	--NOTE RANGES------------------
 	-------------------------------
+	if ib_minNote.value:sub(1,1):find("%l") then ib_minNote.value = string.upper(ib_minNote.value:sub(1,1)) .. ib_minNote.value:sub(2) end
+	if ib_maxNote.value:sub(1,1):find("%l") then ib_maxNote.value = string.upper(ib_maxNote.value:sub(1,1)) .. ib_maxNote.value:sub(2) end
 	if ib_minNote.rightClick or ib_maxNote.rightClick then group_exec(group_noteRange, 'reset') end
 	if ib_minNote.shiftLeftClick then set_from_selected(true, false, false, false, false, nil, nil, ib_minNote)  end
 	if ib_maxNote.shiftLeftClick then set_from_selected(false, true, false, false, false, nil, nil, nil, ib_maxNote) end
@@ -365,6 +382,18 @@ function main()
 			update_pitch_toggles(tgl_pitch)
 		end
 
+		if pp.altLeftClick then 
+			if sharp then 
+				sharp = false
+				sharp_or_flat(sharp)
+			elseif not sharp then
+			    sharp = true
+			    sharp_or_flat(sharp)
+			end
+			for t, tgl in ipairs(group_pitchToggles) do
+				tgl.txt = note_names[t]
+			end
+		end
 		--Set scale
 		if pp.shiftRightClick then 
 			for t = p, p+11 do

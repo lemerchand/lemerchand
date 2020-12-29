@@ -1,6 +1,23 @@
 --@noindex
 --Returns the index of the note under mouse cursor
 
+function save_on_exit(path, sharp)
+	local file = io.open(path .. 'soe.dat', 'w')
+	io.output(file)
+	file:write(tostring(sharp))
+	file:close()
+end
+
+function restore_on_exit(path)
+	local file = io.open(path .. 'soe.dat', 'r')
+	if not file then return true end
+	io.input(file)
+	local sharp = file:read()
+	file:close()
+	if sharp == "true" then return true else return false end
+end
+
+
 function create_preset_action(path, preset)
 	
 	local file = io.open(path .. 'preset_actions/preset_template.lua', 'r')
@@ -62,6 +79,7 @@ end
 function load_preset(path, preset)
 	local file = io.open(path .. '/presets/' .. preset .. '.dat', 'r')
 	io.input()
+	if not file then reaper.ShowMessageBox(preset .. " does not exist!", "Error", 0) ; return end
 	for i, e in ipairs(group_pitchToggles) do
 		if file:read() == "true" then
 			e.state = true 
@@ -272,17 +290,23 @@ end
 
 
 function note_to_midi(str)
+	local note_names_flat  =  {'C','Db', 'D', 'Eb', 'E',				--Note names for notes_list
+					'F','Gb', 'G', 'Ab', 'A', 
+					'Bb','B'}
+	local note_names_sharp 	= {'C','C#', 'D', 'D#', 'E',				--Note names for notes_list
+					'F','F#', 'G', 'G#', 'A', 
+					'A#','B'}
 
 	--separate the octave and note name
-	o = tonumber(str.match(str, '%d%d')) or tonumber(str.match(str, '%d'))
-	n = str.match(str, '%u%p') or str.match(str, '%u')
+	local o = tonumber(str.match(str, '%d%d')) or tonumber(str.match(str, '%d'))
+	local n = str.match(str, '%u%p?b?') or str.match(str, '%u%p?b?')
 
 	for i = 1, 12 do
-		--cons("Note name: " .. note_names[i] .. "\nNote list:" .. note_midi_n[i], false)
-		if n == note_names[i] then return (note_midi_n[i] + (o*12)) end
+		--cons("Note name: " .. o .. "\nNote list:" .. n ,true)
+		if n == note_names_sharp[i] or n == note_names_flat[i] then return (note_midi_n[i] + (o*12)) end
 	end
 
-	cons(midi_n-1, true)
+	
 end
 
 function update_active_arrange()

@@ -1,8 +1,11 @@
--- @version 0.5.1b
+-- @version 0.6.1b
 -- @author Lemerchand
 -- @provides
 --     [main] .
 --     [nomain] /libss/*.lua
+-- @changelog
+--     + Enabled routing of midi and audio
+--     + Added help pages
 
 function reaperDoFile(file) local info = debug.getinfo(1,'S'); script_path = info.source:match[[^@?(.*[\/])[^\/]-$]]; dofile(script_path .. file); end
 reaperDoFile('../libss/gui.lua')
