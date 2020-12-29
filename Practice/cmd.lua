@@ -20,6 +20,7 @@ gfx.init("Console", 425, 310, false, mousex+50,mousey-200)
 local win = reaper.JS_Window_Find("Console", true)
 if win then reaper.JS_Window_AttachTopmostPin(win) end
 
+
 ----------------------------
 --Custom Colors-------------
 ----------------------------
@@ -60,14 +61,14 @@ status = Status:Create()
 status.hide = true
 
 --Create GUI frame and make everything relative to it
-frame = Frame:Create(10, 0, gfx.w-20, gfx.h-35, "")
+frame = Frame:Create(10, -5, gfx.w-20, gfx.h, "")
 
 --Create the main text input field and set it to always active
 local cmd = TextField:Create(10, frame.y+frame.h, frame.w+1, 20, "", "", true, false)
 cmd.alwaysActive = true
 
 --Create a text display for information
-local display = Display:Create(frame.x+15, frame.y+20, frame.w-135, frame.h-70)
+local display = Display:Create(frame.x+15, frame.y+20, frame.w-135, frame.h-60)
 local display2 = Display:Create(frame.x+15, frame.y+frame.h-40, frame.w-120, frame.h)
 
 
@@ -412,9 +413,9 @@ end
 
 --Handles resize whenever the refresh threshold is reached
 local function gui_size_update()
-	frame.w, frame.h = gfx.w-20, gfx.h-30
+	frame.w, frame.h = gfx.w-20, gfx.h-25
 	cmd.w, cmd.y = frame.w+1, frame.y+frame.h
-	display.h = frame.h-70
+	display.h = frame.h-60
 	display2.y = frame.y+frame.h-40
 end
 
@@ -942,6 +943,12 @@ function main()
 		gui_size_update()
 	else 
 		refresh = refresh+1 
+	end
+
+	if reaper.JS_Window_GetFocus() == win then 
+		reaper.JS_Window_SetOpacity( win, 'ALPHA',  1) 
+	else
+		reaper.JS_Window_SetOpacity(win, 'ALPHA', .85)
 	end
 	
 	-- reaper.ClearConsole()
