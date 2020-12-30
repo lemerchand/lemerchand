@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Scripts by Lemerchand" commit="ac7bf1cb589415aba763e648996a5c580e24f470">
+<index version="1" name="Scripts by Lemerchand" commit="3afa681b44009f617e2d421d537942905c4686dc">
   <category name="MIDI Selector Tool">
     <reapack name="MIDI Selector Tool.lua" type="script">
       <version name="1.0.777b" author="Lemerchand" time="2020-12-22T05:44:21Z">
@@ -143,6 +143,14 @@
         <source main="main">https://github.com/lemerchand/lemerchand/raw/ac7bf1cb589415aba763e648996a5c580e24f470/Practice/cmd.lua</source>
         <source file="../libss/cf.lua">https://github.com/lemerchand/lemerchand/raw/ac7bf1cb589415aba763e648996a5c580e24f470/libss/cf.lua</source>
         <source file="../libss/gui.lua">https://github.com/lemerchand/lemerchand/raw/ac7bf1cb589415aba763e648996a5c580e24f470/libss/gui.lua</source>
+      </version>
+      <version name="0.6.6b" author="Lemerchand" time="2020-12-30T00:37:43Z">
+        <changelog><![CDATA[+ Logged commands persist on close
++ Enabled routing of midi and audio
++ Added help pages]]></changelog>
+        <source main="main">https://github.com/lemerchand/lemerchand/raw/3afa681b44009f617e2d421d537942905c4686dc/Practice/cmd.lua</source>
+        <source file="../libss/cf.lua">https://github.com/lemerchand/lemerchand/raw/3afa681b44009f617e2d421d537942905c4686dc/libss/cf.lua</source>
+        <source file="../libss/gui.lua">https://github.com/lemerchand/lemerchand/raw/3afa681b44009f617e2d421d537942905c4686dc/libss/gui.lua</source>
       </version>
     </reapack>
   </category>
