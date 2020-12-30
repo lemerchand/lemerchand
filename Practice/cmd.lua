@@ -1,9 +1,10 @@
--- @version 0.6.1b
+-- @version 0.6.6b
 -- @author Lemerchand
 -- @provides
 --     [main] .
 --     [nomain] /libss/*.lua
 -- @changelog
+--     + Logged commands persist on close
 --     + Enabled routing of midi and audio
 --     + Added help pages
 
@@ -16,8 +17,8 @@ reaper.ClearConsole()
 
 local mousex, mousey = reaper.GetMousePosition()
 
-gfx.init("Console", 425, 310, false, mousex+50,mousey-200)
-local win = reaper.JS_Window_Find("Console", true)
+gfx.init("ReaCon", 425, 310, false, mousex+50,mousey-200)
+local win = reaper.JS_Window_Find("ReaCon", true)
 if win then reaper.JS_Window_AttachTopmostPin(win) end
 
 
@@ -195,7 +196,7 @@ function CMD:Parse()
 	if input:find("=") then 
 		local s, e = input:find('=')
 		self.suffix = input:sub(s+1)
-		input = string.lower(input:sub(1, input:find("=")-1))
+		input = input:sub(1, input:find("=")-1)
 	end
 
 
@@ -213,7 +214,7 @@ function CMD:Parse()
 	
 	for t in input:gmatch('[%a%s%d!@#-]*,') do
 		local tt = t:gsub(",", "")
-		table.insert(self.targets, string.lower(tt))
+		table.insert(self.targets, tt)
 	end
 
 end
@@ -258,6 +259,9 @@ function display2:CommitPreview(trackCount, sources)
 	elseif C.suffix:find("b") then commitPreview = commitPreview .. "Toggle FX, "
 	end
 
+	-- Look for color
+	if C.suffix:find("c") then commitPreview = commitPreview.. "Set Color, " end
+
 	if C.renaming then commitPreview = commitPreview .. "Rename, " end
 	if C.prefix == "n" then 
 		if commitPreview == "" then
@@ -298,6 +302,7 @@ function display2:CommitPreview(trackCount, sources)
 			display2:AddLine(commitPreview , something.r, something.g, something.b)
 		end
 	else
+		if commitPreview ~= "" then commitPreview = commitPreview .. "on " end
 		display2:AddLine(commitPreview .. trackCount .. " tracks...", something.r, something.g, something.b)
 	end
 
@@ -313,11 +318,27 @@ end
 local function save_on_exit()
 	local file = io.open(script_path .. "soe.dat", 'w')
 	io.output(file)
-	for h = 10, 1, -1 do
-		file:write(C.history[h] .. '\n')
+	for h =  20, 1, -1 do
+		if C.history[h] then 
+			file:write(C.history[h] .. '\n')
+		end
 	end
 	file:close()
 end
+
+local function restore_on_load()
+	local file = io.open(script_path .. "soe.dat", 'r')
+	io.input(file)
+	if not file then return end
+	for h = 1, 20 do
+		local l = file:read()
+		if l and l ~= "" then C.history[h] = l end
+	end
+	file:close()
+	C.historySeek = #C.history+1
+end
+
+restore_on_load()
 
 
 local function main_display(page)
@@ -339,25 +360,26 @@ local function main_display(page)
 	elseif page == 1 then 
 		display:AddLine("PREFIX COMMANDS", yellow.r, yellow.g, yellow.b)
 		display:AddLine("")
-		display:AddLine("s     -  Inclusively select tracks ", default.r, default.g, default.b, 50)
-		display:AddLine("S     -  Exclusively select tracks ", default.r, default.g, default.b, 50)
-		display:AddLine("c     -  Unselect all tracks", default.r, default.g, default.b, 50)
-		display:AddLine("c     -  Un-mute/solo/arm/unselect all", default.r, default.g, default.b, 50)
-		display:AddLine("D     -  delete selected tracks", default.r, default.g, default.b, 50)
-		display:AddLine("n     -  create new tracks", default.r, default.g, default.b, 50)
+		display:AddLine("s       -    Inclusively select tracks ", default.r, default.g, default.b, 50)
+		display:AddLine("S       -    Exclusively select tracks ", default.r, default.g, default.b, 50)
+		display:AddLine("c       -    Unselect all tracks", default.r, default.g, default.b, 50)
+		display:AddLine("c       -    Un-mute/solo/arm/unselect all", default.r, default.g, default.b, 50)
+		display:AddLine("D       -    delete selected tracks", default.r, default.g, default.b, 50)
+		display:AddLine("n       -    create new tracks", default.r, default.g, default.b, 50)
 		
 	elseif page == 2 then 
 
 		display:AddLine("SUFFIX COMMANDS", yellow.r, yellow.g, yellow.b)
 		display:AddLine("")
-		display:AddLine("=m    -  toggle mute", default.r, default.g, default.b, 50)
-		display:AddLine("=o    -  toggle solo", default.r, default.g, default.b, 50)
-		display:AddLine("=a    -  toggle arm", default.r, default.g, default.b, 50)
-		display:AddLine("=b    -  toggle FX", default.r, default.g, default.b, 50)
-		display:AddLine("=B    -  toggle FX (include Master)", default.r, default.g, default.b, 50)
-		display:AddLine("=i    -  set to MIDI input (all)", default.r, default.g, default.b, 50)
-		display:AddLine("=I    -  set to Audio Input", default.r, default.g, default.b, 50)
-		display:AddLine('="x"  -  rename track to "x"', default.r, default.g, default.b, 50)
+		display:AddLine("=m       -    toggle mute", default.r, default.g, default.b, 50)
+		display:AddLine("=o       -    toggle solo", default.r, default.g, default.b, 50)
+		display:AddLine("=a       -    toggle arm", default.r, default.g, default.b, 50)
+		display:AddLine("=b       -    toggle FX", default.r, default.g, default.b, 50)
+		display:AddLine("=B       -    toggle FX (include Master)", default.r, default.g, default.b, 50)
+		display:AddLine("=c1-16   -    set to custom color", default.r, default.g, default.b, 50)
+		display:AddLine("=i       -    set to MIDI input (all)", default.r, default.g, default.b, 50)
+		display:AddLine("=I       -    set to Audio Input", default.r, default.g, default.b, 50)
+		display:AddLine('="x      -    rename track to "x"', default.r, default.g, default.b, 50)
 		display:AddLine("")
 		display:AddLine("+/- to specify on or off", default.r, default.g, default.b, 50)
 		display:AddLine("Upper Case makes exclusive", default.r, default.g, default.b, 50)
@@ -365,13 +387,13 @@ local function main_display(page)
 	elseif page == 3 then
 		display:AddLine("ROUTING COMMANDS", yellow.r, yellow.g, yellow.b)
 		display:AddLine("")
-		display:AddLine(">     		-  send to", default.r, default.g, default.b, 50)
-		display:AddLine("<     		-  receive from", default.r, default.g, default.b, 50)
-		display:AddLine("")
-		display:AddLine("=ax:y  	-  route x to y (stereo)", default.r, default.g, default.b, 50)
-		display:AddLine("=cx:y 		-  route x to y (midi)", default.r, default.g, default.b, 50)
-		display:AddLine("")
-		display:AddLine("+			-  add to x or y to auto-increment", default.r, default.g, default.b, 50) 
+		display:AddLine(">        -     send to", default.r, default.g, default.b, 50)
+		display:AddLine("<        -     receive from", default.r, default.g, default.b, 50)
+		display:AddLine("+        -     add to x or y to auto-increment", default.r, default.g, default.b, 50) 
+		display:AddLine("=ax:y    -     route x to y (stereo)", default.r, default.g, default.b, 50)
+		display:AddLine("=mx:y    -     route x to y (midi)", default.r, default.g, default.b, 50)
+		
+		
 
 
 	elseif page == 4 then
@@ -395,7 +417,7 @@ local function main_display(page)
 		display:AddLine("")
 		display:AddLine('Send A, B, & Cs MIDI Ch 1 to Kontakt Ch 1, Ch2, Ch 3', default.r, default.g, default.b, 0)
 		display:AddLine("")
-		display:AddLine('s A, B, C > Kontakt=c1+:1', green.r, green.g, green.b, 50)
+		display:AddLine('s A, B, C > Kontakt=m1+:1', green.r, green.g, green.b, 50)
 		display:AddLine("")
 		display:AddLine('Receive Ch 3/4 from Kontakt to Piano 1/2', default.r, default.g, default.b, 0)
 		display:AddLine("")
@@ -768,6 +790,23 @@ local function update_cmd(char)
 		elseif C.suffix:find("B") then set_selected_tracks('I_FXEN', -1, false)
 		end
 
+
+
+		--Look for custom color 
+		if C.suffix:find("c") then 
+			local color = ""
+			if C.suffix:find('c%d+') then 	
+				color = '_SWS_TRACKCUSTCOL' .. C.suffix:sub(2) 
+			else 
+				color = "RANDOM"
+			end
+			if color == "RANDOM" then reaper.Main_OnCommand(reaper.NamedCommandLookup('_SWS_TRACKRANDCOL'), 0)
+			else reaper.Main_OnCommand(reaper.NamedCommandLookup(color), 0)
+			end
+
+		end
+
+
 		--look for record input
 		if C.suffix:find("i%d*") then 
 			local midiChannel = C.suffix:match("i%d+")
@@ -793,11 +832,11 @@ local function update_cmd(char)
 			local audioDestinationChannel = nil
 
 			-- look for midi routing
-			if C.destinationSuffix:find("c%d+") then
-				midiSourceChannel = C.destinationSuffix:match("c%d+")
+			if C.destinationSuffix:find("m%d+") then
+				midiSourceChannel = C.destinationSuffix:match("m%d+")
 			end
 
-			if C.destinationSuffix:find("c%d+%+?:%d+") then
+			if C.destinationSuffix:find("m%d+%+?:%d+") then
 				midiDestinationChannel = C.destinationSuffix:match(":%d+")
 			end
 
@@ -834,8 +873,8 @@ local function update_cmd(char)
 						reaper.BR_GetSetTrackSendInfo(reaper.GetTrack(0, tr), 0, reaper.GetTrackNumSends(reaper.GetTrack(0, C.destinationID), 0) , 'I_SRCCHAN', true, tonumber(audioSourceChannel)) 
 						reaper.BR_GetSetTrackSendInfo(reaper.GetTrack(0, tr), 0, reaper.GetTrackNumSends(reaper.GetTrack(0, C.destinationID), 0) , 'I_DSTCHAN', true, tonumber(audioDestinationChannel))
 
-						if C.destinationSuffix:find("c%d+%+:") then midiSourceChannel = midiSourceChannel + 1 end
-						if C.destinationSuffix:find("c%d+%+?:%d+%+") then midiDestinationChannel = midiDestinationChannel + 1 end
+						if C.destinationSuffix:find("m%d+%+:") then midiSourceChannel = midiSourceChannel + 1 end
+						if C.destinationSuffix:find("m%d+%+?:%d+%+") then midiDestinationChannel = midiDestinationChannel + 1 end
 
 						if C.destinationSuffix:find("a%d+%+:") then audioSourceChannel = audioSourceChannel + 2 end
 						if C.destinationSuffix:find("a%d+%+?:%d+%+") then audioDestinationChannel = audioDestinationChannel + 2 end
@@ -847,8 +886,8 @@ local function update_cmd(char)
 						reaper.BR_GetSetTrackSendInfo(reaper.GetTrack(0, tr), -1, reaper.GetTrackNumSends(reaper.GetTrack(0, tr), 0) , 'I_SRCCHAN', true, tonumber(audioSourceChannel)) 
 						reaper.BR_GetSetTrackSendInfo(reaper.GetTrack(0, tr), -1, reaper.GetTrackNumSends(reaper.GetTrack(0, tr), 0) , 'I_DSTCHAN', true, tonumber(audioDestinationChannel))
 						
-						if C.destinationSuffix:find("c%d+%+:") then midiDestinationChannel = midiDestinationChannel + 1 end
-						if C.destinationSuffix:find("c%d+%+?:%d+%+") then midiSourceChannel = midiSourceChannel + 1 end
+						if C.destinationSuffix:find("m%d+%+:") then midiDestinationChannel = midiDestinationChannel + 1 end
+						if C.destinationSuffix:find("m%d+%+?:%d+%+") then midiSourceChannel = midiSourceChannel + 1 end
 
 						if C.destinationSuffix:find("a%d+%+:") then audioDestinationChannel = audioDestinationChannel + 2 end	
 						if C.destinationSuffix:find("a%d+%+?:%d+%+") then audioSourceChannel = audioSourceChannel + 2 end						
@@ -903,6 +942,7 @@ function main()
 
 	local char = gfx.getchar()
 	if char == 27 or char == -1  or C.exitOnCommand then 
+		save_on_exit()
 		reaper.atexit(reaper.JS_Window_SetFocus(last_window))
 		return
 	-- Otherwise keep window open
@@ -970,6 +1010,7 @@ function main()
 
 	if reaper.JS_Window_GetFocus() == win then 
 		reaper.JS_Window_SetOpacity( win, 'ALPHA',  1) 
+
 	else
 		reaper.JS_Window_SetOpacity(win, 'ALPHA', .85)
 	end
