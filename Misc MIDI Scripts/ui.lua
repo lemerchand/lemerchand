@@ -159,8 +159,20 @@ function Button:Draw()
 
 	self:ResetClicks()
 	if self.hide then return end
-	local r,g,b
-	if self.color then r, g, b = reaper.ColorFromNative( self.color ) end
+	
+	local r, g, b = .3, .3, .3
+	
+	if self.color then 
+		r, g, b = reaper.ColorFromNative( self.color ) 
+		r = r / 255 
+		g = g / 255 
+		b = b / 255 
+	end
+
+	if r == 0 then r = .3 end
+	if g == 0 then g = .3 end
+	if b == 0 then b = .3 end
+
 
 	gfx.setfont(16, self.font, self.fontSize, 'b')
 
@@ -169,26 +181,28 @@ function Button:Draw()
 
 	if self.mouseDown == true then
 
-		gfx.set(.24,.24,.24,1)
+		gfx.set(r-.3,g-.3,b-.3,1)
 		gfx.rect(self.x+1,self.y+1,self.w-2,self.h-2, true)
 
 	elseif self.mouseOver then 
 
-		gfx.set(.31,.31,.31,1)
+		gfx.set(r+.1,g+.1,b+.1,1)
 		gfx.rect(self.x+1,self.y+1,self.w-2,self.h-2, true)
 
 	elseif self.mouseOver == false then
 
-		gfx.set(.27,.27,.27,1)
+		gfx.set(r-.05, g-.05, b-.05,1)
 		gfx.rect(self.x+1,self.y+1,self.w-2,self.h-2, true)
 
 	end
-	if self.color then 
-		gfx.set(r,g,1)
-		
-	else
-		gfx.set(.7,.7,.7,1)
+
+	if r > g and r > b then r = r -.25
+	elseif g > r and g > b then g = g - .25
+	elseif b > r and b > g then b = b - .25
 	end
+
+	if (r <= .3 and g <= .3 and b <= .3) or not self.color then gfx.set(.7,.7,.7) else gfx.set(r-.3, g-.3, b-.3) end
+
 	if self.name then 
 		gfx.x, gfx.y = self.x-6, self.y-self.fontSize
 		gfx.drawstr(self.txt, 1 | 4, self.w+self.x, self.h+self.y)
@@ -229,5 +243,15 @@ end
 
 function Button:Reset()
 
+end
+
+
+function Button:restore_ME()
+	--TODO: Store and restore selected media items
+	local starttime = reaper.GetMediaItemInfo_Value(self.item, 'D_POSITION')
+	reaper.SelectAllMediaItems(0, false)
+	reaper.SetEditCurPos(starttime , true, true )
+	reaper.SetMediaItemSelected(self.item, true )
+	reaper.Main_OnCommand(40153, 0)
 end
 -------------------------------------------END: BUTTON--------------------------------------------------------
