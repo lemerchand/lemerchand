@@ -9,7 +9,7 @@ local btn_add = Button:Create(nil, 10, "Add", nil, nil,nil,nil, nil, 35)
 local btn_clear = Button:Create(nil, btn_add.y+btn_add.h+5, "CLR", nil, nil, nil, nil, nil, 35)
 local bookmarks = {}
 local clickTimer = -1
-
+local debug = false
 
 function new_bookmark()
 	local context = reaper.MIDIEditor_GetActive() or -1
@@ -83,6 +83,8 @@ function update_button_position()
 end
 
 function prev_editor()
+	debug = true
+	reaper.UpdateArrange()
 	local curWin = reaper.MIDIEditor_GetActive()
 	local curWinTake = reaper.MIDIEditor_GetTake(curWin)
 	for i, me in ipairs(bookmarks) do
@@ -99,6 +101,8 @@ function prev_editor()
 end
 
 function next_editor()
+	debug = true
+	reaper.UpdateArrange()
 	local curWin = reaper.MIDIEditor_GetActive()
 	local curWinTake = reaper.MIDIEditor_GetTake(curWin)
 	for i, me in ipairs(bookmarks) do
@@ -112,6 +116,15 @@ function next_editor()
 			end
 		end
 	end
+end
+
+function clear_all_bookmarks(closeWindow)
+	for i = #bookmarks, 1, -1 do
+		table.remove(Elements, i+2)
+	end
+	bookmarks = {}
+	update_button_position()
+	reaper.Main_OnCommand(40716, 0)
 end
 
 function main()
@@ -139,21 +152,26 @@ function main()
 
 	-- Clear all bookmarks
 	if btn_clear.leftClick then
-		for i = #bookmarks, 1, -1 do
-			table.remove(Elements, i+2)
-		end
-		bookmarks = {}
-		update_button_position()
+		clear_all_bookmarks(false)
+	elseif btn_clear.rightClick then
+		clear_all_bookmarks(true)
+
 	end
 
 	for i, b in ipairs(bookmarks) do
 		if b.leftClick then b:restore_ME() end
-		if b.rightClick and clickTimer  < 0 then 
+		if b.ctrlLeftClick and clickTimer  < 0 then 
 			table.remove(bookmarks, i)
 			--WARNING: The i+1 is to help lua find the button. If there is no button before the bookmarks begin then remove +2
 			table.remove(Elements, i+2)
 			update_button_position()
 			clickTimer = 5
+		end
+		if b.rightClick  and clickTimer < 0 then
+			reaper.SelectAllMediaItems(0, false)
+			reaper.SetMediaItemSelected(b.item, true)
+			reaper.Main_OnCommand(40057, 0)
+			reaper.Main_OnCommand(42398, 0)
 		end
 	end
 
@@ -165,14 +183,23 @@ function main()
 	if char == 27  then 
 		reaper.atexit(reaper.JS_Window_SetFocus(last_window))
 		return
+	elseif char == 26 and gfx.mouse_cap == 12 then reaper.Main_OnCommand(40030, 0)
+	elseif char == 26 then reaper.Main_OnCommand(40029, 0)
+
 	-- Otherwise keep window open
-	else reaper.defer(main)
 	end
---- DEBUG
+	reaper.defer(main)
+	
+-- DEBUG
 
-	cons("Bookmark count: " .. #bookmarks .. "\n"
 
-		, true)
+if debug then
+		cons("Bookmark count: " .. #bookmarks .. "\n")
+	for i, b in ipairs(bookmarks) do
+		cons(i .. ". " .. b.txt .. "\n")
+	end
+	debug = false
+end
 
 end
 main()
