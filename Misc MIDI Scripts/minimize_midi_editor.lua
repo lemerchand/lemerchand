@@ -83,13 +83,14 @@ function update_button_position()
 end
 
 function prev_editor()
-	debug = true
-	reaper.UpdateArrange()
+
+
 	local curWin = reaper.MIDIEditor_GetActive()
 	local curWinTake = reaper.MIDIEditor_GetTake(curWin)
 	for i, me in ipairs(bookmarks) do
 		
 		if  me.take == curWinTake then 
+			debug = true
 			if i == 1 then bookmarks[#bookmarks]:restore_ME()
 				return
 			else
@@ -101,13 +102,14 @@ function prev_editor()
 end
 
 function next_editor()
-	debug = true
-	reaper.UpdateArrange()
+	
+	
 	local curWin = reaper.MIDIEditor_GetActive()
 	local curWinTake = reaper.MIDIEditor_GetTake(curWin)
 	for i, me in ipairs(bookmarks) do
 		
 		if  me.take == curWinTake then 
+			debug = true
 			if i == #bookmarks then bookmarks[1]:restore_ME()
 				return
 			else
