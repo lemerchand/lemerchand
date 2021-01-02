@@ -16,29 +16,41 @@ function new_bookmark()
 	local selectedItems = 1
 	local take, item
 
+	-- if there is no currently active ME then we need to look for selected arrangeview items
 	if context == -1 then selectedItems =  reaper.CountSelectedMediaItems(0) end
 
-
+	-- run thrugh the selected items
 	for i = 0, selectedItems-1 do
+		-- if we are looking for items then...
 		if context == -1 then 
 			item = reaper.GetSelectedMediaItem(0, i)
 			take = reaper.GetActiveTake(item)
+		-- if we are looking for ME then...
 		else
 			take = reaper.MIDIEditor_GetTake(context) 
 			item = reaper.GetMediaItemTake_Item(take)
 		end
-		
+
+		-- either way, we need a track name, and a track object
 		local retval, stringNeedBig = reaper.GetSetMediaItemTakeInfo_String( take, 'P_NAME', "", false)
 		local track = reaper.GetMediaItemInfo_Value( item, 'P_TRACK' )
+
+		-- now let's check for and prevent duplicate bookmarks
 		for ii, b in ipairs(bookmarks) do
 			if b.item == item then goto pass end
 		end
+
+		-- now acquire the name of the parent track, as well as it's color
 		local retval, trackName = reaper.GetTrackName( track )
 		local color = reaper.GetTrackColor( track )
 
 
+		-- create the button for it, add it into bookmarks, don't worrk about the x/y since we
+		-- will run update_button_position() anyway. 
 		table.insert(bookmarks, Button:Create(nil, nil, trackName:sub(1,20), stringNeedBig:sub(1,20), editor, take, item, 150, 35, color))
 		update_button_position()
+		
+		-- in case it's a duplicate, go on to the next item
 		::pass::
 	end
 end
@@ -46,33 +58,86 @@ end
 
 
 function update_button_position()
+--[[	
+		So now we need to run thruogh the table of book marks and move their positions relative to 
+		one aother and the dimensions of the gfx window
+
+ 		1. If we are on the first bookmark then set the x/y manully (this accounts for the add/clr btns..
+ 			all subsequent bookmarks cabn be positioned relative to that
+		2. Place them to the right of the previouse btn..if they exceed the window's edge then reset their X
+			and increase their y (relative to the buttons above) 
+]]--
 	for i, b in ipairs(bookmarks) do
-	
-		if not bookmarks[i-1] then
+		if not bookmarks[i-1] then 						--[1]
 			b.x = 55
 			b.y = 10
-		else
-			b.x = bookmarks[i-1].x + 155
+		else 											--[2]
+			b.x = bookmarks[i-1].x + 155			
 			b.y = bookmarks[i-1].y
 			if b.x+b.w >= gfx.w-10 then
 				b.x = 55
 				b.y = bookmarks[i-1].y + 40
 			end
 		end
-
 	end
 end
 
+function prev_editor()
+	local curWin = reaper.MIDIEditor_GetActive()
+	local curWinTake = reaper.MIDIEditor_GetTake(curWin)
+	for i, me in ipairs(bookmarks) do
+		
+		if  me.take == curWinTake then 
+			if i == 1 then bookmarks[#bookmarks]:restore_ME()
+				return
+			else
+				bookmarks[i-1]:restore_ME()
+				return
+			end
+		end
+	end
+end
 
+function next_editor()
+	local curWin = reaper.MIDIEditor_GetActive()
+	local curWinTake = reaper.MIDIEditor_GetTake(curWin)
+	for i, me in ipairs(bookmarks) do
+		
+		if  me.take == curWinTake then 
+			if i == #bookmarks then bookmarks[1]:restore_ME()
+				return
+			else
+				bookmarks[i+1]:restore_ME()
+				return
+			end
+		end
+	end
+end
 
 function main()
 	--Draws all elements
 	fill_background()
 	draw_elements()
 
+	--let's find our alt+tab keys (actually alt-ctrl-left/right)
+	-- 37 = < 39 = >
+
+	if reaper.JS_Mouse_GetState(-1) == 20 and clickTimer < 0 then
+		if reaper.JS_VKeys_GetState(-1):byte(37) == 1 then 
+			prev_editor() 
+			clickTimer = 5
+		elseif reaper.JS_VKeys_GetState(-1):byte(39)  == 1 then next_editor() 
+			clickTimer = 5
+		end
+
+	end
+
+	-- Creates a bookmark
 	if btn_add.leftClick then 
 		new_bookmark()
 	end
+
+	-- Clear all bookmarks
 	if btn_clear.leftClick then
 		for i = #bookmarks, 1, -1 do
 			table.remove(Elements, i+2)
@@ -92,6 +157,7 @@ function main()
 		end
 	end
 
+	-- This hack prevents accidental clearing from one mouse click
 	if clickTimer ~= -1 then clickTimer = clickTimer - 1 end
 
 	local char = gfx.getchar()
@@ -102,5 +168,11 @@ function main()
 	-- Otherwise keep window open
 	else reaper.defer(main)
 	end
+--- DEBUG
+
+	cons("Bookmark count: " .. #bookmarks .. "\n"
+
+		, true)
+
 end
 main()
