@@ -40,7 +40,7 @@ A tool for quickly selecting midi notes in REAPER. Filters for events such as:
 
 **Installation:**
 
-Add this reapack repo: https://discord.com/channels/694864147032309761/694864147606929440/792110092635078656 and install "MIDI Selector Tool"
+Add this reapack repo: https://raw.githubusercontent.com/lemerchand/lemerchand/master/index.xml  and install "MIDI Selector Tool"
 
 Dependencies: 
 	
