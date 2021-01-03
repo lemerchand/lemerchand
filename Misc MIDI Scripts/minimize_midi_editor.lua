@@ -84,16 +84,14 @@ end
 
 function prev_editor()
 
-
-	local curWin = reaper.MIDIEditor_GetActive()
-	local curWinTake = reaper.MIDIEditor_GetTake(curWin)
-	for i, me in ipairs(bookmarks) do
-		
-		if  me.take == curWinTake then 
-			debug = true
-			if i == 1 then bookmarks[#bookmarks]:restore_ME()
+	for i, me in ipairs(bookmarks) do	
+		if me.active then 
+			if i == 1 then 
+				group_exec(bookmarks, 'false')
+				bookmarks[#bookmarks]:restore_ME()
 				return
 			else
+				group_exec(bookmarks, 'false')
 				bookmarks[i-1]:restore_ME()
 				return
 			end
@@ -102,22 +100,21 @@ function prev_editor()
 end
 
 function next_editor()
-	
-	
-	local curWin = reaper.MIDIEditor_GetActive()
-	local curWinTake = reaper.MIDIEditor_GetTake(curWin)
-	for i, me in ipairs(bookmarks) do
-		
-		if  me.take == curWinTake then 
-			debug = true
-			if i == #bookmarks then bookmarks[1]:restore_ME()
+	for i, me in ipairs(bookmarks) do	
+		if me.active then 
+			if i == #bookmarks then 
+				group_exec(bookmarks, 'false')
+				bookmarks[1]:restore_ME()
 				return
 			else
+				group_exec(bookmarks, 'false')
 				bookmarks[i+1]:restore_ME()
 				return
 			end
 		end
-	end
+	end	
+	
+
 end
 
 function clear_all_bookmarks(closeWindow)

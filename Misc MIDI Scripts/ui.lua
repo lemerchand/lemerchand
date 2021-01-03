@@ -76,7 +76,7 @@ function group_exec(group, action)
 		end
 	elseif action == 'false' then
 		for e, element in ipairs(group) do
-			element.state = false
+			element.active = false
 		end
 	elseif action == 'block' then
 		for e, element in ipairs(group) do
@@ -134,7 +134,8 @@ function Button:Create(x, y, txt, name, editor, take, item, w, h, color, font, f
 		altRightClick = false,
 		hide = hide or false,
 		font = "Lucida Console",
-		fontSize = fontSize or 12
+		fontSize = fontSize or 12,
+		active=false
 	}
 	setmetatable(this, Button)
 	table.insert(Elements, this)
@@ -260,5 +261,6 @@ function Button:restore_ME()
 	reaper.SetEditCurPos(starttime , true, true )
 	reaper.SetMediaItemSelected(self.item, true )
 	reaper.Main_OnCommand(40153, 0)
+	self.active = true
 end
 -------------------------------------------END: BUTTON--------------------------------------------------------
