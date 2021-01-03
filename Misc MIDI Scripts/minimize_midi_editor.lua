@@ -3,13 +3,42 @@ reaperDoFile('ui.lua')
 reaperDoFile('../libss/cf.lua')
 reaper.ClearConsole()
 
-gfx.init("MIDI Editor Tray", 225,500)
 
 local btn_add = Button:Create(nil, 10, " ADD", nil, nil,nil,nil, 40, 35)
 local btn_clear = Button:Create(nil, btn_add.y+btn_add.h+5, " CLR", nil, nil, nil, nil, 40, 35)
 local bookmarks = {}
 local clickTimer = -1
 local debug = false
+local dockstate = 0
+
+
+function load_global_settings()
+	local file = io.open(script_path .. "globalsettings.dat", 'r')
+
+	if not file then save_global_settings() ;  file = io.open(script_path .. "globalsettings.dat", 'r') end
+
+	local line
+	
+	io.input(file)
+
+	while true do
+		line = file:read()
+		if line == nil then break end
+		if line:find("dockstate=") then dockstate = line:sub(line:find("=")+1) end
+	end
+	file:close()
+end
+
+function save_global_settings()
+	local file = io.open(script_path .. "globalsettings.dat", 'w')
+	local line
+	
+	io.output(file)
+
+	file:write('dockstate=' .. gfx.dock(-1))
+	file:close()
+
+end
 
 function new_bookmark()
 	local context = reaper.MIDIEditor_GetActive() or -1
@@ -97,6 +126,7 @@ function prev_editor()
 			end
 		end
 	end
+	bookmarks[1]:restore_ME()
 end
 
 function next_editor()
@@ -113,7 +143,7 @@ function next_editor()
 			end
 		end
 	end	
-	
+	bookmarks[1]:restore_ME()
 
 end
 
@@ -126,7 +156,23 @@ function clear_all_bookmarks(closeWindow)
 	if closeWindow then reaper.Main_OnCommand(40716, 0) end
 end
 
+
+--[[
+
+	Load settings, create window, look at a pig's butt
+
+]]--
+
+load_global_settings()
+
+gfx.init("MIDI Editor Tray", 225,500, dockstate)
+
+
+
+
 function main()
+
+	
 	--Draws all elements
 	fill_background()
 	draw_elements()
@@ -138,8 +184,11 @@ function main()
 		if reaper.JS_VKeys_GetState(-1):byte(37) == 1 then 
 			prev_editor() 
 			clickTimer = 1
-		elseif reaper.JS_VKeys_GetState(-1):byte(39)  == 1 then next_editor() 
+		elseif reaper.JS_VKeys_GetState(-1):byte(39)  == 1 then 
+			next_editor() 
 			clickTimer = 1
+		elseif reaper.JS_VKeys_GetState(-1):byte(13) == 1 then new_bookmark()
+		elseif reaper.JS_VKeys_GetState(-1):byte(8) == 1 then clear_all_bookmarks(true)
 		end
 
 	end
@@ -180,6 +229,7 @@ function main()
 	local char = gfx.getchar()
 	--Exit/defer handling
 	if char == 27  then 
+		save_global_settings()
 		reaper.atexit(reaper.JS_Window_SetFocus(last_window))
 		return
 	elseif char == 26 and gfx.mouse_cap == 12 then reaper.Main_OnCommand(40030, 0)
@@ -193,7 +243,7 @@ function main()
 
 
 if debug then
-		cons("Bookmark count: " .. #bookmarks .. "\n")
+	cons("Bookmark count: " .. #bookmarks .. "\n")
 	for i, b in ipairs(bookmarks) do
 		cons(i .. ". " .. b.txt .. "\n")
 	end
