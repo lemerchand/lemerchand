@@ -3,7 +3,7 @@ reaperDoFile('ui.lua')
 reaperDoFile('../libss/cf.lua')
 reaper.ClearConsole()
 
-gfx.init("MIDI Editor Tray", 225,500, true)
+gfx.init("MIDI Editor Tray", 225,500)
 
 local btn_add = Button:Create(nil, 10, "Add", nil, nil,nil,nil, nil, 35)
 local btn_clear = Button:Create(nil, btn_add.y+btn_add.h+5, "CLR", nil, nil, nil, nil, nil, 35)
@@ -126,7 +126,7 @@ function clear_all_bookmarks(closeWindow)
 	end
 	bookmarks = {}
 	update_button_position()
-	reaper.Main_OnCommand(40716, 0)
+	if closeWindow then reaper.Main_OnCommand(40716, 0) end
 end
 
 function main()

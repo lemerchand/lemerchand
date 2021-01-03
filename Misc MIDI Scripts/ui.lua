@@ -196,12 +196,19 @@ function Button:Draw()
 
 	end
 
-	if r > g and r > b then r = r -.25
-	elseif g > r and g > b then g = g - .25
-	elseif b > r and b > g then b = b - .25
+	-- if r > g and r > b then r = r -.05 ; b = b+.1
+	-- elseif g > r and g > b then g = g - .05 ; b=b+.1
+	-- elseif b > r and b > g then b = b - .05 ; r = r +.1
+	-- end
+
+	if r+g+b > 1.2 then
+		gfx.set(.2, .2, .2)
+	elseif r+g+b > 9 then
+		gfx.set(.3, .3, .3)
+	else gfx.set(.7, .7, .7)
 	end
 
-	if (r <= .3 and g <= .3 and b <= .3) or not self.color then gfx.set(.7,.7,.7) else gfx.set(r-.3, g-.3, b-.3) end
+	--if (r <= .3 and g <= .3 and b <= .3) or not self.color then gfx.set(.7,.7,.7) else gfx.set(r-.3, g-.3, b-.3) end
 
 	if self.name then 
 		gfx.x, gfx.y = self.x-6, self.y-self.fontSize
