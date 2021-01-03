@@ -5,8 +5,8 @@ reaper.ClearConsole()
 
 gfx.init("MIDI Editor Tray", 225,500)
 
-local btn_add = Button:Create(nil, 10, "Add", nil, nil,nil,nil, nil, 35)
-local btn_clear = Button:Create(nil, btn_add.y+btn_add.h+5, "CLR", nil, nil, nil, nil, nil, 35)
+local btn_add = Button:Create(nil, 10, " ADD", nil, nil,nil,nil, 40, 35)
+local btn_clear = Button:Create(nil, btn_add.y+btn_add.h+5, " CLR", nil, nil, nil, nil, 40, 35)
 local bookmarks = {}
 local clickTimer = -1
 local debug = false
@@ -137,9 +137,9 @@ function main()
 	if reaper.JS_Mouse_GetState(-1) == 20 and clickTimer < 0 then
 		if reaper.JS_VKeys_GetState(-1):byte(37) == 1 then 
 			prev_editor() 
-			clickTimer = 5
+			clickTimer = 1
 		elseif reaper.JS_VKeys_GetState(-1):byte(39)  == 1 then next_editor() 
-			clickTimer = 5
+			clickTimer = 1
 		end
 
 	end

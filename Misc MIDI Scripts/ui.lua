@@ -170,9 +170,11 @@ function Button:Draw()
 		b = b / 255 
 	end
 
-	if r == 0 then r = .3 end
-	if g == 0 then g = .3 end
-	if b == 0 then b = .3 end
+	if r <= .05 and g <= .05 and b <= .05 then 
+		r = .23
+	 	g = .23
+	 	b = .23
+	 end
 
 
 	gfx.setfont(16, self.font, self.fontSize, 'b')
@@ -194,18 +196,22 @@ function Button:Draw()
 
 		gfx.set(r-.05, g-.05, b-.05,1)
 		gfx.rect(self.x+1,self.y+1,self.w-2,self.h-2, true)
-
 	end
 
+	if self.active then 
+		gfx.set(r+.15, g+.15,b+.15)
+		gfx.rect(self.x+1, self.y+self.h-3, self.w-2, 2)
+	end
+
+	-- Some color mngmt I may decide to use later
 	-- if r > g and r > b then r = r -.05 ; b = b+.1
 	-- elseif g > r and g > b then g = g - .05 ; b=b+.1
 	-- elseif b > r and b > g then b = b - .05 ; r = r +.1
 	-- end
 
-	if r+g+b > 1.2 then
-		gfx.set(.2, .2, .2)
-	elseif r+g+b > 9 then
-		gfx.set(.3, .3, .3)
+	if r+g+b > 1.8 then
+		gfx.set(.25, .25, .25)
+
 	else gfx.set(.7, .7, .7)
 	end
 
