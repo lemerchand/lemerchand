@@ -4,8 +4,8 @@ reaperDoFile('../libss/cf.lua')
 reaper.ClearConsole()
 
 
-local btn_add = Button:Create(nil, 10, " ADD", nil, nil,nil,nil, 40, 35)
-local btn_clear = Button:Create(nil, btn_add.y+btn_add.h+5, " CLR", nil, nil, nil, nil, 40, 35)
+local btn_add = Button:Create(nil, 10, " ADD", nil, nil,nil,nil, 40, 28)
+local btn_clear = Button:Create(nil, btn_add.y+btn_add.h+3, " CLR", nil, nil, nil, nil, 40, 28)
 local bookmarks = {}
 local clickTimer = -1
 local debug = false
@@ -76,7 +76,7 @@ function new_bookmark()
 
 		-- create the button for it, add it into bookmarks, don't worrk about the x/y since we
 		-- will run update_button_position() anyway. 
-		table.insert(bookmarks, Button:Create(nil, nil, trackName:sub(1,20), stringNeedBig:sub(1,20), editor, take, item, 150, 35, color))
+		table.insert(bookmarks, Button:Create(nil, nil, trackName:sub(1,20), stringNeedBig:sub(1,20), editor, take, item, 150, 28, color))
 		update_button_position()
 		
 		-- in case it's a duplicate, go on to the next item
@@ -105,7 +105,7 @@ function update_button_position()
 			b.y = bookmarks[i-1].y
 			if b.x+b.w >= gfx.w-10 then
 				b.x = 55
-				b.y = bookmarks[i-1].y + 40
+				b.y = bookmarks[i-1].y + 30
 			end
 		end
 	end

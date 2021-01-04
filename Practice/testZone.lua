@@ -16,16 +16,17 @@ local lastChar = 0
 function insert_random_notes()
 
 	update_active_midi()
-	local takeLength = reaper.BR_GetMidiSourceLenPPQ( take )
+	for i = 0, notes-1 do
+		retval, selected, muted, curNoteStartppqpos, curNoteEndppqpos, chan, pitch, vel = reaper.MIDI_GetNote( take, i)
+		retval2, selected2, muted2, nextNoteStartppqpos, nextNoteEndppqpos, chan2, pitch2, vel2 = reaper.MIDI_GetNote( take, i+1 )
 
-	local amount  = math.random(0,25)
-
-	for n = 0, amount do
-		local row = math.random(75, 125)
-		local ppq = math.random(0,takeLength-30) 
-		ppq = ppq - (ppq%120)
-		reaper.MIDI_InsertNote(take, true, false, ppq, ppq+240, 1, row, 80, true)
+		if curNoteEndppqpos > nextNoteStartppqpos and i ~= notes-1 then 
+			reaper.MIDI_SetNote(take, i, true, nil, nil, nil, nil, nil, 127, true)
+			reaper.MIDI_SetNote(take, i+1, true, nil, nil, nil, nil, nil, 127, true)
+		end
+		
 	end
+
 	reaper.MIDI_Sort(take)
 end
 

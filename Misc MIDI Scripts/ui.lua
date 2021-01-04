@@ -99,7 +99,7 @@ Button.__index = Button
 
 function Button:Create(x, y, txt, name, editor, take, item, w, h, color, font, fontSize,hide)
 
-	if font == nil then gfx.setfont(16, "Lucida Console", 12, 'b') end
+	if font == nil then gfx.setfont(16, "Lucida Console", 11, 'b') end
 
 	if w == nil then 
 		ww,hh = gfx.measurestr(txt)
@@ -135,7 +135,7 @@ function Button:Create(x, y, txt, name, editor, take, item, w, h, color, font, f
 		altRightClick = false,
 		hide = hide or false,
 		font = "Lucida Console",
-		fontSize = fontSize or 12,
+		fontSize = fontSize or 11,
 		active=false,
 		mouseUp = true,
 		block = false
@@ -223,9 +223,9 @@ function Button:Draw()
 	--if (r <= .3 and g <= .3 and b <= .3) or not self.color then gfx.set(.7,.7,.7) else gfx.set(r-.3, g-.3, b-.3) end
 
 	if self.name then 
-		gfx.x, gfx.y = self.x-6, self.y-self.fontSize
-		gfx.drawstr(self.txt, 1 | 4, self.w+self.x, self.h+self.y)
-		gfx.x, gfx.y = self.x-6, self.y+self.fontSize+(self.fontSize*.5)
+		-- gfx.x, gfx.y = self.x, self.y-self.fontSize
+		-- gfx.drawstr(self.txt, 1 | 4, self.w+self.x, self.h+self.y)
+		gfx.x, gfx.y = self.x-3, self.y+3 --+self.fontSize+(self.fontSize*.5)
 		gfx.drawstr(self.name, 1 | 4, self.w+self.x, self.h+self.y)
 	else
 		gfx.x = self.x-5
