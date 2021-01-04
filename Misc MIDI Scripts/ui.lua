@@ -38,19 +38,20 @@ end
 --Draws a filled round rectangle
 function filled_round_rect(x,y,w,h, r, g, b)
 
-	local r = r or .7
-	local g = g or .7
-	local b = b or .7
+	-- local r = r or .7
+	-- local g = g or .7
+	-- local b = b or .7
 
 	--Draw plain filled in rectangle
 	gfx.x, gfx.y = x, y
-	gfx.set(r, g, b, 1)
+	--gfx.set(r, g, b, 1)
 
 	gfx.rect(x+1, y+1, w-1 , h-1, true)
 
 	--Round off the corners
 	gfx.set(.19,.19,.19,1)
 	gfx.roundrect(x, y, w, h, 4, true)
+
 
 end
 
@@ -182,28 +183,29 @@ function Button:Draw()
 
 	gfx.setfont(16, self.font, self.fontSize, 'b')
 
-	draw_border(self.x, self.y, self.w, self.h)
+	--filled_round_rect(self.x-1, self.y-1, self.w+1, self.h+1,r,g,b)
 	gfx.x, gfx.y = self.x, self.y
+
 
 	if self.mouseDown == true then
 
 		gfx.set(r-.3,g-.3,b-.3,1)
-		gfx.rect(self.x+1,self.y+1,self.w-2,self.h-2, true)
+		filled_round_rect(self.x+1,self.y+1,self.w-2,self.h-2, true)
 
 	elseif self.mouseOver then 
 
 		gfx.set(r+.1,g+.1,b+.1,1)
-		gfx.rect(self.x+1,self.y+1,self.w-2,self.h-2, true)
+		filled_round_rect(self.x+1,self.y+1,self.w-2,self.h-2, true)
 
 	elseif self.mouseOver == false then
 
 		gfx.set(r-.05, g-.05, b-.05,1)
-		gfx.rect(self.x+1,self.y+1,self.w-2,self.h-2, true)
+		filled_round_rect(self.x+1,self.y+1,self.w-2,self.h-2)
 	end
 
 	if self.active then 
 		gfx.set(r+.15, g+.15,b+.15)
-		gfx.rect(self.x+1, self.y+self.h-3, self.w-2, 2)
+		gfx.rect(self.x+2, self.y+self.h-3, self.w-3, 2)
 	end
 
 	-- Some color mngmt I may decide to use later
@@ -259,7 +261,6 @@ function Button:Draw()
 
 		if self.mouseDown and gfx.mouse_cap ~= 0  then 
 			--User is dragging
-			self.block = true
 			 
 			reaper.JS_Mouse_SetCursor(reaper.JS_Mouse_LoadCursor( 182))
 		elseif gfx.mouse_cap == 0 then

@@ -212,6 +212,7 @@ function main()
 
 	end
 
+	-- If the user is dragging then disable buttons
 	for i, b in ipairs(bookmarks) do
 		if b.leftClick then 
 			for ii, bb in ipairs(bookmarks) do
@@ -220,6 +221,8 @@ function main()
 				btn_add.block = true
 			end
 		end
+
+		-- if the user was dragging a bookmark....
 		if b.lastClick == 1 and b.mouseUp then 
 			local window, segment, details = reaper.BR_GetMouseCursorContext()
 			if segment == "track" then 
@@ -228,6 +231,7 @@ function main()
 				reaper.Main_OnCommand(40057, 0)
 				reaper.Main_OnCommand(41221, 0)
 				b.lastClick = 0
+			-- if the user click-releases a bookmark...
 			else b:restore_ME() end 
 				b.lastClick = 0
 		end
@@ -247,7 +251,6 @@ function main()
 	local char = gfx.getchar()
 	--Exit/defer handling
 	if char == 27  then 
-		
 		return
 	elseif char == 26 and gfx.mouse_cap == 12 then reaper.Main_OnCommand(40030, 0)
 	elseif char == 26 then reaper.Main_OnCommand(40029, 0)
