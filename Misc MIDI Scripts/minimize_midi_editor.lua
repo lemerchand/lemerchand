@@ -157,6 +157,12 @@ function clear_all_bookmarks(closeWindow)
 end
 
 
+function onexit ()
+	
+	save_global_settings()
+	reaper.JS_Window_SetFocus(last_window)
+end
+
 --[[
 
 	Load settings, create window, look at a pig's butt
@@ -207,13 +213,20 @@ function main()
 	end
 
 	for i, b in ipairs(bookmarks) do
+		if b.leftClick then 
+			for ii, bb in ipairs(bookmarks) do
+				bb.block = true
+				btn_clear.block = true
+				btn_add.block = true
+			end
+		end
 		if b.lastClick == 1 and b.mouseUp then 
 			local window, segment, details = reaper.BR_GetMouseCursorContext()
 			if segment == "track" then 
 				reaper.SelectAllMediaItems(0, false)
 				reaper.SetMediaItemSelected(b.item, true)
 				reaper.Main_OnCommand(40057, 0)
-				reaper.Main_OnCommand(42398, 0)
+				reaper.Main_OnCommand(41221, 0)
 				b.lastClick = 0
 			else b:restore_ME() end 
 				b.lastClick = 0
@@ -234,8 +247,7 @@ function main()
 	local char = gfx.getchar()
 	--Exit/defer handling
 	if char == 27  then 
-		save_global_settings()
-		reaper.atexit(reaper.JS_Window_SetFocus(last_window))
+		
 		return
 	elseif char == 26 and gfx.mouse_cap == 12 then reaper.Main_OnCommand(40030, 0)
 	elseif char == 26 then reaper.Main_OnCommand(40029, 0)
@@ -257,3 +269,4 @@ end
 
 end
 main()
+reaper.atexit(onexit)

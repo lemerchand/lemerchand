@@ -136,7 +136,8 @@ function Button:Create(x, y, txt, name, editor, take, item, w, h, color, font, f
 		font = "Lucida Console",
 		fontSize = fontSize or 12,
 		active=false,
-		mouseUp = true
+		mouseUp = true,
+		block = false
 	}
 	setmetatable(this, Button)
 	table.insert(Elements, this)
@@ -229,7 +230,7 @@ function Button:Draw()
 		gfx.drawstr(self.txt, 1 | 4, self.w+self.x, self.h+self.y+3)
 	end
 
-	if hovering(self.x, self.y, self.w, self.h) then 
+	if hovering(self.x, self.y, self.w, self.h) and not self.block  then 
 		
 		self.mouseOver = true 
 		if gfx.mouse_cap >= 1 and self.mouseDown == false then 
@@ -258,10 +259,12 @@ function Button:Draw()
 
 		if self.mouseDown and gfx.mouse_cap ~= 0  then 
 			--User is dragging
+			self.block = true
 			 
 			reaper.JS_Mouse_SetCursor(reaper.JS_Mouse_LoadCursor( 182))
 		elseif gfx.mouse_cap == 0 then
 
+		self.block = false
 		self.mouseDown = false
 		self.mouseUp = true
 
