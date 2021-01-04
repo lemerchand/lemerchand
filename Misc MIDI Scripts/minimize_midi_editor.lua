@@ -207,20 +207,25 @@ function main()
 	end
 
 	for i, b in ipairs(bookmarks) do
-		if b.leftClick then b:restore_ME() end
-		if b.ctrlLeftClick and clickTimer  < 0 then 
+		if b.lastClick == 1 and b.mouseUp then 
+			local window, segment, details = reaper.BR_GetMouseCursorContext()
+			if segment == "track" then 
+				reaper.SelectAllMediaItems(0, false)
+				reaper.SetMediaItemSelected(b.item, true)
+				reaper.Main_OnCommand(40057, 0)
+				reaper.Main_OnCommand(42398, 0)
+				b.lastClick = 0
+			else b:restore_ME() end 
+				b.lastClick = 0
+		end
+		if b.rightClick and clickTimer  < 0 then 
 			table.remove(bookmarks, i)
 			--WARNING: The i+1 is to help lua find the button. If there is no button before the bookmarks begin then remove +2
 			table.remove(Elements, i+2)
 			update_button_position()
 			clickTimer = 5
 		end
-		if b.rightClick  and clickTimer < 0 then
-			reaper.SelectAllMediaItems(0, false)
-			reaper.SetMediaItemSelected(b.item, true)
-			reaper.Main_OnCommand(40057, 0)
-			reaper.Main_OnCommand(42398, 0)
-		end
+
 	end
 
 	-- This hack prevents accidental clearing from one mouse click
@@ -241,11 +246,11 @@ function main()
 	
 -- DEBUG
 
-
+debug = false
 if debug then
 	cons("Bookmark count: " .. #bookmarks .. "\n")
 	for i, b in ipairs(bookmarks) do
-		cons(i .. ". " .. b.txt .. "\n")
+		cons(i .. ". " .. b.txt .. "\n" .. '\nlastclick: ' .. b.lastClick)
 	end
 	debug = false
 end

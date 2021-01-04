@@ -135,7 +135,8 @@ function Button:Create(x, y, txt, name, editor, take, item, w, h, color, font, f
 		hide = hide or false,
 		font = "Lucida Console",
 		fontSize = fontSize or 12,
-		active=false
+		active=false,
+		mouseUp = true
 	}
 	setmetatable(this, Button)
 	table.insert(Elements, this)
@@ -143,6 +144,7 @@ function Button:Create(x, y, txt, name, editor, take, item, w, h, color, font, f
 end
 
 function Button:ResetClicks()
+
 
 	self.leftClick = false
 	self.rightClick = false
@@ -160,7 +162,7 @@ function Button:Draw()
 
 	self:ResetClicks()
 	if self.hide then return end
-	
+	local drag = false
 	local r, g, b = .3, .3, .3
 	
 	if self.color then 
@@ -235,23 +237,36 @@ function Button:Draw()
 			if gfx.mouse_cap == 4 or gfx.mouse_cap == 8 or gfx.mouse_cap == 16 then self.mouse_down = false
 			else
 				self.mouseDown = true
-				if gfx.mouse_cap == 1 then self.leftClick = true
+				if gfx.mouse_cap == 1 then self.leftClick = true ; self.mouseUp = false
 				elseif gfx.mouse_cap == 2 then self.rightClick = true
 				elseif gfx.mouse_cap == 5 then self.ctrlLeftClick = true
-				elseif gfx.mouse_cap == 9 then self.shiftLeftClick = true
+				elseif gfx.mouse_cap == 9 then self.shiftLeftClick = true ; self.mouseUp = false
 				elseif gfx.mouse_cap == 10 then self.shiftRightClick = true	
 				elseif gfx.mouse_cap == 17 then self.altLeftClick = true
 				elseif gfx.mouse_cap == 18 then self.altRightClick = true
 				elseif gfx.mouse_cap == 64 then self.middleClick = true
 				
 				end
+				self.lastClick = gfx.mouse_cap
 			end
 		elseif gfx.mouse_cap == 0 and self.mouseDown == true then
 			self.mouseDown = false
+			self.mouseUp = true
 		end
 	else
 		self.mouseOver = false
+
+		if self.mouseDown and gfx.mouse_cap ~= 0  then 
+			--User is dragging
+			 
+			reaper.JS_Mouse_SetCursor(reaper.JS_Mouse_LoadCursor( 182))
+		elseif gfx.mouse_cap == 0 then
+
 		self.mouseDown = false
+		self.mouseUp = true
+
+		
+	end
 	end
 end
 
