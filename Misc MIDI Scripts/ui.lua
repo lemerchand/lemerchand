@@ -755,21 +755,23 @@ function Toggle:Draw()
 			if gfx.mouse_cap == 4 or gfx.mouse_cap == 8 or gfx.mouse_cap == 16 then self.mouse_down = false
 			else
 				self.mouseDown = true
+				if not self.mouseUp then return end
 				if gfx.mouse_cap == 1 then 
 					self.leftClick = true
 					if self.state == true then self.state = false else self.state = true end
-				elseif gfx.mouse_cap == 2 then self.rightClick = true
-				elseif gfx.mouse_cap == 5 then self.ctrlLeftClick = true
-				elseif gfx.mouse_cap == 9 then self.shiftLeftClick = true
-				elseif gfx.mouse_cap == 10 then self.shiftRightClick = true	
-				elseif gfx.mouse_cap == 17 then self.altLeftClick = true
-				elseif gfx.mouse_cap == 18 then self.altRightClick = true
-				elseif gfx.mouse_cap == 64 then self.middleClick = true
+					elseif gfx.mouse_cap == 2 then self.rightClick = true
+					elseif gfx.mouse_cap == 5 then self.ctrlLeftClick = true
+					elseif gfx.mouse_cap == 9 then self.shiftLeftClick = true
+					elseif gfx.mouse_cap == 10 then self.shiftRightClick = true	
+					elseif gfx.mouse_cap == 17 then self.altLeftClick = true
+					elseif gfx.mouse_cap == 18 then self.altRightClick = true
+					elseif gfx.mouse_cap == 64 then self.middleClick = true
 				
 				end
 			end
 		elseif gfx.mouse_cap == 0 and self.mouseDown == true then
 			self.mouseDown = false
+			self.mouseUp = true
 		end
 	else
 		self.mouseOver = false
@@ -831,10 +833,6 @@ function Page:Add()
 	self.page = self.page + 1
 	self.pages.names[self.page] = pagename
 	self.pages.groups[self.page] = {}
-	
-	for ee, element in ipairs(Elements) do
-		if element.btype=='group' then element.hide = true end
-	end
 	
 
 end

@@ -1,27 +1,3 @@
-function reaperDoFile(file) local info = debug.getinfo(1,'S'); script_path = info.source:match[[^@?(.*[\/])[^\/]-$]]; dofile(script_path .. file); end
-reaperDoFile('ui.lua')
-reaperDoFile('../libss/cf.lua')
-reaperDoFile('vf.lua')
-reaper.ClearConsole()
-
-local frm_controls = Frame:Create(5,-13, nil,nil, '')
-local frm_groups = Frame:Create(5, -13,  nil,nil, "", nil, 12)
-local btn_add = Button:Create(nil, nil, 'control', " ADD", nil, nil,nil, nil, 40, 25)
-local btn_clear = Button:Create(nil, nil, 'control'," CLR", nil, nil, nil, nil, 40, 25)
-local search = TextField:Create(nil, nil, 150, 22, "", false, false)
-local btn_add_group = Button:Create(nil, nil, 'control', '+', nil, nil, nil, nil, 20,20)
-local btn_prev_page = Button:Create(nil, nil, 'control', "<", nil,nil,nil,nil,20,20)
-local btn_next_page = Button:Create(nil, nil, 'control', ">", nil,nil,nil,nil,20,20)
-local btn_add_page = Button:Create(nil, nil, 'control', '+', nil, nil, nil, nil, 20,20)
-local page = Page:Create(nil,nil, 150,nil,'ui', 1)
-local bookmarks = {}
-
-local clickTimer = -1
-local debug = false
-local dockstate = 0
-
-
-
 function load_global_settings()
 	local file = io.open(script_path .. "globalsettings.dat", 'r')
 
@@ -55,12 +31,11 @@ function add_group(p)
 	table.insert(p, Toggle:Create(nil, nil, 'group', name, false, 150, 25 ))
 end
 
-function check_group_drop(b)
+function check_group_drop()
 
 	for i, g in ipairs(page.pages.groups[page.page]) do
-		if hovering(g.x, g.y, g.w, g.h) and b.mouseUp then
-			table.insert(b.groups, i*6/(page.page*6))
-
+		if hovering(g.x, g.y, g.w, g.h) then
+			table.insert(page.pages.groups[page.page], g)
 			return true
 		end
 	end
@@ -102,61 +77,6 @@ function display_groups(vertical)
 		
 		
 	end
-end
-
-function display_items(vertical)
-	-- if no groups are selected
-	local visible = {}
-	local groupsSelected = 0
-	for k, g in ipairs(page.pages.groups) do
-			for kk, gg in ipairs(g) do
-				if gg.state then 
-					groupsSelected = groupsSelected + 1
-					for b, bookmark in ipairs(bookmarks) do
-							bookmark.hide = true
-						for bb, bookmarkGroup in ipairs(bookmark.groups) do
-							if bookmarkGroup == kk*6/(k*6) then bookmark.hide = false 
-								table.insert(visible, bookmark)								
-							end
-						end
-					end
-				end
-			end
-	end
-
- if #visible < 1 and groupsSelected == 0 then visible = bookmarks end
-
-	for i, b in ipairs(visible) do
-		b.hide = false
-		if not bookmarks[i-1] then 						--[1]
-			if not vertical then 
-				b.x = frm_groups.x+frm_groups.w+5
-				b.y = 3
-			else
-				b.x = 10
-				b.y = frm_groups.y+frm_groups.h + 25
-			end
-		else 	
-			if not vertical then 
-													--[2]
-				b.x = bookmarks[i-1].x + 155			
-				b.y = bookmarks[i-1].y
-				if b.x+b.w >= gfx.w-7 then
-					b.x = frm_groups.w+frm_groups.x + 5
-					b.y = bookmarks[i-1].y + 26
-				end
-			else
-				b.x = bookmarks[i-1].x + 155			
-				b.y = bookmarks[i-1].y
-				if b.x+b.w >= gfx.w-7 then
-					b.x = btn_add.x
-					b.y = bookmarks[i-1].y + 26
-				end
-			end
-		end
-	end
-
-
 end
 
 function new_bookmark()
@@ -278,8 +198,36 @@ function update_ui()
 	end
 
 	display_groups(vertical)
-	display_items(vertical)
 
+-- Place bookmarks
+	for i, b in ipairs(bookmarks) do
+		if not bookmarks[i-1] then 						--[1]
+			if not vertical then 
+				b.x = frm_groups.x+frm_groups.w+5
+				b.y = 3
+			else
+				b.x = 10
+				b.y = frm_groups.y+frm_groups.h + 25
+			end
+		else 	
+			if not vertical then 
+													--[2]
+				b.x = bookmarks[i-1].x + 155			
+				b.y = bookmarks[i-1].y
+				if b.x+b.w >= gfx.w-7 then
+					b.x = frm_groups.w+frm_groups.x + 5
+					b.y = bookmarks[i-1].y + 26
+				end
+			else
+				b.x = bookmarks[i-1].x + 155			
+				b.y = bookmarks[i-1].y
+				if b.x+b.w >= gfx.w-7 then
+					b.x = btn_add.x
+					b.y = bookmarks[i-1].y + 26
+				end
+			end
+		end
+	end
 end
 
 function prev_editor()
@@ -335,164 +283,3 @@ function onexit ()
 	save_global_settings()
 	reaper.JS_Window_SetFocus(last_window)
 end
-
---[[
-
-	Load settings, create window, look at a pig's butt
-
-]]--
-
-load_global_settings()
-
-gfx.init("MIDI Editor Tray", 225,500, dockstate)
-
-update_ui()
-
-
-function main()
-
-	
-	--Draws all elements
-	fill_background()
-	draw_elements()
-
-	--let's find our alt+tab keys (actually alt-ctrl-left/right)
-	-- 37 = < 39 = >
-
-	if reaper.JS_Mouse_GetState(-1) == 20 and clickTimer < 0 then
-		if reaper.JS_VKeys_GetState(-1):byte(37) == 1 then 
-			prev_editor() 
-			clickTimer = 1
-		elseif reaper.JS_VKeys_GetState(-1):byte(39)  == 1 then 
-			next_editor() 
-			clickTimer = 1
-		elseif reaper.JS_VKeys_GetState(-1):byte(13) == 1 then new_bookmark()
-		elseif reaper.JS_VKeys_GetState(-1):byte(8) == 1 then clear_all_bookmarks(true)
-		end
-
-	end
-
-	-- Search
-	if search.leftClick then search.active = true end
-
-	-- Creates a bookmark
-	if btn_add.leftClick then 
-		new_bookmark()
-		update_ui()
-
-	end
-
-	-- Clear all bookmarks
-	if btn_clear.leftClick then
-		clear_all_bookmarks(false)
-	elseif btn_clear.rightClick then
-		clear_all_bookmarks(true)
-		update_ui()
-	end
-
-	-- Group Add button
-	if btn_add_group.leftClick then
-		add_group(page.pages.groups[page.page])
-		update_ui()
-	end
-
-	-- Page Add button
-
-	if btn_add_page.leftClick then
-		page:Add()
-		update_ui()
-	end
-
-	if btn_prev_page.leftClick then 
-		if page.page - 1 > 0 then
-			page.page = page.page - 1
-		else
-			page.page = #page.pages.names
-		end
-		update_ui()
-	end
-
-	if btn_next_page.leftClick then 
-		if page.page + 1 > #page.pages.names then
-			page.page = 1
-		else
-			page.page = page.page + 1
-		end
-		update_ui()
-	end
-
-
-	-- If the user is dragging then disable buttons
-	for i, b in ipairs(bookmarks) do
-		if b.leftClick then 
-			for ii, bb in ipairs(bookmarks) do
-				bb.block = true
-				btn_clear.block = true
-				btn_add.block = true
-			end
-		end
-
-		-- if the user was dragging a bookmark....
-		if b.lastClick == 1 and b.mouseUp then 
-			local window, segment, details = reaper.BR_GetMouseCursorContext()
-			if segment == "track" then 
-				reaper.SelectAllMediaItems(0, false)
-				reaper.SetMediaItemSelected(b.item, true)
-				reaper.Main_OnCommand(40057, 0)
-				reaper.Main_OnCommand(41221, 0)
-				b.lastClick = 0
-			-- if the user click-releases a bookmark...
-			else 
-
-				if not check_group_drop(b) then b:restore_ME() end
-				update_ui()
-			end 
-				b.lastClick = 0
-		end
-
-		if b.rightClick and clickTimer  < 0 and b.btype == 'bookmark'  then 
-			table.remove(bookmarks, i)
-			for ii = #Elements, 1, -1 do
-				if Elements[ii].take == b.take then table.remove(Elements, ii) ; break end
-			end
-			update_ui()
-			clickTimer = 5
-		end
-
-	end
-
-	for i, b in ipairs(Elements) do
-		if b.btype == 'group' then
-			if b.leftClick then update_ui() end
-		end
-	end
-
-	-- This hack prevents accidental clearing from one mouse click
-	if clickTimer ~= -1 then clickTimer = clickTimer - 1 end
-
-	local char = gfx.getchar()
-	--Exit/defer handling
-	if char == 27  then 
-		return
-	elseif char == 26 and gfx.mouse_cap == 12 then reaper.Main_OnCommand(40030, 0)
-	elseif char == 26 then reaper.Main_OnCommand(40029, 0)
-	else
-		search:Change(char)
-	
-	end
-	reaper.defer(main)
-	
--- DEBUG
-
---debug = true
--- if debug then
--- 	cons("Bookmark count: " .. #bookmarks .. "\n")
--- 	for i, b in ipairs(bookmarks) do
--- 		cons(i .. ". " .. b.txt .. "\n" .. '\nlastclick: ' .. b.lastClick)
--- 	end
--- 	debug = false
--- end
-
-end
-main()
-reaper.atexit(onexit)
