@@ -332,12 +332,17 @@ function TextField:Create(x,y, w, h, txt, active, multiline, fontSize, r, g, b, 
 		alwaysActive = false,
 		returned = false,
 		cpos = 0,
-		blink = 0
+		blink = 0,
+		image = script_path .. 'search.png'
 
 	}
 
 	setmetatable(this, TextField)
 	table.insert(Elements, this)
+
+	gfx.loadimg(1, script_path .. 'search.png')
+
+
 	return this
 end
 
@@ -355,6 +360,8 @@ function TextField:Draw()
 	local txtlen = string.len(self.txt)
 	local charwidth = gfx.measurestr("-")
 
+	gfx.x = self.x+self.w-22
+	gfx.blit(1, .43, 0)
 
 	if self.active  and self.blink <= 15 then 
 		gfx.x = self.x+5 + (self.cpos * charwidth)
@@ -794,7 +801,6 @@ function Page:Create(x, y, w, h, btype, page)
 		y = y or 10,
 		btype = btype or nil,
 		page = page or 1,
-		pages = 1,
 		w=w or 25,
 		h=h or 25,
 		mouseOver = false,
@@ -804,7 +810,8 @@ function Page:Create(x, y, w, h, btype, page)
 		hide = hide or false,
 		font = "Lucida Console",
 		fontSize = fontSize or 13,
-		block = false
+		block = false,
+		pages = {names={'None'}, groups={{}}}
 	}
 	setmetatable(this, Page)
 	table.insert(Elements, this)
@@ -814,5 +821,29 @@ end
 function Page:Draw()
 	gfx.set(.7,.7,.7)
 	gfx.x, gfx.y = self.x, self.y
-	gfx.drawstr(tostring(self.page) .. ' of ' .. tostring(self.pages), 1, self.w+self.x, self.h+self.y)
+	gfx.drawstr(self.pages.names[self.page] , 1, self.w+self.x, self.h+self.y)
 end
+
+function Page:Add()
+
+	local retval, pagename = reaper.GetUserInputs( "Page Name", 1, 'Page Name:', 'Name' )	
+	
+	self.page = self.page + 1
+	self.pages.names[self.page] = pagename
+	self.pages.groups[self.page] = {}
+	
+	for ee, element in ipairs(Elements) do
+		if element.btype=='group' then element.hide = true end
+	end
+	
+
+end
+
+--[[
+
+pages = {name={}, group={}}
+
+pages.name
+
+
+]]--

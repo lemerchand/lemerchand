@@ -7,13 +7,14 @@ local frm_controls = Frame:Create(5,-13, nil,nil, '')
 local frm_groups = Frame:Create(5, -13,  nil,nil, "", nil, 12)
 local btn_add = Button:Create(nil, nil, 'control', " ADD", nil, nil,nil, nil, 40, 25)
 local btn_clear = Button:Create(nil, nil, 'control'," CLR", nil, nil, nil, nil, 40, 25)
-local search = TextField:Create(nil, nil, 150, 22, "Search...", false, false)
+local search = TextField:Create(nil, nil, 150, 22, "", false, false)
 local btn_add_group = Button:Create(nil, nil, 'control', '+', nil, nil, nil, nil, 20,20)
-local btn_prev_group = Button:Create(nil, nil, 'control', "<", nil,nil,nil,nil,20,20)
-local btn_next_group = Button:Create(nil, nil, 'control', ">", nil,nil,nil,nil,20,20)
-local page = Page:Create(nil,nil, 150,nil,'ui')
+local btn_prev_page = Button:Create(nil, nil, 'control', "<", nil,nil,nil,nil,20,20)
+local btn_next_page = Button:Create(nil, nil, 'control', ">", nil,nil,nil,nil,20,20)
+local btn_add_page = Button:Create(nil, nil, 'control', '+', nil, nil, nil, nil, 20,20)
+local page = Page:Create(nil,nil, 150,nil,'ui', 1)
 local bookmarks = {}
-local groups = {}
+
 local clickTimer = -1
 local debug = false
 local dockstate = 0
@@ -49,9 +50,47 @@ function save_global_settings()
 
 end
 
-function add_group()
+function add_group(p)
 	local retval, name = reaper.GetUserInputs( "Group Name", 1, 'Group Name:', 'Name' )	
-	table.insert(groups, Toggle:Create(nil, nil, 'group', name, false, 150, 25 ))
+	table.insert(p, Toggle:Create(nil, nil, 'group', name, false, 150, 25 ))
+end
+
+
+function display_groups(vertical)
+
+	for i, b in ipairs(page.pages.groups[page.page]) do
+			
+			b.hide = false
+			if not page.pages.groups[page.page][i-1] then 						
+				if not vertical then 
+					b.x = btn_add_group.x
+					b.y = btn_add_group.y+btn_add_group.h+5
+				else
+					b.x = frm_groups.x+5
+					b.y = frm_groups.y + 40
+
+				end
+			else 	
+				if not vertical then 
+														
+					b.x = page.pages.groups[page.page][i-1].x + 155			
+					b.y = page.pages.groups[page.page][i-1].y
+					if b.x+b.w >= frm_groups.x+frm_groups.w-3 then
+						b.x = frm_groups.x + 5
+						b.y =  page.pages.groups[page.page][i-1].y + 26
+					end
+				else
+					b.x = page.pages.groups[page.page][i-1].x + 155			
+					b.y = page.pages.groups[page.page][i-1].y
+					if b.x+b.w >= frm_groups.x+frm_groups.w-3 then
+						b.x = btn_add.x
+						b.y = page.pages.groups[page.page][i-1].y + 26
+					end
+				end
+			end
+		
+		
+	end
 end
 
 function new_bookmark()
@@ -152,52 +191,27 @@ function update_ui()
 
 	btn_add_group.x = frm_groups.x+5
 	btn_add_group.y = frm_groups.y+20
-	btn_prev_group.x = btn_add_group.x+btn_add_group.w+5
-	btn_prev_group.y = btn_add_group.y
+	btn_prev_page.x = btn_add_group.x+btn_add_group.w+5
+	btn_prev_page.y = btn_add_group.y
 
-	page.x = btn_prev_group.x+btn_prev_group.w+5
+	page.x = btn_prev_page.x+btn_prev_page.w+5
 	page.y = btn_add_group.y+6
 
-	btn_next_group.x = page.x+page.w+5
-	btn_next_group.y = btn_prev_group.y
+	btn_next_page.x = page.x+page.w+5
+	btn_next_page.y = btn_prev_page.y
 
-
+	btn_add_page.x = btn_next_page.x+btn_next_page.w+5
+	btn_add_page.y = btn_prev_page.y
 
 -- Place groups
 	
-	page.pages = math.ceil(#groups/6)
-	if page.pages == 0 then page.pages  = 1 end
-	page.page = 1
-
-	for i, b in ipairs(groups) do
-		if not groups[i-1] then 						
-			if not vertical then 
-				b.x = btn_add_group.x
-				b.y = btn_add_group.y+btn_add_group.h+5
-			else
-				b.x = frm_groups.x+5
-				b.y = frm_groups.y + 40
-			end
-		else 	
-			if not vertical then 
-													
-				b.x = groups[i-1].x + 155			
-				b.y = groups[i-1].y
-				if b.x+b.w >= frm_groups.x+frm_groups.w-3 then
-					b.x = frm_groups.x + 5
-					b.y = groups[i-1].y + 26
-				end
-			else
-				b.x = groups[i-1].x + 155			
-				b.y = groups[i-1].y
-				if b.x+b.w >= frm_groups.x+frm_groups.w-3 then
-					b.x = btn_add.x
-					b.y = groups[i-1].y + 26
-				end
-			end
+	for c, g in ipairs(page.pages.groups) do
+		for cc, gg in ipairs(g) do
+			gg.hide = true
 		end
 	end
 
+	display_groups(vertical)
 
 -- Place bookmarks
 	for i, b in ipairs(bookmarks) do
@@ -339,9 +353,35 @@ function main()
 
 	-- Group Add button
 	if btn_add_group.leftClick then
-		add_group()
+		add_group(page.pages.groups[page.page])
 		update_ui()
 	end
+
+	-- Page Add button
+
+	if btn_add_page.leftClick then
+		page:Add()
+		update_ui()
+	end
+
+	if btn_prev_page.leftClick then 
+		if page.page - 1 > 0 then
+			page.page = page.page - 1
+		else
+			page.page = #page.pages.names
+		end
+		update_ui()
+	end
+
+	if btn_next_page.leftClick then 
+		if page.page + 1 > #page.pages.names then
+			page.page = 1
+		else
+			page.page = page.page + 1
+		end
+		update_ui()
+	end
+
 
 	-- If the user is dragging then disable buttons
 	for i, b in ipairs(bookmarks) do
