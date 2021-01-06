@@ -55,6 +55,16 @@ function add_group(p)
 	table.insert(p, Toggle:Create(nil, nil, 'group', name, false, 150, 25 ))
 end
 
+function check_group_drop()
+
+	for i, g in ipairs(page.pages.groups[page.page]) do
+		if hovering(g.x, g.y, g.w, g.h) then
+			table.insert(page.pages.groups[page.page], g)
+			return true
+		end
+	end
+
+end
 
 function display_groups(vertical)
 
@@ -403,7 +413,11 @@ function main()
 				reaper.Main_OnCommand(41221, 0)
 				b.lastClick = 0
 			-- if the user click-releases a bookmark...
-			else b:restore_ME() end 
+			else 
+
+				if not check_group_drop() then b:restore_ME() end
+
+			end 
 				b.lastClick = 0
 		end
 		if b.rightClick and clickTimer  < 0 and b.btype == 'bookmark'  then 
