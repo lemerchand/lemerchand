@@ -1,10 +1,13 @@
+
+local scriptName = "Clipit"
+local versionNumber = '0.4b'
 function reaperDoFile(file) local info = debug.getinfo(1, 'S'); script_path = info.source:match[[^@?(.*[\/])[^\/]-$]]; dofile(script_path .. file); end
 reaperDoFile('ui.lua')
 reaperDoFile('../libss/cf.lua')
 reaperDoFile('vf.lua')
 reaper.ClearConsole()
 
-enableHelp = true
+
 
 local frm_controls = Frame:Create(5, -13, nil, nil, '')
 local frm_groups = Frame:Create(5, -13, nil, nil, "", nil, 12)
@@ -21,8 +24,15 @@ local bookmarks = {}
 local groups = {}
 
 local clickTimer = -1
+
+---------------------
+-- Global Settings --
+---------------------
 local debug = false
 local dockstate = 0
+local windowxpos, windowypos, windowHeight, windowWidth
+enableHelp = true
+
 
 function load_global_settings()
 	local file = io.open(script_path .. "globalsettings.dat", 'r')
@@ -37,6 +47,12 @@ function load_global_settings()
 		line = file:read()
 		if line == nil then break end
 		if line:find("dockstate=") then dockstate = line:sub(line:find("=") + 1) end
+		if line:find('enableHelp=') then 
+			enableHelp = line:sub(line:find("=") + 1) 
+			if enableHelp == 'true' then enableHelp = 'true' else enableHelp = false end
+		end
+		if line:find('windowheight=') then windowHeight = line:sub(line:find("=") + 1) end
+		if line:find('windowwidth=') then windowWidth = line:sub(line:find("=") + 1) end
 	end
 	file:close()
 end
@@ -47,7 +63,10 @@ function save_global_settings()
 
 	io.output(file)
 
-	file:write('dockstate=' .. gfx.dock(-1))
+	file:write('dockstate=' .. gfx.dock(-1).. '\n') 
+	file:write('enableHelp=' .. tostring(enableHelp).. '\n')
+	file:write('windowwidth=' .. gfx.w.. '\n')
+	file:write('windowheight=' .. gfx.h.. '\n')
 	file:close()
 
 end
@@ -352,7 +371,7 @@ Load settings, create window, look at a pig's butt
 
 load_global_settings()
 
-gfx.init("MIDI Editor Tray", 225, 500, dockstate)
+gfx.init(scriptName .. versionNumber,  windowWidth, windowHeight, dockstate, 100, 100)
 
 update_ui()
 
