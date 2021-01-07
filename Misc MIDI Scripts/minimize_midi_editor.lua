@@ -490,18 +490,20 @@ function main()
 			
 			elseif b.rightClick then
 				gfx.x, gfx.y = gfx.mouse_x, gfx.mouse_y
-				local option = gfx.showmenu("Rename Group|Move Group|Duplicate Group||Delete Group|>Delete All Groups|In Current Page|<In All Pages")
+				local option = gfx.showmenu("Rename Group|Move Group|Duplicate Group||Delete Group|Delete all groups")
+
 
 				if option == 1 then 
 				elseif option ==2 then
 				elseif option == 3 then
 				elseif option == 4 then
 				elseif option == 5 then
-				elseif option == 6 then
-					for j = #Elements, 1, -1 do
 
+				local confirm = reaper.ShowMessageBox("Delete all groups in all pages?", "Confirm", 4)
+				if confirm == 7 then break end
+
+					for j = #Elements, 1, -1 do
 						if Elements[j].btype == 'group' then 
-							
 							table.remove(Elements, j) end
 						end
 					for k, bookmark in ipairs(bookmarks) do bookmark.groups = {} end
