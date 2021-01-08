@@ -430,8 +430,12 @@ function main()
 
 	if page.rightClick then
 		gfx.x, gfx.y = gfx.mouse_x, gfx.mouse_y
-		local option = gfx.showmenu("Add Page|Rename Page||Delete Page|Delete All Pages|")
-		if option == 1 then end
+		local option = gfx.showmenu("Add Page|Rename Page||Delete Page|Delete All Pages")
+		if option == 1 then page:Add()
+		elseif option == 2 then page:Rename()
+		elseif option == 3 then page:Remove(false)
+		elseif option == 4 then page:Remove(true)
+		end
 	end
 
 	if btn_prev_page.leftClick then
@@ -506,7 +510,7 @@ function main()
 	for i, b in ipairs(Elements) do
 		if b.btype == 'group' then
 			if b.leftClick then
-			
+				
 			elseif b.rightClick then
 				gfx.x, gfx.y = gfx.mouse_x, gfx.mouse_y
 				local option = gfx.showmenu("Rename Group|Move Group|Duplicate Group||Delete Group|Delete all groups")
@@ -516,20 +520,16 @@ function main()
 				elseif option ==2 then
 				elseif option == 3 then
 				elseif option == 4 then
+					b:Remove(bookmarks, groups, false)
 				elseif option == 5 then
 
 				local confirm = reaper.ShowMessageBox("Delete all groups in all pages?", "Confirm", 4)
 				if confirm == 7 then break end
-
-					for j = #Elements, 1, -1 do
-						if Elements[j].btype == 'group' then 
-							table.remove(Elements, j) end
-						end
-					for k, bookmark in ipairs(bookmarks) do bookmark.groups = {} end
-					groups = {}
+					b:Remove(bookmarks, groups, true)
 				end
-			update_ui()
+			
 			end
+			update_ui()
 		end
 	end
 
