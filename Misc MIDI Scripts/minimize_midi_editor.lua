@@ -549,14 +549,14 @@ function main()
 				elseif option == 3 then
 				elseif option == 4 then
 					b:Remove(false, i)
-					debug('ugh')
+					
 				elseif option == 5 then
 
 				local confirm = reaper.ShowMessageBox("Delete all groups in all pages?", "Confirm", 4)
 				if confirm == 7 then break end
 					b:Remove(true)
 				end
-			debug('after')
+			
 			end
 			update_ui()
 		end
