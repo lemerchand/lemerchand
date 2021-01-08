@@ -139,7 +139,8 @@ function Button:Create(x, y, btype, txt, name, take, item, track, w, h, help, co
 		active = false,
 		mouseUp = true,
 		block = false,
-	groups = {}}
+		groups = {}
+	}
 	setmetatable(this, Button)
 	table.insert(Elements, this)
 	return this
@@ -758,40 +759,43 @@ function Toggle:Draw()
 end
 
 
-function Toggle:Remove(bookmarks, groups, all)
+function Toggle:Remove(all, group)
+
 
 	if all then
 		for e = #Elements, 1, -1 do
 			if Elements[e].btype == 'group' then 
 				for ee = #bookmarks, 1, -1 do
-					if bookmarks[ee].groups == e then
-						table.remove(bookmarks.groups, e)
+					for eee, ggg in ipairs(bookmarks.groups) do
+						if ggg == Elements[e] then
+							table.remove(bookmarks.groups, e)
+						end
 					end
 				end
 				table.remove(Elements, e) 
 			end
 		end
 		groups = {}
+		
+
 	else
-		-- TODO: FIx this shit...Can't seem to remove the fuck from the 
-		-- Elements
-		for g, group in ipairs(groups) do
-			if group == self then
-				for b = #bookmarks, 1, -1 do
-					if bookmarks[b].groups == b then
-						table.remove(bookmarks.groups, b)
+		
+		for k, g in ipairs(groups) do
+			if g == self then 
+				for b, bookmark in ipairs(bookmarks) do
+					for bb, bg in ipairs(bookmark.groups) do
+						if bg == k then
+							table.remove(bookmark.groups, bb)
+						end
 					end
 				end
-
-				for e = #Elements, 1, -1 do
-					if Elements[e] == self then 
-						table.remove(Elements, g)
-					end
-				end
-				table.remove(groups, g)
+				table.remove(groups, k)
 			end
-		end
+		end					
 
+		table.remove(Elements, group)
+
+		
 		
 	end
 

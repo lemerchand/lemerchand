@@ -20,8 +20,8 @@ local btn_prev_page = Button:Create(nil, nil, 'control', "<", nil, nil, nil, nil
 local btn_next_page = Button:Create(nil, nil, 'control', " >", nil, nil, nil, nil, 20, 20)
 local btn_add_page = Button:Create(nil, nil, 'control', ' +', nil, nil, nil, nil, 20, 20)
 
-local bookmarks = {}
-local groups = {}
+bookmarks = {}
+groups = {}
 
 local clickTimer = -1
 
@@ -32,6 +32,33 @@ local debug = false
 local dockstate = 0
 local windowxpos, windowypos, windowHeight, windowWidth
 enableHelp = true
+
+function debug(txt)
+
+	cons(txt)
+	cons('\n--------\n\n')
+	if debug then
+		cons('\nTotal Elements: ' .. #Elements)
+		cons("\nGroup Count: " .. #groups)
+		
+		for i, b in ipairs(groups) do
+		cons('\n\t' .. i .. ". " .. b.txt)
+		end
+
+		cons("\n\nBookmark Count: " .. #bookmarks)
+		for i, b in ipairs(bookmarks) do
+			cons('\n\t' .. i .. '. ' .. b.name)
+			for ii, bb in ipairs(b.groups) do
+				cons('\n\t\tgroup: index= ' .. ii .. ' group= ' .. bb .. '\n')
+			end
+		end
+	end
+
+	cons('\n' .. txt)
+	cons('\n--------\n')
+
+end
+
 
 
 function load_global_settings()
@@ -515,19 +542,21 @@ function main()
 				gfx.x, gfx.y = gfx.mouse_x, gfx.mouse_y
 				local option = gfx.showmenu("Rename Group|Move Group|Duplicate Group||Delete Group|Delete all groups")
 
+			--	debug('before')
 
 				if option == 1 then 
 				elseif option ==2 then
 				elseif option == 3 then
 				elseif option == 4 then
-					b:Remove(bookmarks, groups, false)
+					b:Remove(false, i)
+					debug('ugh')
 				elseif option == 5 then
 
 				local confirm = reaper.ShowMessageBox("Delete all groups in all pages?", "Confirm", 4)
 				if confirm == 7 then break end
-					b:Remove(bookmarks, groups, true)
+					b:Remove(true)
 				end
-			
+			debug('after')
 			end
 			update_ui()
 		end
@@ -548,16 +577,6 @@ function main()
 	end
 	reaper.defer(main)
 
-	-- -- DEBUG
-
-	-- debug = true
-	-- if debug then
-	-- cons("group count: " .. #groups .. "\n")
-	-- for i, b in ipairs(groups) do
-	-- cons(i .. ". " .. b.txt .. "\n")
-	-- end
-	-- debug = false
-	-- end
 
 end
 main()
