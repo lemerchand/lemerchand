@@ -290,8 +290,39 @@ function Button:restore_ME()
 	reaper.SelectAllMediaItems(0, false)
 	reaper.SetEditCurPos(starttime, true, true)
 	reaper.SetMediaItemSelected(self.item, true)
-	reaper.Main_OnCommand(40153, 0)
+	if reaper.TakeIsMIDI(self.take)	then 
+		reaper.Main_OnCommand(40153, 0)
+	else
+		reaper.Main_OnCommand(41589, 0)
+	end
 	self.active = true
+end
+
+
+function Button:Rename(location)
+
+end
+
+function Button:Insert(location)
+	reaper.SelectAllMediaItems(0, false)
+	reaper.SetMediaItemSelected(self.item, true)
+
+	reaper.Main_OnCommand(40057, 0)
+	
+	if location == 'mouse' then
+		reaper.Main_OnCommand(41221, 0)
+	elseif location == 'edit' then
+		reaper.Main_OnCommand(42398, 0)
+	end
+end
+
+function Button:RemoveFromGroup(all, group)
+
+	if all then self.groups = {} 
+	else
+		table.remove(self.groups, group)
+	end
+
 end
 -------------------------------------------END: BUTTON--------------------------------------------------------
 --------------------------------------------------------------------------------------------------------------
@@ -766,12 +797,9 @@ function Toggle:Remove(all, group)
 	if all then
 		for e = #Elements, 1, -1 do
 			if Elements[e].btype == 'group' then 
-				for ee = #bookmarks, 1, -1 do
-					for eee, ggg in ipairs(bookmarks.groups) do
-						if ggg == Elements[e] then
-							table.remove(bookmarks.groups, e)
-						end
-					end
+				for ee, bm in ipairs(bookmarks) do
+					bm.groups = {}
+
 				end
 				table.remove(Elements, e) 
 			end
@@ -786,7 +814,7 @@ function Toggle:Remove(all, group)
 				for b, bookmark in ipairs(bookmarks) do
 					for bb, bg in ipairs(bookmark.groups) do
 						if bg == k then
-							table.remove(bookmark.groups, bb)
+							table.remove(bookmark.groups, k)
 						end
 					end
 				end

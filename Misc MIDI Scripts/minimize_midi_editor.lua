@@ -1,5 +1,5 @@
 
-local scriptName = "Clipit"
+local scriptName = "Bookmarks"
 local versionNumber = '0.4b'
 function reaperDoFile(file) local info = debug.getinfo(1, 'S'); script_path = info.source:match[[^@?(.*[\/])[^\/]-$]]; dofile(script_path .. file); end
 reaperDoFile('ui.lua')
@@ -165,7 +165,7 @@ function display_groups(vertical)
 end
 
 function display_items(vertical)
-	-- if no groups are selected
+	
 	local visible = {}
 	local groupsSelected = 0
 	for k, g in ipairs(groups) do
@@ -175,7 +175,11 @@ function display_items(vertical)
 				bookmark.hide = true
 				for i, group in ipairs(bookmark.groups) do
 					if group == k then bookmark.hide = false
+						for t, present in ipairs(visible) do
+							if bookmark == present then goto pass end
+						end
 						table.insert(visible, bookmark)
+						::pass::
 					end
 				end
 			end
@@ -496,10 +500,7 @@ function main()
 		if b.lastClick == 1 and b.mouseUp then
 			local window, segment, details = reaper.BR_GetMouseCursorContext()
 			if segment == "track" then
-				reaper.SelectAllMediaItems(0, false)
-				reaper.SetMediaItemSelected(b.item, true)
-				reaper.Main_OnCommand(40057, 0)
-				reaper.Main_OnCommand(41221, 0)
+				b:Insert('mouse')
 				b.lastClick = 0
 				-- if the user click-releases a bookmark...
 			else
@@ -520,8 +521,8 @@ function main()
 		end
 
 		if b.rightClick then
-			local options = 'Open in Editor|Rename|Insert at Edit Cursor||Delete'
-			if #b.groups > 0 then options = options .. '|>Remove from...' end
+			local options = 'Open in Editor|Rename|Insert at Edit Cursor||Remove'
+			if #b.groups > 0 then options = options .. '|>Remove from...|All Groups|' end
 			for ii, group in ipairs(b.groups) do
 				if ii + 1 > #b.groups then options = options .. '|<' .. groups[ii].txt
 				else options = options .. '|' .. groups[ii].txt
@@ -529,6 +530,27 @@ function main()
 			end
 			gfx.x, gfx.y = gfx.mouse_x, gfx.mouse_y
 			local option = gfx.showmenu(options)
+
+			if option == 0 then 
+			elseif option == 1 then 
+				b:restore_ME()
+			elseif option == 2 then
+				-- TODO
+				b:Rename()
+
+			elseif option == 3 then 
+				b:Insert('edit')
+
+			elseif option == 4 then
+				-- TODO: don't forget to remove from groups
+				b:Remove()
+			elseif option == 5 then
+				b:RemoveFromGroup(true)
+			else
+				b:RemoveFromGroup(false, option-5)
+			end
+
+
 		end
 
 	end
@@ -564,22 +586,24 @@ function main()
 
 				-- Add the potential pages to the options
 				for p, pageoption in ipairs(pageoptions) do
-					if p+1 > #pageoptions then 
-						options = options .. '|<' .. pageoption
-					else
 						options = options .. '|' .. pageoption
-					end
 				end
 
+				if pagecount > 1 then options = options .. '|<'
+				else options = options .. '|' end
+
 				-- Add the remaining options
-				options = options .. "|Duplicate Group||Delete Group|Delete all groups"
+				options = options .. "Send to New Page|Duplicate Group||Delete Group|Delete all groups"
 				local option = gfx.showmenu(options)
-				cons(option)
+				
 				-- Add pagecount-2 to get the right menu item to the right if
 				if option == 1 then 
 					b:Rename()
-				elseif option == #pageoptions_index  + 2 then
+				elseif option == #pageoptions_index + 2 then
+					page:Add()
+					b:Move(page.page)
 				elseif option == #pageoptions_index + 3 then
+					-- TODO: add this shit
 				elseif option == #pageoptions_index + 4 then
 					b:Remove(false, i)
 				elseif option == #pageoptions_index + 5 then
