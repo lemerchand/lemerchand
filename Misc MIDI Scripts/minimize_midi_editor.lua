@@ -589,11 +589,11 @@ function main()
 						options = options .. '|' .. pageoption
 				end
 
-				if pagecount > 1 then options = options .. '|<'
+				if pagecount > 1 then options = options .. '||<'
 				else options = options .. '|' end
 
 				-- Add the remaining options
-				options = options .. "Send to New Page|Duplicate Group||Delete Group|Delete all groups"
+				options = options .. "Send to New Page||Duplicate Group||Delete Group|Delete all groups"
 				local option = gfx.showmenu(options)
 				
 				-- Add pagecount-2 to get the right menu item to the right if
