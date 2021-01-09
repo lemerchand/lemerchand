@@ -578,11 +578,11 @@ function main()
 				-- Add pagecount-2 to get the right menu item to the right if
 				if option == 1 then 
 					b:Rename()
-				elseif option == option%#pageoptions_index  then
-				elseif option == option%#pageoptions_index then
-				elseif option == option%#pageoptions_index then
+				elseif option == #pageoptions_index  + 2 then
+				elseif option == #pageoptions_index + 3 then
+				elseif option == #pageoptions_index + 4 then
 					b:Remove(false, i)
-				elseif option == option%#pageoptions_index then
+				elseif option == #pageoptions_index + 5 then
 
 					-- confrim deletion
 					local confirm = reaper.ShowMessageBox("Delete all groups in all pages?", "Confirm", 4)
