@@ -108,13 +108,12 @@ end
 function check_group_drop(b)
 	for i, g in ipairs(groups) do
 
-		if hovering(g.x, g.y, g.w, g.h) then
+		if hovering(g.x, g.y, g.w, g.h) and b.btype == 'bookmark' then
 			g.block = true
 
 			if b.mouseUp then
 				g.block = false
 				table.insert(b.groups, i)
-				
 				return true
 			end
 		end
@@ -536,29 +535,71 @@ function main()
 
 	for i, b in ipairs(Elements) do
 		if b.btype == 'group' then
+			-- Update the UI so it shows the appropriate items
 			if b.leftClick then
-				
+				update_ui()
+
+			-- for display additional group options
 			elseif b.rightClick then
 				gfx.x, gfx.y = gfx.mouse_x, gfx.mouse_y
-				local option = gfx.showmenu("Rename Group|Move Group|Duplicate Group||Delete Group|Delete all groups")
+				local options = 'Rename Group'
+				local pagecount = #page.pages.names
+				local pageoptions = {}
+				local pageoptions_index = {}
 
-			--	debug('before')
-
-				if option == 1 then 
-				elseif option ==2 then
-				elseif option == 3 then
-				elseif option == 4 then
-					b:Remove(false, i)
+				-- if the pagecount is less than 2 then fuck this menu
+				-- otherwise, add the pages to a table to parse
+				-- that way we can easily give the final option the '|<' flag
+				if pagecount > 1 then options = options .. '|>Move to...'
+					for p, pagename in ipairs(page.pages.names) do
+						if p == page.page then goto pass
+						else 
+							table.insert(pageoptions, pagename)
+							table.insert(pageoptions_index, p)
 					
-				elseif option == 5 then
-
-				local confirm = reaper.ShowMessageBox("Delete all groups in all pages?", "Confirm", 4)
-				if confirm == 7 then break end
-					b:Remove(true)
+						end
+						::pass::
+					end
 				end
-			
+
+				-- Add the potential pages to the options
+				for p, pageoption in ipairs(pageoptions) do
+					if p+1 > #pageoptions then 
+						options = options .. '|<' .. pageoption
+					else
+						options = options .. '|' .. pageoption
+					end
+				end
+
+				-- Add the remaining options
+				options = options .. "|Duplicate Group||Delete Group|Delete all groups"
+				local option = gfx.showmenu(options)
+				cons(#pageoptions_index)
+				-- Add pagecount-2 to get the right menu item to the right if
+				if option == 1 then 
+					b:Rename()
+				elseif option == #pageoptions_index  + 2 then
+				elseif option == #pageoptions_index + 3 then
+				elseif option == #pageoptions_index + 4 then
+					b:Remove(false, i)
+				elseif option == #pageoptions_index + 5 then
+
+					-- confrim deletion
+					local confirm = reaper.ShowMessageBox("Delete all groups in all pages?", "Confirm", 4)
+					if confirm == 7 then break end
+					b:Remove(true)
+				elseif option == 0 then 
+				-- Now that the static options are ruled out...
+				-- let's equate the number value to the pageoptions and move the group
+				-- the selected option index-1 should  be the right page
+		
+				else
+					b:Move(pageoptions_index[option-1])
+					
+				end
 			end
 			update_ui()
+			
 		end
 	end
 
@@ -576,6 +617,7 @@ function main()
 
 	end
 	reaper.defer(main)
+
 
 
 end

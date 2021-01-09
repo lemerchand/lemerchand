@@ -661,7 +661,8 @@ function Toggle:Create(x, y, btype, txt, state, w, h, page, hide)
 		font = "Lucida Console",
 		fontSize = fontSize or 11,
 		block = false,
-		page = page or nil
+		page = page or nil,
+		clickTemp = nil
 	}
 	setmetatable(this, Toggle)
 	table.insert(Elements, this)
@@ -669,7 +670,7 @@ function Toggle:Create(x, y, btype, txt, state, w, h, page, hide)
 end
 
 function Toggle:ResetClicks()
-
+	self.mouseUp = false
 	self.leftClick = false
 	self.rightClick = false
 	self.middleClick = false
@@ -730,25 +731,25 @@ function Toggle:Draw()
 
 		if gfx.mouse_cap >= 1 and self.mouseDown == false then
 
-			if gfx.mouse_cap == 4 or gfx.mouse_cap == 8 or gfx.mouse_cap == 16 then self.mouse_down = false
-			else
-				self.mouseDown = true
-				if not self.mouseUp then return end
-				if gfx.mouse_cap == 1 then
-					self.leftClick = true
-					if self.state == true then self.state = false else self.state = true end
-				elseif gfx.mouse_cap == 2 then self.rightClick = true
-				elseif gfx.mouse_cap == 5 then self.ctrlLeftClick = true
-				elseif gfx.mouse_cap == 9 then self.shiftLeftClick = true
-				elseif gfx.mouse_cap == 10 then self.shiftRightClick = true
-				elseif gfx.mouse_cap == 17 then self.altLeftClick = true
-				elseif gfx.mouse_cap == 18 then self.altRightClick = true
-				elseif gfx.mouse_cap == 64 then self.middleClick = true
+			self.mouseDown = true
+			self.clickTemp = gfx.mouse_cap
 
-				end
+		elseif gfx.mouse_cap == 1 and self.mouseDown == true then
 
-			end
 		elseif gfx.mouse_cap == 0 and self.mouseDown == true then
+
+			if self.clickTemp == 1 then 
+				self.leftClick = true
+				if self.state == true then self.state = false else self.state = true end
+			elseif self.clickTemp == 2 then self.rightClick = true
+			elseif self.clickTemp == 5 then self.ctrlLeftClick = true
+			elseif self.clickTemp == 9 then self.shiftLeftClick = true
+			elseif self.clickTemp == 10 then self.shiftRightClick = true
+			elseif self.clickTemp == 17 then self.altLeftClick = true
+			elseif self.clickTemp == 18 then self.altRightClick = true
+			elseif self.clickTemp == 64 then self.middleClick = true
+			end
+
 			self.mouseDown = false
 			self.mouseUp = true
 		end
@@ -794,11 +795,18 @@ function Toggle:Remove(all, group)
 		end					
 
 		table.remove(Elements, group)
-
-		
-		
 	end
+end
 
+function Toggle:Rename()
+	local retval, groupname = reaper.GetUserInputs("Group Name", 1, 'New Name:', self.txt)
+	if not retval then return end
+	self.txt = groupname
+end
+
+function Toggle:Move(p)
+
+	self.page = p
 
 end
 
