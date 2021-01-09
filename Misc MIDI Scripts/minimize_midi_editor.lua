@@ -574,15 +574,15 @@ function main()
 				-- Add the remaining options
 				options = options .. "|Duplicate Group||Delete Group|Delete all groups"
 				local option = gfx.showmenu(options)
-				cons(#pageoptions_index)
+				cons(option)
 				-- Add pagecount-2 to get the right menu item to the right if
 				if option == 1 then 
 					b:Rename()
-				elseif option == #pageoptions_index  + 2 then
-				elseif option == #pageoptions_index + 3 then
-				elseif option == #pageoptions_index + 4 then
+				elseif option == option%#pageoptions_index  then
+				elseif option == option%#pageoptions_index then
+				elseif option == option%#pageoptions_index then
 					b:Remove(false, i)
-				elseif option == #pageoptions_index + 5 then
+				elseif option == option%#pageoptions_index then
 
 					-- confrim deletion
 					local confirm = reaper.ShowMessageBox("Delete all groups in all pages?", "Confirm", 4)
