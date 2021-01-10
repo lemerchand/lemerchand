@@ -1,10 +1,18 @@
+-- @version 0.4b
+-- @author Lemerchand
+-- @provides
+--    [main] .
+--    [nomain] cf.lua
+--    [nomain] ui.lua
+--    [nomain] vf.lua
+--    [nomain] search.png
 
 local scriptName = "Bookmarks"
 local versionNumber = ' 0.4b'
 local projectPath = reaper.GetProjectPath(0)
 function reaperDoFile(file) local info = debug.getinfo(1, 'S'); script_path = info.source:match[[^@?(.*[\/])[^\/]-$]]; dofile(script_path .. file); end
 reaperDoFile('ui.lua')
-reaperDoFile('../libss/cf.lua')
+reaperDoFile('cf.lua')
 reaperDoFile('vf.lua')
 reaper.ClearConsole()
 
