@@ -299,8 +299,12 @@ function Button:restore_ME()
 end
 
 
-function Button:Rename(location)
+function Button:Rename()
+	local retval, takeName = reaper.GetUserInputs("Item Name", 1, 'Item Name:', self.name)
+	if not retval then return end
 
+	self.name = takeName
+	reaper.GetSetMediaItemTakeInfo_String( self.take, 'P_NAME', takeName, true )
 end
 
 function Button:Insert(location)

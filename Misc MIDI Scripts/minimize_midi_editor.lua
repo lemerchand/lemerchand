@@ -1,6 +1,7 @@
 
 local scriptName = "Bookmarks"
-local versionNumber = '0.4b'
+local versionNumber = ' 0.4b'
+local projectPath = reaper.GetProjectPath(0)
 function reaperDoFile(file) local info = debug.getinfo(1, 'S'); script_path = info.source:match[[^@?(.*[\/])[^\/]-$]]; dofile(script_path .. file); end
 reaperDoFile('ui.lua')
 reaperDoFile('../libss/cf.lua')
@@ -24,6 +25,8 @@ bookmarks = {}
 groups = {}
 
 local clickTimer = -1
+local UIRefresh = 10
+
 
 ---------------------
 -- Global Settings --
@@ -33,32 +36,29 @@ local dockstate = 0
 local windowxpos, windowypos, windowHeight, windowWidth
 enableHelp = true
 
-function debug(txt)
 
-	cons(txt)
-	cons('\n--------\n\n')
-	if debug then
-		cons('\nTotal Elements: ' .. #Elements)
-		cons("\nGroup Count: " .. #groups)
-		
-		for i, b in ipairs(groups) do
-		cons('\n\t' .. i .. ". " .. b.txt)
-		end
-
-		cons("\n\nBookmark Count: " .. #bookmarks)
-		for i, b in ipairs(bookmarks) do
-			cons('\n\t' .. i .. '. ' .. b.name)
-			for ii, bb in ipairs(b.groups) do
-				cons('\n\t\tgroup: index= ' .. ii .. ' group= ' .. bb .. '\n')
-			end
-		end
-	end
-
-	cons('\n' .. txt)
-	cons('\n--------\n')
+function load_project_settings()
 
 end
 
+function save_project_settings()
+	local file = io.open(projectPath .. 'bm.dat', 'w')
+	io.output(file)
+	
+	for p, page in ipairs(page) do
+		file:write('page=' .. page.pages.name .. '\n')
+	end
+
+	for g, group in ipairs(groups) do
+		file:write('groupname=' .. group.txt .. '\n' .. 'grouppages=' .. group.page .. '\n')
+	end
+
+	for b, bookmark in ipairs(bookmarks) do
+		file:write('bookmarkname=' .. bookmark.name .. '\n')
+	end
+
+	file:close()
+end
 
 
 function load_global_settings()
@@ -247,8 +247,7 @@ function new_bookmark()
 		-- now let's check for and prevent duplicate bookmarks
 		for ii, b in ipairs(bookmarks) do
 			if b.item == item then goto pass end
-			-- TODO: add a setting to show multiple takes with same name
-			--if b.name == stringNeedBig then goto pass end
+
 		end
 
 		-- now acquire the name of the parent track, as well as it's color
@@ -388,7 +387,7 @@ function clear_all_bookmarks(closeWindow)
 end
 
 function onexit ()
-
+	save_project_settings()
 	save_global_settings()
 	reaper.JS_Window_SetFocus(last_window)
 end
@@ -400,8 +399,10 @@ Load settings, create window, look at a pig's butt
 ]]--
 
 load_global_settings()
-
 gfx.init(scriptName .. versionNumber,  windowWidth, windowHeight, dockstate, 100, 100)
+-- Keep on top
+local win = reaper.JS_Window_Find(scriptName .. versionNumber, true)
+if win then reaper.JS_Window_AttachTopmostPin(win) end
 
 update_ui()
 
@@ -517,7 +518,7 @@ function main()
 				if Elements[ii].take == b.take then table.remove(Elements, ii); break end
 			end
 			update_ui()
-			clickTimer = 5
+			clickTimer = 2
 		end
 
 		if b.rightClick then
@@ -535,15 +536,17 @@ function main()
 			elseif option == 1 then 
 				b:restore_ME()
 			elseif option == 2 then
-				-- TODO
+				
 				b:Rename()
+
 
 			elseif option == 3 then 
 				b:Insert('edit')
 
 			elseif option == 4 then
 				-- TODO: don't forget to remove from groups
-				b:Remove()
+				--b:Remove()
+				not_implemented()
 			elseif option == 5 then
 				b:RemoveFromGroup(true)
 			else
@@ -593,7 +596,7 @@ function main()
 				else options = options .. '|' end
 
 				-- Add the remaining options
-				options = options .. "Send to New Page||Duplicate Group||Delete Group|Delete all groups"
+				options = options .. "Send to New Page||Delete Group|Delete all groups"
 				local option = gfx.showmenu(options)
 				
 				-- Add pagecount-2 to get the right menu item to the right if
@@ -602,11 +605,10 @@ function main()
 				elseif option == #pageoptions_index + 2 then
 					page:Add()
 					b:Move(page.page)
+
 				elseif option == #pageoptions_index + 3 then
-					-- TODO: add this shit
-				elseif option == #pageoptions_index + 4 then
 					b:Remove(false, i)
-				elseif option == #pageoptions_index + 5 then
+				elseif option == #pageoptions_index + 4 then
 
 					-- confrim deletion
 					local confirm = reaper.ShowMessageBox("Delete all groups in all pages?", "Confirm", 4)
@@ -621,8 +623,9 @@ function main()
 					b:Move(pageoptions_index[option-1])
 					
 				end
+				update_ui()
 			end
-			update_ui()
+			
 			
 		end
 	end
@@ -642,6 +645,14 @@ function main()
 	end
 	reaper.defer(main)
 
+	if UIRefresh == 0 then 
+		if gfx.dock(-1) == 1 then UIRefresh = 20 else UIRefresh = 5 end
+
+		update_ui() 
+	else
+		 
+		UIRefresh = UIRefresh - 1 
+	end
 
 
 end
