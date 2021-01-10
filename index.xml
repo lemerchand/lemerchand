@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Scripts by Lemerchand" commit="3afa681b44009f617e2d421d537942905c4686dc">
+<index version="1" name="Scripts by Lemerchand" commit="95ad305794feb5b93aa8e007ccee3aa4e1033541">
+  <category name="ItemTray">
+    <reapack name="itemtray.lua" type="script">
+      <version name="0.4b" author="Lemerchand" time="2021-01-10T16:44:05Z">
+        <source main="main">https://github.com/lemerchand/lemerchand/raw/95ad305794feb5b93aa8e007ccee3aa4e1033541/ItemTray/itemtray.lua</source>
+        <source file="cf.lua">https://github.com/lemerchand/lemerchand/raw/95ad305794feb5b93aa8e007ccee3aa4e1033541/ItemTray/cf.lua</source>
+        <source file="ui.lua">https://github.com/lemerchand/lemerchand/raw/95ad305794feb5b93aa8e007ccee3aa4e1033541/ItemTray/ui.lua</source>
+        <source file="vf.lua">https://github.com/lemerchand/lemerchand/raw/95ad305794feb5b93aa8e007ccee3aa4e1033541/ItemTray/vf.lua</source>
+        <source file="search.png">https://github.com/lemerchand/lemerchand/raw/95ad305794feb5b93aa8e007ccee3aa4e1033541/ItemTray/search.png</source>
+      </version>
+    </reapack>
+  </category>
   <category name="MIDI Selector Tool">
     <reapack name="MIDI Selector Tool.lua" type="script">
       <version name="1.0.777b" author="Lemerchand" time="2020-12-22T05:44:21Z">
