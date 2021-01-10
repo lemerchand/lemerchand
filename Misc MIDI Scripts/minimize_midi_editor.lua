@@ -31,7 +31,6 @@ local UIRefresh = 10
 ---------------------
 -- Global Settings --
 ---------------------
-local debug = false
 local dockstate = 0
 local windowxpos, windowypos, windowHeight, windowWidth
 enableHelp = true
@@ -54,7 +53,15 @@ function save_project_settings()
 	end
 
 	for b, bookmark in ipairs(bookmarks) do
-		file:write('bookmarkname=' .. bookmark.name .. '\n')
+		file:write(
+			'bookmarktxt=' .. bookmark.txt .. '\n' .. 
+			'bookmarkname=' .. bookmark.name .. '\n' .. 
+			'bookmarktake=' .. bookmark.take .. '\n' .. 
+			'bookmarkitem=' .. bookmark.item .. '\n' ..
+			'bookmarktrack=' .. bookmark.track .. '\n')
+		for g, group in ipairs(bookmark.groups) do
+			file:write('bookmarkgroup=' .. group .. '\n')
+		end
 	end
 
 	file:close()
@@ -98,10 +105,11 @@ function save_global_settings()
 
 end
 
-function add_group()
+function add_group(p)
+	
 	local retval, name = reaper.GetUserInputs("Group Name", 1, 'Group Name:', 'Name')
 	if not retval then return end
-	table.insert(groups, Toggle:Create(nil, nil, 'group', name, false, 150, 25, page.page))
+	table.insert(groups, Toggle:Create(nil, nil, 'group', name, false, 150, 25, p))
 	
 end
 
@@ -121,47 +129,53 @@ function check_group_drop(b)
 end
 
 function display_groups(vertical)
+	
 	local first = true
+	local visible = {}
+
+
 	for i, b in ipairs(groups) do
 		b.hide = true
 		if b.page == page.page then
-			b.hide = false
-			
-			if first then
-				if not vertical then
-					b.x = btn_add_group.x
-					b.y = btn_add_group.y + btn_add_group.h + 5
-					first = false
-				else
-					b.x = frm_groups.x + 5
-					b.y = frm_groups.y + 42
-					first = false
-				end
-			else
-				if not vertical then
 
-					b.x = groups[i - 1].x + 155
-					b.y = groups[i - 1].y
-					if b.x + b.w >= frm_groups.x + frm_groups.w - 3 then
-						b.x = frm_groups.x + 5
-						b.y = groups[i - 1].y + 26
-					end
-				else
-					b.x = groups[i - 1].x + 155
-					b.y = groups[i - 1].y
-					if b.x + b.w >= frm_groups.x + frm_groups.w - 3 then
-						b.x = btn_add.x
-						b.y = groups[i - 1].y + 26
-					end
-				end
+			b.hide = false
+			table.insert(visible, b)
+		end
+	end
+
+	for i, b in ipairs(visible) do
+		if first then
+
+			if not vertical then
+				b.x = btn_add_group.x
+				b.y = btn_add_group.y + btn_add_group.h + 5
+				first = false
+			else
+				b.x = frm_groups.x + 5
+				b.y = frm_groups.y + 42
+				first = false
 			end
 		else
-			--deal with stupid ass bs bug motherfucker. just toss hidden buttons off to
-			--the land of nod
-			b.x = -666
+			if not vertical then
+
+				b.x = groups[i - 1].x + 155
+				b.y = groups[i - 1].y
+				if b.x + b.w >= frm_groups.x + frm_groups.w - 3 then
+					b.x = frm_groups.x + 5
+					b.y = groups[i - 1].y + 26
+				end
+			else
+				b.x = groups[i - 1].x + 155
+				b.y = groups[i - 1].y
+				if b.x + b.w >= frm_groups.x + frm_groups.w - 3 then
+					b.x = btn_add.x
+					b.y = groups[i - 1].y + 26
+				end
+			end
 		end
-		
 	end
+	
+	
 end
 
 function display_items(vertical)
@@ -448,7 +462,7 @@ function main()
 
 	-- Group Add button
 	if btn_add_group.leftClick then
-		add_group()
+		add_group(page.page)
 		update_ui()
 	end
 
@@ -604,6 +618,7 @@ function main()
 					b:Rename()
 				elseif option == #pageoptions_index + 2 then
 					page:Add()
+					
 					b:Move(page.page)
 
 				elseif option == #pageoptions_index + 3 then
@@ -639,6 +654,7 @@ function main()
 		return
 	elseif char == 26 and gfx.mouse_cap == 12 then reaper.Main_OnCommand(40030, 0)
 	elseif char == 26 then reaper.Main_OnCommand(40029, 0)
+	elseif char == 32 then debug('Current Page: ' .. page.page)
 	else
 		search:Change(char)
 

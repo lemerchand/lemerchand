@@ -903,8 +903,11 @@ function Page:Add()
 
 	local retval, pagename = reaper.GetUserInputs("Page Name", 1, 'Page Name:', 'Name')
 	if not retval then return end
-	self.page = #self.pages.names + 1
 	table.insert(self.pages.names, pagename)
+	self.page = #self.pages.names
+	
+
+
 end
 
 function Page:Reset_Clicks()

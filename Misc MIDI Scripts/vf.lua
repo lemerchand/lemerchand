@@ -3,27 +3,29 @@ function not_implemented()
 end
 
 function debug(txt)
-
+	if txt == 'before' then reaper.ClearConsole() end
 	cons(txt)
 	cons('\n--------\n\n')
 	if debug then
+
 		cons('\nTotal Elements: ' .. #Elements)
 		cons("\nGroup Count: " .. #groups)
 		
 		for i, b in ipairs(groups) do
-		cons('\n\t' .. i .. ". " .. b.txt)
+		cons('\n\t' .. i .. ". " .. b.txt .. ' - Page: ' .. b.page)
+
 		end
 
 		cons("\n\nBookmark Count: " .. #bookmarks)
 		for i, b in ipairs(bookmarks) do
 			cons('\n\t' .. i .. '. ' .. b.name)
 			for ii, bb in ipairs(b.groups) do
-				cons('\n\t\tgroup: index= ' .. ii .. ' group= ' .. bb .. '\n')
+		cons('\n\t' .. i .. ". " .. b.txt .. ' - Page: ' .. b.page)
 			end
 		end
 	end
 
-	cons('\n' .. txt)
+
 	cons('\n--------\n')
 
 end
