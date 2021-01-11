@@ -1,4 +1,4 @@
--- @version 0.46b
+-- @version 0.466b
 -- @author Lemerchand
 -- @provides
 --    [main] .
@@ -175,7 +175,7 @@ function check_group_drop(b)
 			if b.mouseUp then
 				g.block = false
 				table.insert(b.groups, i)
-				cons(b.name .. ' added to ' .. i .. '\n')
+				
 				return true
 			end
 		end
