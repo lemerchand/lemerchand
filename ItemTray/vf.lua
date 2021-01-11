@@ -2,7 +2,7 @@ function not_implemented()
 	reaper.ShowMessageBox('This feature has yet to be implemented', 'Message', 0)
 end
 
-function debug(txt)
+function db(txt)
 	if txt == 'before' then reaper.ClearConsole() end
 	cons(txt)
 	cons('\n--------\n\n')

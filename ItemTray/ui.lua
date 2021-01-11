@@ -95,7 +95,7 @@ end
 Button = {}
 Button.__index = Button
 
-function Button:Create(x, y, btype, txt, name, take, item, track, w, h, help, color, font, fontSize, hide)
+function Button:Create(x, y, btype, txt, name, take, item, track, itemGuid, takeGuid, w, h, help, color, font, fontSize, hide)
 
 	if font == nil then gfx.setfont(16, "Lucida Console", 11, 'b') end
 
@@ -139,7 +139,9 @@ function Button:Create(x, y, btype, txt, name, take, item, track, w, h, help, co
 		active = false,
 		mouseUp = true,
 		block = false,
-		groups = {}
+		groups = {},
+		itemGuid = itemGuid or nil,
+		takeGuid = takeGuid or nil
 	}
 	setmetatable(this, Button)
 	table.insert(Elements, this)
@@ -328,6 +330,10 @@ function Button:RemoveFromGroup(all, group)
 	end
 
 end
+
+
+
+
 -------------------------------------------END: BUTTON--------------------------------------------------------
 --------------------------------------------------------------------------------------------------------------
 ----------------------------------CLASS: TEXT FIELD-----------------------------------------------------------------
@@ -899,16 +905,22 @@ function Page:Draw()
 	end
 end
 
-function Page:Add()
+function Page:Add(name)
 
-	local retval, pagename = reaper.GetUserInputs("Page Name", 1, 'Page Name:', 'Name')
-	if not retval then return end
+
+	local pagename, retval
+	if not name then 
+		retval, pagename = reaper.GetUserInputs("Page Name", 1, 'Page Name:', 'Name')
+		if not retval then return end
+	else
+		pagename = name
+	end
+
 	table.insert(self.pages.names, pagename)
 	self.page = #self.pages.names
 	
-
-
 end
+
 
 function Page:Reset_Clicks()
 	self.leftClick = false

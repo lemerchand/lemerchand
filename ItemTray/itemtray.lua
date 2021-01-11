@@ -14,26 +14,28 @@ function reaperDoFile(file) local info = debug.getinfo(1, 'S'); script_path = in
 reaperDoFile('ui.lua')
 reaperDoFile('cf.lua')
 reaperDoFile('vf.lua')
+
 reaper.ClearConsole()
 
 
 
 local frm_controls = Frame:Create(5, -13, nil, nil, '')
 local frm_groups = Frame:Create(5, -13, nil, nil, "", nil, 12)
-local btn_add = Button:Create(nil, nil, 'control', " ADD", nil, nil, nil, nil, 40, 25, 'Add selected items to tray')
-local btn_clear = Button:Create(nil, nil, 'control', " CLR", nil, nil, nil, nil, 40, 25)
+local btn_add = Button:Create(nil, nil, 'control', " ADD", nil, nil, nil, nil, nil, nil, 40, 25, 'Add selected items to tray')
+local btn_clear = Button:Create(nil, nil, 'control', " CLR", nil, nil, nil, nil, nil, nil, 40, 25)
 local search = TextField:Create(nil, nil, 150, 22, "", false, false)
 local page = Page:Create(nil, nil, 150, nil, 'ui', 1)
-local btn_add_group = Button:Create(nil, nil, 'control', '+', nil, nil, nil, nil, 20, 20)
-local btn_prev_page = Button:Create(nil, nil, 'control', "<", nil, nil, nil, nil, 20, 20)
-local btn_next_page = Button:Create(nil, nil, 'control', " >", nil, nil, nil, nil, 20, 20)
-local btn_add_page = Button:Create(nil, nil, 'control', ' +', nil, nil, nil, nil, 20, 20)
+local btn_add_group = Button:Create(nil, nil, 'control', '+', nil, nil, nil, nil, nil, nil, 20, 20)
+local btn_prev_page = Button:Create(nil, nil, 'control', "<", nil, nil, nil, nil, nil, nil, 20, 20)
+local btn_next_page = Button:Create(nil, nil, 'control', " >", nil, nil, nil, nil, nil, nil, 20, 20)
+local btn_add_page = Button:Create(nil, nil, 'control', ' +', nil, nil, nil, nil, nil, nil, 20, 20)
 
 bookmarks = {}
 groups = {}
 
 local clickTimer = -1
 local UIRefresh = 10
+
 
 
 ---------------------
@@ -45,15 +47,51 @@ enableHelp = true
 
 
 function load_project_settings()
+	local line
+	local file = io.open(projectPath .. 'bm.dat', 'r')
+	io.input(file)
+
+	if not file then return end
+
+	page.pages.names = {}
+
+	while true do
+		line = file:read()
+		if not line then break end
+
+		if line:find('page=') then page:Add(line:sub(line:find('=')+1)) end
+		if line:find('groupname=') then 
+			local page = file:read()
+			add_group(tonumber(page:sub(page:find('=')+1)), line:sub(line:find('=')+1))
+		end
+
+		if line:find('bookmark=') then 
+
+			local itemGuid = line:sub(line:find('=')+1)
+			local takeGuid = file:read()
+			local savedgroups = file:read()
+			if savedgroups:find('bmgroup=') then 
+				savedgroups = savedgroups:sub(savedgroups:find('=')+1)
+			end
+			load_bookmark(itemGuid, takeGuid, savedgroups)
+
+		end
+
+
+
+	end
+	file:close()
 
 end
 
 function save_project_settings()
 	local file = io.open(projectPath .. 'bm.dat', 'w')
 	io.output(file)
-	
-	for p, page in ipairs(page) do
-		file:write('page=' .. page.pages.name .. '\n')
+
+
+
+	for p, page in ipairs(page.pages.names) do
+		file:write('page=' .. page .. '\n')
 	end
 
 	for g, group in ipairs(groups) do
@@ -62,14 +100,11 @@ function save_project_settings()
 
 	for b, bookmark in ipairs(bookmarks) do
 		file:write(
-			'bookmarktxt=' .. bookmark.txt .. '\n' .. 
-			'bookmarkname=' .. bookmark.name .. '\n' .. 
-			'bookmarktake=' .. bookmark.take .. '\n' .. 
-			'bookmarkitem=' .. bookmark.item .. '\n' ..
-			'bookmarktrack=' .. bookmark.track .. '\n')
-		for g, group in ipairs(bookmark.groups) do
-			file:write('bookmarkgroup=' .. group .. '\n')
+			'bookmark=' .. bookmark.itemGuid .. '\n' .. bookmark.takeGuid .. '\n')
+			for g, group in ipairs(bookmark.groups) do
+			file:write('bmgroup=' .. group .. ',')
 		end
+		file:write('\n')
 	end
 
 	file:close()
@@ -79,7 +114,14 @@ end
 function load_global_settings()
 	local file = io.open(script_path .. "globalsettings.dat", 'r')
 
-	if not file then save_global_settings(); file = io.open(script_path .. "globalsettings.dat", 'r') end
+	if not file then 
+		dockstate = -1
+		enableHelp = true
+		windowWidth = 300
+		windowHeight = 600	
+		save_global_settings()
+		file = io.open(script_path .. "globalsettings.dat", 'r') 
+	end
 
 	local line
 
@@ -113,10 +155,12 @@ function save_global_settings()
 
 end
 
-function add_group(p)
-	
-	local retval, name = reaper.GetUserInputs("Group Name", 1, 'Group Name:', 'Name')
-	if not retval then return end
+function add_group(p, name)
+	local retval
+	if not name then 
+		retval, name = reaper.GetUserInputs("Group Name", 1, 'Group Name:', 'Name')
+		if not retval then return end
+	end
 	table.insert(groups, Toggle:Create(nil, nil, 'group', name, false, 150, 25, p))
 	
 end
@@ -244,7 +288,38 @@ function display_items(vertical)
 	
 end
 
+function load_bookmark(itemGuid, takeGuid, savedgroups)
+
+	local groups = {}
+	local i = 1
+
+	while i < 10 do
+			if savedgroups:find(',') then 
+				local s, e = savedgroups:find(',')
+				groups[i] = savedgroups:sub(1,s-1)
+				savedgroups = savedgroups:sub(e)
+			end
+		cons(tostring(groups[i]) .. '\n')
+		i = i + 1
+	end
+
+	local item = reaper.BR_GetMediaItemByGUID(0, itemGuid)
+	local take = reaper.GetMediaItemTakeByGUID(0, takeGuid)
+
+
+	local retval, stringNeedBig = reaper.GetSetMediaItemTakeInfo_String(take, 'P_NAME', "", false)
+	local track = reaper.GetMediaItemInfo_Value(item, 'P_TRACK')
+
+	-- now acquire the name of the parent track, as well as it's color
+	local retval, trackName = reaper.GetTrackName(track)
+	local color = reaper.GetTrackColor(track)
+
+	table.insert(bookmarks, Button:Create(nil, nil, 'bookmark', trackName, name, take, item, track, itemGuid, takeGuid, 150, 25,"", color))
+
+end
+
 function new_bookmark()
+
 	local context = reaper.MIDIEditor_GetActive() or - 1
 	local selectedItems = 1
 	local take, item
@@ -277,10 +352,12 @@ function new_bookmark()
 		-- now acquire the name of the parent track, as well as it's color
 		local retval, trackName = reaper.GetTrackName(track)
 		local color = reaper.GetTrackColor(track)
+		local itemGuid = reaper.BR_GetMediaItemGUID(item)
+		local takeGuid = reaper.BR_GetMediaItemTakeGUID(take)
 
 		-- create the button for it, add it into bookmarks, don't worrk about the x/y since we
 		-- will run update_ui() anyway.
-		table.insert(bookmarks, Button:Create(nil, nil, 'bookmark', trackName, stringNeedBig, take, item, track, 150, 25,"", color))
+		table.insert(bookmarks, Button:Create(nil, nil, 'bookmark', trackName, stringNeedBig, take, item, track, itemGuid, takeGuid, 150, 25,"", color))
 		update_ui()
 
 		-- in case it's a duplicate, go on to the next item
@@ -423,6 +500,8 @@ Load settings, create window, look at a pig's butt
 ]]--
 
 load_global_settings()
+load_project_settings()
+
 gfx.init(scriptName .. versionNumber,  windowWidth, windowHeight, dockstate, 100, 100)
 -- Keep on top
 local win = reaper.JS_Window_Find(scriptName .. versionNumber, true)
@@ -664,7 +743,7 @@ function main()
 		return
 	elseif char == 26 and gfx.mouse_cap == 12 then reaper.Main_OnCommand(40030, 0)
 	elseif char == 26 then reaper.Main_OnCommand(40029, 0)
-	elseif char == 32 then debug('Current Page: ' .. page.page)
+	elseif char == 32 then db('Current Page: ' .. page.page)
 	else
 		search:Change(char)
 
