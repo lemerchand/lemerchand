@@ -1,4 +1,4 @@
--- @version 1.2.3b
+-- @version 1.2.4
 -- @author Lemerchand
 -- @provides
 --    [main=midi_editor] .
