@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Scripts by Lemerchand" commit="95ad305794feb5b93aa8e007ccee3aa4e1033541">
+<index version="1" name="Scripts by Lemerchand" commit="c4cc54e69d3c712d8e41ce4363e98b81f70c8cea">
   <category name="ItemTray">
     <reapack name="itemtray.lua" type="script">
       <version name="0.4b" author="Lemerchand" time="2021-01-10T16:44:05Z">
@@ -8,6 +8,13 @@
         <source file="ui.lua">https://github.com/lemerchand/lemerchand/raw/95ad305794feb5b93aa8e007ccee3aa4e1033541/ItemTray/ui.lua</source>
         <source file="vf.lua">https://github.com/lemerchand/lemerchand/raw/95ad305794feb5b93aa8e007ccee3aa4e1033541/ItemTray/vf.lua</source>
         <source file="search.png">https://github.com/lemerchand/lemerchand/raw/95ad305794feb5b93aa8e007ccee3aa4e1033541/ItemTray/search.png</source>
+      </version>
+      <version name="0.45b" author="Lemerchand" time="2021-01-11T18:47:31Z">
+        <source main="main">https://github.com/lemerchand/lemerchand/raw/dd067740ed2e438a061b92bea9db21d13a739787/ItemTray/itemtray.lua</source>
+        <source file="cf.lua">https://github.com/lemerchand/lemerchand/raw/dd067740ed2e438a061b92bea9db21d13a739787/ItemTray/cf.lua</source>
+        <source file="ui.lua">https://github.com/lemerchand/lemerchand/raw/dd067740ed2e438a061b92bea9db21d13a739787/ItemTray/ui.lua</source>
+        <source file="vf.lua">https://github.com/lemerchand/lemerchand/raw/dd067740ed2e438a061b92bea9db21d13a739787/ItemTray/vf.lua</source>
+        <source file="search.png">https://github.com/lemerchand/lemerchand/raw/dd067740ed2e438a061b92bea9db21d13a739787/ItemTray/search.png</source>
       </version>
     </reapack>
   </category>
@@ -131,6 +138,18 @@
         <source file="libs/gui.lua">https://github.com/lemerchand/lemerchand/raw/ac7bf1cb589415aba763e648996a5c580e24f470/MIDI%20Selector%20Tool/libs/gui.lua</source>
         <source file="default_lament.config">https://github.com/lemerchand/lemerchand/raw/ac7bf1cb589415aba763e648996a5c580e24f470/MIDI%20Selector%20Tool/default_lament.config</source>
         <source file="preset_actions/preset_template.lua">https://github.com/lemerchand/lemerchand/raw/ac7bf1cb589415aba763e648996a5c580e24f470/MIDI%20Selector%20Tool/preset_actions/preset_template.lua</source>
+      </version>
+      <version name="1.2.4" author="Lemerchand" time="2021-01-11T18:48:01Z">
+        <changelog><![CDATA[+ Added sharp/flat toggle
++ Improved behavior on Preset Overwrite
++ Updating no longer overwrites user's settings
++ Exported presets now have 'MST_' as a prefix in Actions List]]></changelog>
+        <source main="midi_editor">https://github.com/lemerchand/lemerchand/raw/c4cc54e69d3c712d8e41ce4363e98b81f70c8cea/MIDI%20Selector%20Tool/MIDI%20Selector%20Tool.lua</source>
+        <source file="presets/Default Preset.dat">https://github.com/lemerchand/lemerchand/raw/c4cc54e69d3c712d8e41ce4363e98b81f70c8cea/MIDI%20Selector%20Tool/presets/Default%20Preset.dat</source>
+        <source file="libs/cf.lua">https://github.com/lemerchand/lemerchand/raw/c4cc54e69d3c712d8e41ce4363e98b81f70c8cea/MIDI%20Selector%20Tool/libs/cf.lua</source>
+        <source file="libs/gui.lua">https://github.com/lemerchand/lemerchand/raw/c4cc54e69d3c712d8e41ce4363e98b81f70c8cea/MIDI%20Selector%20Tool/libs/gui.lua</source>
+        <source file="default_lament.config">https://github.com/lemerchand/lemerchand/raw/c4cc54e69d3c712d8e41ce4363e98b81f70c8cea/MIDI%20Selector%20Tool/default_lament.config</source>
+        <source file="preset_actions/preset_template.lua">https://github.com/lemerchand/lemerchand/raw/c4cc54e69d3c712d8e41ce4363e98b81f70c8cea/MIDI%20Selector%20Tool/preset_actions/preset_template.lua</source>
       </version>
     </reapack>
   </category>
