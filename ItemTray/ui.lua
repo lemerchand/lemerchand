@@ -288,7 +288,6 @@ function Button:Reset()
 end
 
 function Button:restore_ME()
-	--TODO: Store and restore selected media items
 	local starttime = reaper.GetMediaItemInfo_Value(self.item, 'D_POSITION')
 	reaper.SelectAllMediaItems(0, false)
 	reaper.SetEditCurPos(starttime, true, true)
@@ -940,7 +939,14 @@ function Page:Remove(all)
 		self.pages.names = {'Pages'}
 		self.page = 1
 
+		groups[1]:Remove(all)
+
 	else
+
+		for i, group in ipairs(groups) do
+			if group.page == self.page then group:Remove() end
+		end
+
 		if #self.pages == 1 then 
 			self.pages.names[1] = "Pages"
 		else

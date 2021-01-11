@@ -1,4 +1,4 @@
--- @version 0.45b
+-- @version 0.46b
 -- @author Lemerchand
 -- @provides
 --    [main] .
@@ -8,7 +8,7 @@
 --    [nomain] search.png
 
 local scriptName = "Bookmarks"
-local versionNumber = ' 0.45b'
+local versionNumber = ' 0.46b'
 local projectPath = reaper.GetProjectPath(0)
 function reaperDoFile(file) local info = debug.getinfo(1, 'S'); script_path = info.source:match[[^@?(.*[\/])[^\/]-$]]; dofile(script_path .. file); end
 reaperDoFile('ui.lua')
@@ -175,6 +175,7 @@ function check_group_drop(b)
 			if b.mouseUp then
 				g.block = false
 				table.insert(b.groups, i)
+				cons(b.name .. ' added to ' .. i .. '\n')
 				return true
 			end
 		end
@@ -189,10 +190,12 @@ function display_groups(vertical)
 
 	for i, b in ipairs(groups) do
 		b.hide = true
+		b.x = -666
 		if b.page == page.page then
 
 			b.hide = false
 			table.insert(visible, b)
+
 		else
 			
 		end

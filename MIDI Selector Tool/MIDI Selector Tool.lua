@@ -1,4 +1,4 @@
--- @version 1.2.4
+-- @version 1.2.41
 -- @author Lemerchand
 -- @provides
 --    [main=midi_editor] .
@@ -13,7 +13,7 @@
 --    + Exported presets now have 'MST_' as a prefix in Actions List
 
 
-local v = " v1.2.3b"
+local v = " v1.2.4b"
 local name = "MST5K"
 local path = ""
 
