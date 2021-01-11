@@ -2,7 +2,7 @@ function not_implemented()
 	reaper.ShowMessageBox('This feature has yet to be implemented', 'Message', 0)
 end
 
-function db(txt)
+function db(txt, page)
 	if txt == 'before' then reaper.ClearConsole() end
 	cons(txt)
 	cons('\n--------\n\n')
@@ -20,7 +20,7 @@ function db(txt)
 		for i, b in ipairs(bookmarks) do
 			cons('\n\t' .. i .. '. ' .. b.name)
 			for ii, bb in ipairs(b.groups) do
-		cons('\n\t' .. i .. ". " .. b.txt .. ' - Page: ' .. b.page)
+		cons('\n\t' .. i .. ". " .. b.txt .. ' - ' .. bb)
 			end
 		end
 	end

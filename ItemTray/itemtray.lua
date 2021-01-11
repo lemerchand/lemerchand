@@ -743,7 +743,7 @@ function main()
 		return
 	elseif char == 26 and gfx.mouse_cap == 12 then reaper.Main_OnCommand(40030, 0)
 	elseif char == 26 then reaper.Main_OnCommand(40029, 0)
-	elseif char == 32 then db('Current Page: ' .. page.page)
+	elseif char == 32 then db('Current Page: ' .. page.page, page)
 	else
 		search:Change(char)
 
