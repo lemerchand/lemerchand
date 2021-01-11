@@ -236,7 +236,8 @@ function Button:Draw()
 	if hovering(self.x, self.y, self.w, self.h) and not self.block then
 
 		if not self.tt and enableHelp then
-			reaper.TrackCtl_SetToolTip(self.help, self.x + self.w + 20, self.y + self.h, true)
+			--local mx, my = reaper.GetMousePosition()
+			--reaper.TrackCtl_SetToolTip(self.help, mx + 20, my + 20, true)
 			self.tt = true
 		end
 		

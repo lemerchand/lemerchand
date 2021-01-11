@@ -1,4 +1,4 @@
--- @version 0.4b
+-- @version 0.45b
 -- @author Lemerchand
 -- @provides
 --    [main] .
@@ -8,7 +8,7 @@
 --    [nomain] search.png
 
 local scriptName = "Bookmarks"
-local versionNumber = ' 0.4b'
+local versionNumber = ' 0.45b'
 local projectPath = reaper.GetProjectPath(0)
 function reaperDoFile(file) local info = debug.getinfo(1, 'S'); script_path = info.source:match[[^@?(.*[\/])[^\/]-$]]; dofile(script_path .. file); end
 reaperDoFile('ui.lua')
@@ -101,9 +101,10 @@ function save_project_settings()
 	for b, bookmark in ipairs(bookmarks) do
 		file:write(
 			'bookmark=' .. bookmark.itemGuid .. '\n' .. bookmark.takeGuid .. '\n')
+			file:write('bmgroup=')
 			for g, group in ipairs(bookmark.groups) do
-			file:write('bmgroup=' .. group .. ',')
-		end
+				file:write(group .. ',')
+			end
 		file:write('\n')
 	end
 
@@ -115,12 +116,12 @@ function load_global_settings()
 	local file = io.open(script_path .. "globalsettings.dat", 'r')
 
 	if not file then 
-		dockstate = -1
-		enableHelp = true
+		windowHeight = 500
 		windowWidth = 300
-		windowHeight = 600	
-		save_global_settings()
-		file = io.open(script_path .. "globalsettings.dat", 'r') 
+
+		return
+		-- save_global_settings()
+		-- file = io.open(script_path .. "globalsettings.dat", 'r') 
 	end
 
 	local line
@@ -290,24 +291,11 @@ end
 
 function load_bookmark(itemGuid, takeGuid, savedgroups)
 
-	local groups = {}
-	local i = 1
-
-	while i < 10 do
-			if savedgroups:find(',') then 
-				local s, e = savedgroups:find(',')
-				groups[i] = savedgroups:sub(1,s-1)
-				savedgroups = savedgroups:sub(e)
-			end
-		cons(tostring(groups[i]) .. '\n')
-		i = i + 1
-	end
-
 	local item = reaper.BR_GetMediaItemByGUID(0, itemGuid)
 	local take = reaper.GetMediaItemTakeByGUID(0, takeGuid)
 
 
-	local retval, stringNeedBig = reaper.GetSetMediaItemTakeInfo_String(take, 'P_NAME', "", false)
+	local retval, name = reaper.GetSetMediaItemTakeInfo_String(take, 'P_NAME', "", false)
 	local track = reaper.GetMediaItemInfo_Value(item, 'P_TRACK')
 
 	-- now acquire the name of the parent track, as well as it's color
@@ -316,6 +304,21 @@ function load_bookmark(itemGuid, takeGuid, savedgroups)
 
 	table.insert(bookmarks, Button:Create(nil, nil, 'bookmark', trackName, name, take, item, track, itemGuid, takeGuid, 150, 25,"", color))
 
+	local groups = {}
+	local i = 1
+
+	while savedgroups ~= '' do
+			if savedgroups:find(',') then 
+				local s, e = savedgroups:find(',')
+				local t = savedgroups:sub(1,s-1)
+				if t then 
+					table.insert(bookmarks[#bookmarks].groups, tonumber(t))
+				end
+				savedgroups = savedgroups:sub(e+1)
+			end
+		
+		i = i + 1
+	end
 end
 
 function new_bookmark()

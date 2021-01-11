@@ -20,7 +20,7 @@ function db(txt, page)
 		for i, b in ipairs(bookmarks) do
 			cons('\n\t' .. i .. '. ' .. b.name)
 			for ii, bb in ipairs(b.groups) do
-		cons('\n\t' .. i .. ". " .. b.txt .. ' - ' .. bb)
+				cons('\n\t\t' .. i .. ". "  .. bb)
 			end
 		end
 	end
