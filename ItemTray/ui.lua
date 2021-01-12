@@ -309,6 +309,7 @@ function Button:restore_ME()
 	else
 		reaper.Main_OnCommand(41589, 0)
 	end
+	group_exec(bookmarks, 'false')
 	self.active = true
 end
 

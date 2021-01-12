@@ -1,4 +1,4 @@
--- @version 0.5b
+-- @version 0.51b
 -- @author Lemerchand
 -- @provides
 --    [main] .
@@ -7,13 +7,14 @@
 --    [nomain] vf.lua
 --    [nomain] imgs/*.png
 -- @changelog
+--    + Improved cycling behavior
 --    + Added some icons
 --    + Fixed close all windows behavior
 --    + Now restores session on reload
 
 
 local scriptName = "Item Tray"
-local versionNumber = ' 0.5b'
+local versionNumber = ' 0.51b'
 local projectPath = reaper.GetProjectPath(0)
 function reaperDoFile(file) local info = debug.getinfo(1, 'S'); script_path = info.source:match[[^@?(.*[\/])[^\/]-$]]; dofile(script_path .. file); end
 reaperDoFile('ui.lua')
@@ -475,11 +476,10 @@ function prev_editor()
 	for i, me in ipairs(bookmarks) do
 		if me.active then
 			if i == 1 then
-				group_exec(bookmarks, 'false')
+				
 				bookmarks[#bookmarks]:restore_ME()
 				return
 			else
-				group_exec(bookmarks, 'false')
 				bookmarks[i - 1]:restore_ME()
 				return
 			end
@@ -492,11 +492,11 @@ function next_editor()
 	for i, me in ipairs(bookmarks) do
 		if me.active then
 			if i == #bookmarks then
-				group_exec(bookmarks, 'false')
+				
 				bookmarks[1]:restore_ME()
 				return
 			else
-				group_exec(bookmarks, 'false')
+				
 				bookmarks[i + 1]:restore_ME()
 				return
 			end
@@ -655,6 +655,7 @@ function main()
 	end
 
 	-- If the user is dragging then disable buttons
+	-- TODO: Block all necessary elements
 	for i, b in ipairs(bookmarks) do
 		if b.leftClick then
 			for ii, bb in ipairs(bookmarks) do
@@ -676,7 +677,9 @@ function main()
 				-- if the user click-releases a bookmark...
 			else
 
-				if not check_group_drop(b) then b:restore_ME() end
+				if not check_group_drop(b) then 
+					b:restore_ME() 
+				end
 				update_ui()
 			end
 			b.lastClick = 0
