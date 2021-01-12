@@ -95,7 +95,7 @@ end
 Button = {}
 Button.__index = Button
 
-function Button:Create(x, y, btype, txt, name, take, item, track, itemGuid, takeGuid, w, h, help, color, font, fontSize, hide)
+function Button:Create(x, y, btype, txt, name, take, item, track, itemGuid, takeGuid, w, h, help, color, img)
 
 	if font == nil then gfx.setfont(16, "Lucida Console", 11, 'b') end
 
@@ -141,10 +141,14 @@ function Button:Create(x, y, btype, txt, name, take, item, track, itemGuid, take
 		block = false,
 		groups = {},
 		itemGuid = itemGuid or nil,
-		takeGuid = takeGuid or nil
+		takeGuid = takeGuid or nil,
+		img = img or nil
 	}
 	setmetatable(this, Button)
 	table.insert(Elements, this)
+
+	if img then gfx.loadimg(2, script_path .. img) end
+
 	return this
 end
 
@@ -221,6 +225,11 @@ function Button:Draw()
 	end
 
 	--if (r <= .3 and g <= .3 and b <= .3) or not self.color then gfx.set(.7,.7,.7) else gfx.set(r-.3, g-.3, b-.3) end
+
+	if self.img then 
+		gfx.x = self.x + self.w - 22
+		gfx.blit(2, .43, 0)
+	end
 
 	if self.name then
 		-- gfx.x, gfx.y = self.x, self.y-self.fontSize
@@ -312,7 +321,6 @@ end
 function Button:Insert(location)
 	reaper.SelectAllMediaItems(0, false)
 	reaper.SetMediaItemSelected(self.item, true)
-
 	reaper.Main_OnCommand(40057, 0)
 	
 	if location == 'mouse' then
@@ -331,6 +339,20 @@ function Button:RemoveFromGroup(all, group)
 
 end
 
+function Button:Remove(all, i)
+	if all then bookmarks = {} 
+		for e = #Elements, 1, -1 do
+			if Elements[e].btype == 'bookmark' then
+				table.remove(Elements, e)
+			end
+		end
+	else
+			table.remove(bookmarks, i)
+			for ii = #Elements, 1, -1 do
+				if Elements[ii].take == self.take then table.remove(Elements, ii); break end
+			end
+	end
+end
 
 
 
