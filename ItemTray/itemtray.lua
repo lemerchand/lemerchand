@@ -5,7 +5,7 @@
 --    [nomain] cf.lua
 --    [nomain] ui.lua
 --    [nomain] vf.lua
---    [nomain] /imgs/*.png
+--    [nomain] imgs/*.png
 -- @changelog
 --    + Added some icons
 --    + Fixed close all windows behavior
