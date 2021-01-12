@@ -96,7 +96,7 @@ end
 Button = {}
 Button.__index = Button
 
-function Button:Create(x, y, btype, txt, name, take, item, track, itemGuid, takeGuid, w, h, help, color, img)
+function Button:Create(x, y, btype, txt, name, take, item, track, itemGuid, takeGuid, w, h, help, color, img, imgind)
 
 	if font == nil then gfx.setfont(16, "Lucida Console", 11, 'b') end
 
@@ -143,12 +143,13 @@ function Button:Create(x, y, btype, txt, name, take, item, track, itemGuid, take
 		groups = {},
 		itemGuid = itemGuid or nil,
 		takeGuid = takeGuid or nil,
-		img = img or nil
+		img = img or nil,
+		imgind = imgind or nil
 	}
 	setmetatable(this, Button)
 	table.insert(Elements, this)
 
-	if img then gfx.loadimg(2, script_path .. img) end
+	if img then gfx.loadimg(imgind, script_path .. img) end
 
 	return this
 end
@@ -228,8 +229,9 @@ function Button:Draw()
 	--if (r <= .3 and g <= .3 and b <= .3) or not self.color then gfx.set(.7,.7,.7) else gfx.set(r-.3, g-.3, b-.3) end
 
 	if self.img then 
-		gfx.x = self.x + self.w - 32
-		gfx.blit(2, .255, 0)
+		gfx.x = self.x + self.w/3
+		gfx.y = self.y + 5 
+		gfx.blit(self.imgind, .5, 0)
 	end
 
 	if self.name then
@@ -399,14 +401,14 @@ function TextField:Create(x, y, w, h, txt, active, multiline, fontSize, r, g, b,
 		returned = false,
 		cpos = 0,
 		blink = 0,
-		image = script_path .. 'search.png'
+		image = script_path .. '/imgs/search.png'
 
 	}
 
 	setmetatable(this, TextField)
 	table.insert(Elements, this)
 
-	gfx.loadimg(1, script_path .. 'search.png')
+	gfx.loadimg(1, script_path .. '/imgs/search.png')
 
 	return this
 end

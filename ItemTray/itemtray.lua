@@ -1,15 +1,19 @@
--- @version 0.488b
+-- @version 0.5b
 -- @author Lemerchand
 -- @provides
 --    [main] .
 --    [nomain] cf.lua
 --    [nomain] ui.lua
 --    [nomain] vf.lua
---    [nomain] search.png
---    [nomain] gears.png
+--    [nomain] /imgs/*.png
+-- @changelog
+--    + Added some icons
+--    + Fixed close all windows behavior
+--    + Now restores session on reload
+
 
 local scriptName = "Item Tray"
-local versionNumber = ' 0.488b'
+local versionNumber = ' 0.5b'
 local projectPath = reaper.GetProjectPath(0)
 function reaperDoFile(file) local info = debug.getinfo(1, 'S'); script_path = info.source:match[[^@?(.*[\/])[^\/]-$]]; dofile(script_path .. file); end
 reaperDoFile('ui.lua')
@@ -21,9 +25,10 @@ reaper.ClearConsole()
 local frm_controls = Frame:Create(5, -13, nil, nil, '', 'main')
 local frm_groups = Frame:Create(5, -13, nil, nil, "", 'main')
 local frm_settings = Frame:Create(5, -13, nil, nil, '', 'settings', true)
-local btn_add = Button:Create(nil, nil, 'control', " ADD", nil, nil, nil, nil, nil, nil, 40, 25, 'Add selected items to tray')
-local btn_clear = Button:Create(nil, nil, 'control', " CLR", nil, nil, nil, nil, nil, nil, 40, 25)
-local tgl_settings = Toggle:Create(nil, nil, 'ui', '', false, 40, 25, nil, 'gears.png')
+local btn_add = Button:Create(nil, nil, 'control', "", nil, nil, nil, nil, nil, nil, 40, 25, 'Add selected items to tray', nil, '/imgs/pin.png', 11)
+local btn_clear = Button:Create(nil, nil, 'control', "", nil, nil, nil, nil, nil, nil, 40, 25, '', nil, '/imgs/clear.png', 12)
+local btn_closeMEWs = Button:Create(nil, nil, 'control', "", nil, nil, nil, nil, nil, nil, 40, 25, '', nil, '/imgs/exit.png', 13)
+local tgl_settings = Toggle:Create(nil, nil, 'ui', '', false, 40, 25, nil, '/imgs/gears.png')
 local search = TextField:Create(nil, nil, 150, 22, "", false, false)
 local page = Page:Create(nil, nil, 150, nil, 'control', 1)
 local btn_add_group = Button:Create(nil, nil, 'control', '+', nil, nil, nil, nil, nil, nil, 20, 20)
@@ -398,6 +403,8 @@ and increase their y (relative to the buttons above)
 		btn_add.y = frm_controls.y + 22
 		btn_clear.x = btn_add.x + btn_add.w + 5
 		btn_clear.y = btn_add.y
+		btn_closeMEWs.x = btn_clear.x+btn_clear.w + 5
+		btn_clear.y = btn_add.y
 		
 		search.x = frm_controls.x + 7
 		search.y = btn_add.y + btn_add.h + 5
@@ -422,6 +429,8 @@ and increase their y (relative to the buttons above)
 		btn_add.y = frm_controls.y + 22
 		btn_clear.x = btn_add.x + btn_add.w + 5
 		btn_clear.y = btn_add.y
+		btn_closeMEWs.x = btn_clear.x+btn_clear.w + 5
+		btn_closeMEWs.y = btn_add.y
 		
 		frm_settings.x = tgl_settings.x + tgl_settings.w - 45
 		frm_settings.w = 500
@@ -463,7 +472,6 @@ and increase their y (relative to the buttons above)
 end
 
 function prev_editor()
-
 	for i, me in ipairs(bookmarks) do
 		if me.active then
 			if i == 1 then
@@ -498,15 +506,24 @@ function next_editor()
 
 end
 
+function close_all_MEWS()
+	local retval, openMEWS = pcall(get_open_MEWS)
+	for m, mew in ipairs(openMEWS) do
+		reaper.MIDIEditor_OnCommand(mew, 2)
+	end
+end
+
 function clear_all_bookmarks(closeWindow)
-
 	for e = #Elements, 1, -1 do
-
 		if Elements[e].btype == "bookmark" then table.remove(Elements, e) end
 	end
+
 	bookmarks = {}
 	update_ui()
-	if closeWindow then reaper.Main_OnCommand(40716, 0) end
+
+	if closeWindow then 
+		close_all_MEWS()		
+	end
 end
 
 function onexit ()
@@ -548,7 +565,7 @@ function main()
 			next_editor()
 			clickTimer = 1
 		elseif reaper.JS_VKeys_GetState(-1):byte(13) == 1 then new_bookmark()
-		elseif reaper.JS_VKeys_GetState(-1):byte(8) == 1 then clear_all_bookmarks(true)
+		elseif reaper.JS_VKeys_GetState(-1):byte(8) == 1 then close_all_MEWS()
 		end
 
 	end
@@ -560,7 +577,10 @@ function main()
 	if btn_add.leftClick then
 		new_bookmark()
 		update_ui()
-
+	elseif btn_add.rightClick then
+		reaper.SelectAllMediaItems(0, true)
+		new_bookmark()
+		update_ui()
 	end
 
 	-- Clear all bookmarks
@@ -571,6 +591,11 @@ function main()
 		update_ui()
 	end
 	
+	-- Closde Editors button
+	if btn_closeMEWs.leftClick then
+		close_all_MEWS()
+	end
+
 	-- Settings
 	if tgl_settings.leftClick then
 		
@@ -789,7 +814,7 @@ function main()
 	
 
 	if UIRefresh == 0 then
-		if gfx.dock(-1) == 1 then UIRefresh = 20 else UIRefresh = 5 end
+		if gfx.dock(-1) == 1 then UIRefresh = 15 else UIRefresh = 5 end
 
 		update_ui()
 	else

@@ -13,21 +13,17 @@ status = Status:Create(10,10,280,350)
 local lastChar = 0
 
 
-function insert_random_notes()
-
-	update_active_midi()
-	for i = 0, notes-1 do
-		retval, selected, muted, curNoteStartppqpos, curNoteEndppqpos, chan, pitch, vel = reaper.MIDI_GetNote( take, i)
-		retval2, selected2, muted2, nextNoteStartppqpos, nextNoteEndppqpos, chan2, pitch2, vel2 = reaper.MIDI_GetNote( take, i+1 )
-
-		if curNoteEndppqpos > nextNoteStartppqpos and i ~= notes-1 then 
-			reaper.MIDI_SetNote(take, i, true, nil, nil, nil, nil, nil, 127, true)
-			reaper.MIDI_SetNote(take, i+1, true, nil, nil, nil, nil, nil, 127, true)
-		end
-		
-	end
-
-	reaper.MIDI_Sort(take)
+function get_open_MEWS()
+	 local retval, list = reaper.JS_MIDIEditor_ListAll()
+	 local parsedlist = {}
+	 
+	 while true do
+	 	local t = list:match('%w*')
+	 	table.insert(parsedlist, reaper.JS_Window_HandleFromAddress( t ))
+	 	list = list:gsub(t .. ',?', '')
+	 	if list == '' then break end
+	 end
+	 return parsedlist
 end
 
 
@@ -114,7 +110,15 @@ function main()
 
 
 
-if btn_randomNotes.leftClick then insert_random_notes() end
+if btn_randomNotes.leftClick then 
+	local l = get_open_MEWS()
+	for i, w in ipairs(l) do
+		reaper.MIDIEditor_OnCommand(w, 2)
+	end
+
+
+
+end
 	if cmd.leftClick then cmd.active = true end
 
 	if cmd.active and cmd.txt == "s" then 
