@@ -227,8 +227,8 @@ function Button:Draw()
 	--if (r <= .3 and g <= .3 and b <= .3) or not self.color then gfx.set(.7,.7,.7) else gfx.set(r-.3, g-.3, b-.3) end
 
 	if self.img then 
-		gfx.x = self.x + self.w - 22
-		gfx.blit(2, .43, 0)
+		gfx.x = self.x + self.w - 32
+		gfx.blit(2, .255, 0)
 	end
 
 	if self.name then
@@ -533,14 +533,14 @@ end
 Frame = {}
 Frame.__index = Frame
 
-function Frame:Create(x, y, w, h, title, font, fontSize, r, g, b, hide)
+function Frame:Create(x, y, w, h, title, btype, hide)
 
 	local this = {
 		x = x or 10,
 		y = y or 10,
 		w = w or 100,
 		h = h or 100,
-		btype = 'ui',
+		btype = btype or 'ui',
 		title = title or "Some text.",
 		font = font or "Lucida Console",
 		fontSize = fontSize or 14,
@@ -686,7 +686,7 @@ end
 Toggle = {}
 Toggle.__index = Toggle
 
-function Toggle:Create(x, y, btype, txt, state, w, h, page, hide)
+function Toggle:Create(x, y, btype, txt, state, w, h, page, img)
 
 	if font == nil then gfx.setfont(15, "Lucida Console", 11) end
 
@@ -725,10 +725,14 @@ function Toggle:Create(x, y, btype, txt, state, w, h, page, hide)
 		fontSize = fontSize or 11,
 		block = false,
 		page = page or nil,
-		clickTemp = nil
+		clickTemp = nil,
+		img = img or nil
 	}
 	setmetatable(this, Toggle)
 	table.insert(Elements, this)
+
+	if img then gfx.loadimg(3, script_path .. img) end
+
 	return this
 end
 
@@ -788,6 +792,11 @@ function Toggle:Draw()
 
 	gfx.set(.7, .7, .7, 1)
 	gfx.drawstr(self.txt, 1 | 4, self.w + self.x, self.h + self.y + 2)
+
+	if self.img then 
+		gfx.x = self.x + self.w - 32
+		gfx.blit(3, .255, 0)
+	end
 
 	if self.block == false and hovering(self.x, self.y, self.w, self.h) then
 		self.mouseOver = true
@@ -913,7 +922,9 @@ end
 
 function Page:Draw()
 
+
 	self:Reset_Clicks()
+	if self.hide then return true end
 	gfx.set(.16, .16, .16)
 	gfx.rect(self.x + 30, self.y - 3, self.w - 57, self.h - 10, true)
 	gfx.set(.7, .7, .7)
