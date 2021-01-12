@@ -1,4 +1,4 @@
--- @version 0.47b
+-- @version 0.48b
 -- @author Lemerchand
 -- @provides
 --    [main] .
@@ -8,7 +8,7 @@
 --    [nomain] search.png
 
 local scriptName = "Item Tray"
-local versionNumber = ' 0.47b'
+local versionNumber = ' 0.48b'
 local projectPath = reaper.GetProjectPath(0)
 function reaperDoFile(file) local info = debug.getinfo(1, 'S'); script_path = info.source:match[[^@?(.*[\/])[^\/]-$]]; dofile(script_path .. file); end
 reaperDoFile('ui.lua')

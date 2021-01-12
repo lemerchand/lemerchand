@@ -1,3 +1,4 @@
+-- @noindex
 function not_implemented()
 	reaper.ShowMessageBox('This feature has yet to be implemented', 'Message', 0)
 end

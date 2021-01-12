@@ -1,3 +1,4 @@
+-- @noindex
 --All elements get loaded into this table to make drawing and reseting easier
 Elements = {}
 
