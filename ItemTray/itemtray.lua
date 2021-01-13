@@ -1,4 +1,4 @@
--- @version 0.61b
+-- @version 0.62b
 -- @author Lemerchand
 -- @provides
 --    [main] .
@@ -12,7 +12,7 @@
 
 
 local scriptName = "Item Tray"
-local versionNumber = ' 0.61b'
+local versionNumber = ' 0.62b'
 local projectPath = reaper.GetProjectPath(0)
 function reaperDoFile(file) local info = debug.getinfo(1, 'S'); script_path = info.source:match[[^@?(.*[\/])[^\/]-$]]; dofile(script_path .. file); end
 reaperDoFile('ui.lua')
@@ -34,7 +34,7 @@ local frm_settings = Frame:Create(5, -13, nil, nil, '', 'settings', true)
 
 local btn_add = Button:Create(nil, nil, 'control', "", nil, nil, nil, nil, nil, nil, 40, 25, '', nil, '/imgs/pin.png', 11)
 btn_add.id = 'add' 
-btn_add.help = 'Pin selected items to tray\n\nRight-Click to add all itmes'
+btn_add.help = 'Pin selected items to tray\nHotkey: Ctrl+Alt+Enter\n\nRight-Click to add all items'
 
 local btn_clear = Button:Create(nil, nil, 'control', "", nil, nil, nil, nil, nil, nil, 40, 25, '', nil, '/imgs/clear.png', 12)
 btn_clear.id = 'clear'
@@ -42,7 +42,7 @@ btn_clear.help = 'Clear all pins.\n\nRight-click to clear all pins \nand close a
 
 local btn_closeMEWs = Button:Create(nil, nil, 'control', "", nil, nil, nil, nil, nil, nil, 40, 25, '', nil, '/imgs/exit.png', 13)
 btn_closeMEWs.id = 'closeMEWS'
-btn_closeMEWs.help = 'Close all midi editors'
+btn_closeMEWs.help = 'Close all midi editors\nHotkey: Ctrl+Alt+Backspace'
 
 local tgl_settings = Toggle:Create(nil, nil, 'ui', '', false, 40, 25, nil, '/imgs/gears.png')
 tgl_settings.id = 'tglsettings'
@@ -56,14 +56,14 @@ page.help = 'Pages contain groups.\n\nRight-click for more options'
 
 local btn_add_group = Button:Create(nil, nil, 'control', '+', nil, nil, nil, nil, nil, nil, 20, 20)
 btn_add_group.id = 'addgroup'
-btn_add_group.help = 'Adds a group to \norganize pinned items'
+btn_add_group.help = 'Adds a group to \norganize pinned items\n\nRight-click a group \nfor more options'
 
 local btn_prev_page = Button:Create(nil, nil, 'control', "<", nil, nil, nil, nil, nil, nil, 20, 20)
 local btn_next_page = Button:Create(nil, nil, 'control', " >", nil, nil, nil, nil, nil, nil, 20, 20)
 
 local btn_add_page = Button:Create(nil, nil, 'control', ' +', nil, nil, nil, nil, nil, nil, 20, 20, nil, nil)
 btn_add_page.id = 'addpage'
-btn_add_page.help = 'Adds a page to organizee groups'
+btn_add_page.help = 'Adds a page to organize groups'
 
 -----------------------------------
 --[			 Settings			]--
@@ -610,6 +610,7 @@ function main()
 			clickTimer = 1
 		elseif reaper.JS_VKeys_GetState(-1):byte(13) == 1 then new_bookmark()
 		elseif reaper.JS_VKeys_GetState(-1):byte(8) == 1 then close_all_MEWS()
+		elseif reaper.JS_VKeys_GetState(-1):byte(32) == 1 then  db('Current Page: ' .. page.page, page)
 		end
 
 	end
@@ -873,7 +874,6 @@ function main()
 		return
 	elseif char == 26 and gfx.mouse_cap == 12 then reaper.Main_OnCommand(40030, 0)
 	elseif char == 26 then reaper.Main_OnCommand(40029, 0)
-	elseif char == 32 then db('Current Page: ' .. page.page, page)
 	else
 
 	end

@@ -1053,10 +1053,10 @@ function Tooltip:Draw()
 	--TOO: squash edge cases and optomize
 	if self.x + self.w > gfx.w then 
 		gfx.set(self.br, self.bg, self.bb)
-		gfx.rect(self.x-self.w, self.y+30, self.w+5, self.h+3)
+		gfx.rect(gfx.w-self.w-10, self.y+30, self.w+5, self.h+3)
 		
 		gfx.set(self.tr, self.tg, self.tb)
-		gfx.x = self.x -self.w + 2
+		gfx.x = gfx.w - self.w - 7
 		gfx.y = self.y + 32
 		gfx.drawstr(self.tip)
 	else

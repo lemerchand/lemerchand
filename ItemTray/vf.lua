@@ -6,28 +6,28 @@ end
 function db(txt, page)
 	if txt == 'before' then reaper.ClearConsole() end
 	cons(txt)
-	cons('\n--------\n\n')
+	cons('--------\n')
 	if debug then
 
 		cons('Enable help: ' .. tostring(enableHelp))
-		cons('\nTotal Elements: ' .. #Elements)
-		cons("\nGroup Count: " .. #groups)
+		cons('Total Elements: ' .. #Elements)
+		cons("Group Count: " .. #groups)
 		
 		for i, b in ipairs(groups) do
-		cons('\n\t' .. i .. ". " .. b.txt .. ' - Page: ' .. b.page)
+		cons('\t' .. i .. ". " .. b.txt .. ' - Page: ' .. b.page)
 
 		end
 
-		cons("\n\nBookmark Count: " .. #bookmarks)
+		cons("\nBookmark Count: " .. #bookmarks)
 		for i, b in ipairs(bookmarks) do
-			cons('\n\t' .. i .. '. ' .. b.name)
+			cons('\t' .. i .. '. ' .. b.name)
 			for ii, bb in ipairs(b.groups) do
-				cons('\n\t\t' .. i .. ". "  .. bb)
+				cons('\t\t' .. i .. ". "  .. bb)
 			end
 		end
 	end
 
 
-	cons('\n--------\n')
+	cons('--------\n')
 
 end
