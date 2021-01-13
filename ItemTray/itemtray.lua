@@ -21,14 +21,17 @@ reaperDoFile('ui.lua')
 reaperDoFile('cf.lua')
 reaperDoFile('vf.lua')
 
+
 reaper.ClearConsole()
+toolTipTime = 20
+
 
 local frm_controls = Frame:Create(5, -13, nil, nil, '', 'main')
 local frm_groups = Frame:Create(5, -13, nil, nil, "", 'main')
 local frm_settings = Frame:Create(5, -13, nil, nil, '', 'settings', true)
-local btn_add = Button:Create(nil, nil, 'control', "", nil, nil, nil, nil, nil, nil, 40, 25, 'Add selected items to tray', nil, '/imgs/pin.png', 11)
-local btn_clear = Button:Create(nil, nil, 'control', "", nil, nil, nil, nil, nil, nil, 40, 25, '', nil, '/imgs/clear.png', 12)
-local btn_closeMEWs = Button:Create(nil, nil, 'control', "", nil, nil, nil, nil, nil, nil, 40, 25, '', nil, '/imgs/exit.png', 13)
+local btn_add = Button:Create(nil, nil, 'control', "", nil, nil, nil, nil, nil, nil, 40, 25, 'Pin selected items to tray\n\nRight-Click to add all itmes', nil, '/imgs/pin.png', 11)
+local btn_clear = Button:Create(nil, nil, 'control', "", nil, nil, nil, nil, nil, nil, 40, 25, 'Clear all pins.\n\nRight-click to clear all pins \nand close all midi editors', nil, '/imgs/clear.png', 12)
+local btn_closeMEWs = Button:Create(nil, nil, 'control', "", nil, nil, nil, nil, nil, nil, 40, 25, 'Close all midi editors', nil, '/imgs/exit.png', 13)
 local tgl_settings = Toggle:Create(nil, nil, 'ui', '', false, 40, 25, nil, '/imgs/gears.png')
 local search = TextField:Create(nil, nil, 150, 22, "", false, false)
 local page = Page:Create(nil, nil, 150, nil, 'control', 1)
@@ -36,6 +39,8 @@ local btn_add_group = Button:Create(nil, nil, 'control', '+', nil, nil, nil, nil
 local btn_prev_page = Button:Create(nil, nil, 'control', "<", nil, nil, nil, nil, nil, nil, 20, 20)
 local btn_next_page = Button:Create(nil, nil, 'control', " >", nil, nil, nil, nil, nil, nil, 20, 20)
 local btn_add_page = Button:Create(nil, nil, 'control', ' +', nil, nil, nil, nil, nil, nil, 20, 20, nil, nil)
+tip = Tooltip:Create(nil, nil, nil, toolTipTime, {.1,.1,.1}, {.9,.9,.7})
+
 
 bookmarks = {}
 groups = {}
@@ -575,6 +580,7 @@ function main()
 
 	-- Creates a bookmark
 	if btn_add.leftClick then
+		
 		new_bookmark()
 		update_ui()
 	elseif btn_add.rightClick then
@@ -671,14 +677,21 @@ function main()
 			if segment == "track" then
 				
 				if pcall(Button.Insert, b, 'mouse') then else
-					reaper.MB('Something went wrong.\nPerhaps the media item has been deleted...', 'Something\'s amiss', 0)
+					missing_item(b, i)
 				end
 				b.lastClick = 0
 				-- if the user click-releases a bookmark...
 			else
 
 				if not check_group_drop(b) then 
-					b:restore_ME() 
+					if b.active then 
+						b.active = false
+						reaper.MIDIEditor_OnCommand(reaper.MIDIEditor_GetActive(),2)
+					else
+						if pcall(Button.restore_ME, b) then else
+							missing_item(b, i)
+						end
+					end
 				end
 				update_ui()
 			end
@@ -711,7 +724,7 @@ function main()
 
 			elseif option == 3 then
 				if pcall(Button.Insert, b, 'edit') then else
-					reaper.MB('Something went wrong.\nPerhaps the media item has been deleted...', 'Something\'s amiss', 0)
+					missing_item(b, i)
 				end
 
 			elseif option == 4 then

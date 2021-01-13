@@ -16,3 +16,10 @@ function get_open_MEWS()
 	 end
 	 return parsedlist
 end
+
+function missing_item(b, i)
+
+	reaper.MB('The pinned item '.. b.name .. ' has been glued,\ndeleted, or dissapeared into the ether.\n\nTip: Repin items after gluing.' , 'Something\'s amiss', 0)
+	b:Remove(false, i)	
+
+end

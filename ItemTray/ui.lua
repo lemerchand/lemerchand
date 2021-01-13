@@ -247,11 +247,7 @@ function Button:Draw()
 	
 	if hovering(self.x, self.y, self.w, self.h) and not self.block then
 
-		if not self.tt and enableHelp then
-			--local mx, my = reaper.GetMousePosition()
-			--reaper.TrackCtl_SetToolTip(self.help, mx + 20, my + 20, true)
-			self.tt = true
-		end
+		tip:Set(self.x, self.y, self.help)
 		
 		self.mouseOver = true
 		if gfx.mouse_cap >= 1 and self.mouseDown == false then
@@ -277,10 +273,7 @@ function Button:Draw()
 		end
 	else
 		self.mouseOver = false
-		if self.tt then
-			reaper.TrackCtl_SetToolTip('', self.x + self.w + 20, self.y + self.h, true)
-			self.tt = false
-		end
+
 		if self.mouseDown and gfx.mouse_cap ~= 0 then
 			--User is dragging
 
@@ -994,3 +987,82 @@ function Page:Remove(all)
 
 end
 
+-------------------------------------------------------------------
+Tooltip = {}
+Tooltip.__index = Tooltip
+
+function Tooltip:Create(tip, x, y, c, fgColor, bgColor, font, fontSize)
+
+	local this = {
+		tip = tip or nil,
+		c = c or 25,
+		defaultC = c,
+		x = x or gfx.mouse_x + 30,
+		y = y or gfx.mouse_y,
+		tr = fgColor[1] or .1,
+		tg = fgColor[2] or .1,
+		tb = fgColor[3] or .1,
+		br = bgColor[1] or .1,
+		bg = bgColor[2] or .6,
+		bb = bgColor[3] or .4,
+		font = font or 'Arial',
+		fontSize = fontSize or 12,
+		w = 0,
+		h = 0,
+		hide = false,
+		enabled = true,
+		btype = 'tooltip',
+		state="countup"
+	}
+
+	setmetatable(this, Tooltip)
+	table.insert(Elements, this)
+	return this
+
+end
+
+function Tooltip:Draw()
+
+	if self.state == 'countup' then 
+		self.c = self.c + 1
+		if self.c == self.defaultC * 4 then 
+			self.hide = false
+			self.state = 'countdown'
+		end
+	elseif self.state == 'countdown' then
+		self.c = self.c - 1
+		if self.c == 0 then 
+			self.hide = true 
+			self.state = 'halt'
+		end
+	end
+
+
+	if not self.enabled 
+		or not self.tip 
+		or self.hide == true then return end
+
+	
+	gfx.setfont(2, self.font, self.fontSize)
+
+	self.w, self.h = gfx.measurestr(self.tip)
+
+	gfx.set(self.br, self.bg, self.bb)
+	gfx.rect(self.x, self.y+30, self.w+5, self.h+3)
+	
+	gfx.set(self.tr, self.tg, self.tb)
+	gfx.x = self.x + 2
+	gfx.y = self.y + 32
+	gfx.drawstr(self.tip)
+
+
+
+end
+
+function Tooltip:Set(x, y, str)
+
+	if x then self.x = x end
+	if y then self.y = y end
+
+	self.tip = str
+end
