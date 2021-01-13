@@ -1,4 +1,4 @@
--- @version 0.62b
+-- @version 0.633b
 -- @author Lemerchand
 -- @provides
 --    [main] .
@@ -12,7 +12,7 @@
 
 
 local scriptName = "Item Tray"
-local versionNumber = ' 0.62b'
+local versionNumber = ' 0.633b'
 local projectPath = reaper.GetProjectPath(0)
 function reaperDoFile(file) local info = debug.getinfo(1, 'S'); script_path = info.source:match[[^@?(.*[\/])[^\/]-$]]; dofile(script_path .. file); end
 reaperDoFile('ui.lua')
@@ -304,7 +304,7 @@ function display_items(vertical)
 	
 	for i, b in ipairs(visible) do
 		b.hide = false
-		if not bookmarks[i - 1] then --[1]
+		if not visible[i - 1] then --[1]
 			if not vertical then
 				b.x = frm_groups.x + frm_groups.w + 5
 				b.y = 3
@@ -315,18 +315,18 @@ function display_items(vertical)
 		else
 			if not vertical then
 				--[2]
-				b.x = bookmarks[i - 1].x + 155
-				b.y = bookmarks[i - 1].y
+				b.x = visible[i - 1].x + 155
+				b.y = visible[i - 1].y
 				if b.x + b.w >= gfx.w - 7 then
 					b.x = frm_groups.w + frm_groups.x + 5
-					b.y = bookmarks[i - 1].y + 26
+					b.y = visible[i - 1].y + 26
 				end
 			else
-				b.x = bookmarks[i - 1].x + 155
-				b.y = bookmarks[i - 1].y
+				b.x = visible[i - 1].x + 155
+				b.y = visible[i - 1].y
 				if b.x + b.w >= gfx.w - 7 then
 					b.x = btn_add.x
-					b.y = bookmarks[i - 1].y + 26
+					b.y = visible[i - 1].y + 26
 				end
 			end
 		end
