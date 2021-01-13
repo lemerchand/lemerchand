@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Scripts by Lemerchand" commit="a5c8e80d9cdc69c48e054e60e5fbfd508361344a">
+<index version="1" name="Scripts by Lemerchand" commit="db2bc176bf469250110eb0bbb2094d0308d73c68">
   <category name="ItemTray">
     <reapack name="itemtray.lua" type="script">
       <version name="0.4b" author="Lemerchand" time="2021-01-10T16:44:05Z">
@@ -99,6 +99,21 @@
         <source file="imgs/newpage.png">https://github.com/lemerchand/lemerchand/raw/a5c8e80d9cdc69c48e054e60e5fbfd508361344a/ItemTray/imgs/newpage.png</source>
         <source file="imgs/pin.png">https://github.com/lemerchand/lemerchand/raw/a5c8e80d9cdc69c48e054e60e5fbfd508361344a/ItemTray/imgs/pin.png</source>
         <source file="imgs/search.png">https://github.com/lemerchand/lemerchand/raw/a5c8e80d9cdc69c48e054e60e5fbfd508361344a/ItemTray/imgs/search.png</source>
+      </version>
+      <version name="0.62b" author="Lemerchand" time="2021-01-13T15:10:28Z">
+        <changelog><![CDATA[+ Added tooltips
++ Improved cycling behavior]]></changelog>
+        <source main="main">https://github.com/lemerchand/lemerchand/raw/db2bc176bf469250110eb0bbb2094d0308d73c68/ItemTray/itemtray.lua</source>
+        <source file="cf.lua">https://github.com/lemerchand/lemerchand/raw/db2bc176bf469250110eb0bbb2094d0308d73c68/ItemTray/cf.lua</source>
+        <source file="ui.lua">https://github.com/lemerchand/lemerchand/raw/db2bc176bf469250110eb0bbb2094d0308d73c68/ItemTray/ui.lua</source>
+        <source file="vf.lua">https://github.com/lemerchand/lemerchand/raw/db2bc176bf469250110eb0bbb2094d0308d73c68/ItemTray/vf.lua</source>
+        <source file="imgs/add-file.png">https://github.com/lemerchand/lemerchand/raw/db2bc176bf469250110eb0bbb2094d0308d73c68/ItemTray/imgs/add-file.png</source>
+        <source file="imgs/clear.png">https://github.com/lemerchand/lemerchand/raw/db2bc176bf469250110eb0bbb2094d0308d73c68/ItemTray/imgs/clear.png</source>
+        <source file="imgs/exit.png">https://github.com/lemerchand/lemerchand/raw/db2bc176bf469250110eb0bbb2094d0308d73c68/ItemTray/imgs/exit.png</source>
+        <source file="imgs/gears.png">https://github.com/lemerchand/lemerchand/raw/db2bc176bf469250110eb0bbb2094d0308d73c68/ItemTray/imgs/gears.png</source>
+        <source file="imgs/newpage.png">https://github.com/lemerchand/lemerchand/raw/db2bc176bf469250110eb0bbb2094d0308d73c68/ItemTray/imgs/newpage.png</source>
+        <source file="imgs/pin.png">https://github.com/lemerchand/lemerchand/raw/db2bc176bf469250110eb0bbb2094d0308d73c68/ItemTray/imgs/pin.png</source>
+        <source file="imgs/search.png">https://github.com/lemerchand/lemerchand/raw/db2bc176bf469250110eb0bbb2094d0308d73c68/ItemTray/imgs/search.png</source>
       </version>
     </reapack>
   </category>
