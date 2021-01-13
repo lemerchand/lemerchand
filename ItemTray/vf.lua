@@ -9,6 +9,7 @@ function db(txt, page)
 	cons('\n--------\n\n')
 	if debug then
 
+		cons('Enable help: ' .. tostring(enableHelp))
 		cons('\nTotal Elements: ' .. #Elements)
 		cons("\nGroup Count: " .. #groups)
 		

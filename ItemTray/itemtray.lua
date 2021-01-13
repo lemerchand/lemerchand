@@ -1,4 +1,4 @@
--- @version 0.51b
+-- @version 0.61b
 -- @author Lemerchand
 -- @provides
 --    [main] .
@@ -7,14 +7,12 @@
 --    [nomain] vf.lua
 --    [nomain] imgs/*.png
 -- @changelog
+--    + Added tooltips
 --    + Improved cycling behavior
---    + Added some icons
---    + Fixed close all windows behavior
---    + Now restores session on reload
 
 
 local scriptName = "Item Tray"
-local versionNumber = ' 0.51b'
+local versionNumber = ' 0.61b'
 local projectPath = reaper.GetProjectPath(0)
 function reaperDoFile(file) local info = debug.getinfo(1, 'S'); script_path = info.source:match[[^@?(.*[\/])[^\/]-$]]; dofile(script_path .. file); end
 reaperDoFile('ui.lua')
@@ -25,21 +23,60 @@ reaperDoFile('vf.lua')
 reaper.ClearConsole()
 toolTipTime = 20
 
-
+--Frames
 local frm_controls = Frame:Create(5, -13, nil, nil, '', 'main')
 local frm_groups = Frame:Create(5, -13, nil, nil, "", 'main')
 local frm_settings = Frame:Create(5, -13, nil, nil, '', 'settings', true)
-local btn_add = Button:Create(nil, nil, 'control', "", nil, nil, nil, nil, nil, nil, 40, 25, 'Pin selected items to tray\n\nRight-Click to add all itmes', nil, '/imgs/pin.png', 11)
-local btn_clear = Button:Create(nil, nil, 'control', "", nil, nil, nil, nil, nil, nil, 40, 25, 'Clear all pins.\n\nRight-click to clear all pins \nand close all midi editors', nil, '/imgs/clear.png', 12)
-local btn_closeMEWs = Button:Create(nil, nil, 'control', "", nil, nil, nil, nil, nil, nil, 40, 25, 'Close all midi editors', nil, '/imgs/exit.png', 13)
+
+-----------------------------------
+--[			 MAINVIEW			]--
+-----------------------------------
+
+local btn_add = Button:Create(nil, nil, 'control', "", nil, nil, nil, nil, nil, nil, 40, 25, '', nil, '/imgs/pin.png', 11)
+btn_add.id = 'add' 
+btn_add.help = 'Pin selected items to tray\n\nRight-Click to add all itmes'
+
+local btn_clear = Button:Create(nil, nil, 'control', "", nil, nil, nil, nil, nil, nil, 40, 25, '', nil, '/imgs/clear.png', 12)
+btn_clear.id = 'clear'
+btn_clear.help = 'Clear all pins.\n\nRight-click to clear all pins \nand close all midi editors'
+
+local btn_closeMEWs = Button:Create(nil, nil, 'control', "", nil, nil, nil, nil, nil, nil, 40, 25, '', nil, '/imgs/exit.png', 13)
+btn_closeMEWs.id = 'closeMEWS'
+btn_closeMEWs.help = 'Close all midi editors'
+
 local tgl_settings = Toggle:Create(nil, nil, 'ui', '', false, 40, 25, nil, '/imgs/gears.png')
+tgl_settings.id = 'tglsettings'
+tgl_settings.help = 'Settings'
+
 local search = TextField:Create(nil, nil, 150, 22, "", false, false)
+
 local page = Page:Create(nil, nil, 150, nil, 'control', 1)
+page.id = 'pagecontrol'
+page.help = 'Pages contain groups.\n\nRight-click for more options'
+
 local btn_add_group = Button:Create(nil, nil, 'control', '+', nil, nil, nil, nil, nil, nil, 20, 20)
+btn_add_group.id = 'addgroup'
+btn_add_group.help = 'Adds a group to \norganize pinned items'
+
 local btn_prev_page = Button:Create(nil, nil, 'control', "<", nil, nil, nil, nil, nil, nil, 20, 20)
 local btn_next_page = Button:Create(nil, nil, 'control', " >", nil, nil, nil, nil, nil, nil, 20, 20)
+
 local btn_add_page = Button:Create(nil, nil, 'control', ' +', nil, nil, nil, nil, nil, nil, 20, 20, nil, nil)
-tip = Tooltip:Create(nil, nil, nil, toolTipTime, {.1,.1,.1}, {.9,.9,.7})
+btn_add_page.id = 'addpage'
+btn_add_page.help = 'Adds a page to organizee groups'
+
+-----------------------------------
+--[			 Settings			]--
+-----------------------------------
+local tgl_tooltips = Toggle:Create(nil, nil, 'settings', "Show Tooltips")
+tgl_tooltips.id = 'tgltooltips'
+tgl_tooltips.help = 'Enable/disable tooltips'
+tgl_tooltips.hide = true
+
+
+
+tip = Tooltip:Create(nil, nil, nil, toolTipTime, {.1,.1,.1}, {.92,.92,.68})
+tip.btype = 'all'
 
 
 bookmarks = {}
@@ -141,7 +178,7 @@ function load_global_settings()
 		if line:find("dockstate=") then dockstate = line:sub(line:find("=") + 1) end
 		if line:find('enableHelp=') then
 			enableHelp = line:sub(line:find("=") + 1)
-			if enableHelp == 'true' then enableHelp = 'true' else enableHelp = false end
+			if enableHelp == 'true' then enableHelp = true else enableHelp = false end
 		end
 		if line:find('windowheight=') then windowHeight = line:sub(line:find("=") + 1) end
 		if line:find('windowwidth=') then windowWidth = line:sub(line:find("=") + 1) end
@@ -537,14 +574,16 @@ function onexit ()
 	reaper.JS_Window_SetFocus(last_window)
 end
 
---[[
- 
-Load settings, create window, look at a pig's butt
- 
-]]--
+-----------------------------------
+--[		  LOAD SETTINGS			]--
+--[		And create window 		]--
+-----------------------------------
 
 load_global_settings()
 load_project_settings()
+
+if enableHelp then tgl_tooltips.state = true else tgl_tooltips.state = false end
+
 
 gfx.init(scriptName .. versionNumber, windowWidth, windowHeight, dockstate, 100, 100)
 -- Keep on top
@@ -610,7 +649,8 @@ function main()
 				if element.btype == 'settings' then
 					element.hide = true
 
-				else element.hide = false
+				else
+					element.hide = false
 				end
 			end
 			
@@ -813,6 +853,17 @@ function main()
 		end
 	end
 
+-----------------------------------
+--[		 Setting Bindings		]--
+-----------------------------------
+
+	if tgl_tooltips.state then enableHelp = true else enableHelp = false end
+
+
+-----------------------------------
+--[			 Upkeep 			]--
+-----------------------------------
+
 	-- This hack prevents accidental clearing from one mouse click
 	if clickTimer ~= -1 then clickTimer = clickTimer - 1 end
 
@@ -824,14 +875,12 @@ function main()
 	elseif char == 26 then reaper.Main_OnCommand(40029, 0)
 	elseif char == 32 then db('Current Page: ' .. page.page, page)
 	else
-		search:Change(char)
 
 	end
 	
 
 	if UIRefresh == 0 then
 		if gfx.dock(-1) == 1 then UIRefresh = 15 else UIRefresh = 5 end
-
 		update_ui()
 	else
 
@@ -840,8 +889,11 @@ function main()
 	
 	if tgl_settings.state == true then
 		for e, element in ipairs(Elements) do
-			if element.btype == 'settings' or element.btype == 'ui' then element.hide = false
-			else element.hide = true end
+			if element.btype == 'settings' 
+				or element.btype == 'ui' then element.hide = false
+			else
+				if element.btype == 'all' then else element.hide = true end
+			end
 		end
 	end
 	
