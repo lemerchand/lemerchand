@@ -1,4 +1,4 @@
--- @version 0.633b
+-- @version 0.651b
 -- @author Lemerchand
 -- @provides
 --    [main] .
@@ -7,12 +7,14 @@
 --    [nomain] vf.lua
 --    [nomain] imgs/*.png
 -- @changelog
+--    + Script now looks for alternate items
+--    + Added Birdbird's midi-to-audio trigger
 --    + Added tooltips
 --    + Improved cycling behavior
 
 
 local scriptName = "Item Tray"
-local versionNumber = ' 0.633b'
+local versionNumber = ' 0.651b'
 local projectPath = reaper.GetProjectPath(0)
 function reaperDoFile(file) local info = debug.getinfo(1, 'S'); script_path = info.source:match[[^@?(.*[\/])[^\/]-$]]; dofile(script_path .. file); end
 reaperDoFile('ui.lua')
@@ -598,8 +600,10 @@ function main()
 	fill_background()
 	draw_elements()
 
-	--let's find our alt+tab keys (actually alt-ctrl-left/right)
-	-- 37 = < 39 = >
+-----------------------------------
+--[ 	Intercepted Hot Keys    ]--
+-----------------------------------
+
 
 	if reaper.JS_Mouse_GetState(-1) == 20 and clickTimer < 0 then
 		if reaper.JS_VKeys_GetState(-1):byte(37) == 1 then
@@ -615,7 +619,11 @@ function main()
 
 	end
 
-	-- Search
+
+-----------------------------------
+--[			Main Panel			]--
+-----------------------------------
+
 	if search.leftClick then search.active = true end
 
 	-- Creates a bookmark
@@ -659,6 +667,9 @@ function main()
 		
 	end
 	
+-----------------------------------
+--[			Page Panel			]--
+-----------------------------------
 
 	-- Group Add button
 	if btn_add_group.leftClick then
@@ -701,26 +712,58 @@ function main()
 		update_ui()
 	end
 
+-----------------------------------
+--[			Bookmarks			]--
+-----------------------------------
+
+
 	-- If the user is dragging then disable buttons
 	-- TODO: Block all necessary elements
 	for i, b in ipairs(bookmarks) do
 		if b.leftClick then
-			for ii, bb in ipairs(bookmarks) do
-				bb.block = true
-				btn_clear.block = true
-				btn_add.block = true
+			for ii, element in ipairs(Elements) do
+				if element.btype == 'control' or element.btype == 'bookmark' then
+					element.block = true
+				end
 			end
 		end
 
 		-- if the user was dragging a bookmark....
 		if b.lastClick == 1 and b.mouseUp then
+			local itemType
 			local window, segment, details = reaper.BR_GetMouseCursorContext()
+
+			local itemType = pcall(audio_or_midi, b.take)
+
+
 			if segment == "track" then
+				 local destination = reaper.BR_GetMouseCursorContext_Item()
+				 
+				 if not destination then 
+	
+				 	if pcall(Button.Insert, b, 'mouse') then else
+				 		if missing_item(b, i) then end
+				 	end
+				 	b.lastClick = 0
+				 elseif itemType == 'audio' and reaper.TakeIsMIDI(reaper.GetActiveTake(destination)) then 
+				 	
+				 	if pcall(midi_to_audio, b.item, destination) then 
+				 		b.lastClick = 0
+				 		break
+				 	else
+				 		if missing_item(b, i) then end
+				 	end
+				 else 
+				 	if pcall(Button.Insert, b, 'mouse') then else
+				 		
+				 		if missing_item(b, i) then end
+				 	end
+				 	b.lastClick = 0
+				 end
+
+					
+
 				
-				if pcall(Button.Insert, b, 'mouse') then else
-					missing_item(b, i)
-				end
-				b.lastClick = 0
 				-- if the user click-releases a bookmark...
 			else
 
@@ -781,6 +824,10 @@ function main()
 		end
 
 	end
+
+-----------------------------------
+--[			Groups				]--
+-----------------------------------
 
 	for i, b in ipairs(Elements) do
 		if b.btype == 'group' then
@@ -853,6 +900,8 @@ function main()
 			
 		end
 	end
+
+
 
 -----------------------------------
 --[		 Setting Bindings		]--
