@@ -26,7 +26,10 @@ function db(txt, page)
 		end
 	end
 
-	
+	cons('\nActive Bookmarks:')
+	for i, b in ipairs(bookmarks) do
+		if b.active then cons(i .. ' - ' .. b.name) end
+	end
 	cons('--------------------------\n')
 
 end

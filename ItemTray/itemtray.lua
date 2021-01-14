@@ -1,4 +1,4 @@
--- @version 0.651b
+-- @version 0.661b
 -- @author Lemerchand
 -- @provides
 --    [main] .
@@ -7,14 +7,16 @@
 --    [nomain] vf.lua
 --    [nomain] imgs/*.png
 -- @changelog
+--    + Shift-click to view multiple pins
+--    + Only one error when items not found on load
+--    + Fixed midi to audio trigger
 --    + Script now looks for alternate items
 --    + Added Birdbird's midi-to-audio trigger
---    + Added tooltips
---    + Improved cycling behavior
+
 
 
 local scriptName = "Item Tray"
-local versionNumber = ' 0.651b'
+local versionNumber = ' 0.661b'
 local projectPath = reaper.GetProjectPath(0)
 function reaperDoFile(file) local info = debug.getinfo(1, 'S'); script_path = info.source:match[[^@?(.*[\/])[^\/]-$]]; dofile(script_path .. file); end
 reaperDoFile('ui.lua')
@@ -96,6 +98,7 @@ enableHelp = true
 
 function load_project_settings()
 	local line
+	local errors = 0
 	local file = io.open(projectPath .. 'bm.dat', 'r')
 	io.input(file)
 
@@ -104,6 +107,7 @@ function load_project_settings()
 	page.pages.names = {}
 
 	while true do
+
 		line = file:read()
 		if not line then break end
 
@@ -123,11 +127,13 @@ function load_project_settings()
 			end
 
 			if pcall(load_bookmark, itemGuid, takeGuid, savedgroups) then else
-				reaper.MB('Some Bookmarks could not be restored.\nThey may have been deleted since the previous run.', 'Somethin\'s amiss', 0)
+				errors = errors + 1
 			end
 
 		end
-
+		if errors > 0 then 
+			reaper.MB('Some Bookmarks could not be restored.\nThey may have been deleted since the previous run.', 'Somethin\'s amiss', 0)
+		end
 	end
 	file:close()
 
@@ -728,13 +734,36 @@ function main()
 			end
 		end
 
+		-- Shift Left Click to pin to current editor
+		if b.shiftLeftClick then
+			if b.active then 
+				reaper.SetMediaItemInfo_Value(b.item, 'B_UISEL', 0)
+				reaper.UpdateArrange()
+				b.active = false
+			else
+				reaper.SelectAllMediaItems(0, false)
+				reaper.SetMediaItemSelected(b.item, true)
+				b.active = true
+				for am, bookmark in ipairs(bookmarks) do
+					if bookmark.active then 
+						reaper.SetMediaItemSelected(bookmark.item, true)
+					end
+				end
+				reaper.Main_OnCommand(40153, 0)
+			end
+		end
+
 		-- if the user was dragging a bookmark....
 		if b.lastClick == 1 and b.mouseUp then
+			
+			for b, bookmark in ipairs(bookmarks) do
+				bookmark.active = false
+			end
+
 			local itemType
 			local window, segment, details = reaper.BR_GetMouseCursorContext()
 
 			local ret, itemType = pcall(audio_or_midi, b.take)
-
 
 			if segment == "track" then
 				 local destination = reaper.BR_GetMouseCursorContext_Item()
