@@ -52,6 +52,7 @@ function missing_item(b, i)
 end
 
 function audio_or_midi(take)
+
 	if reaper.TakeIsMIDI(take) then return  'midi' else
 		return  'audio'
 	end

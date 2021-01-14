@@ -733,14 +733,14 @@ function main()
 			local itemType
 			local window, segment, details = reaper.BR_GetMouseCursorContext()
 
-			local itemType = pcall(audio_or_midi, b.take)
+			local ret, itemType = pcall(audio_or_midi, b.take)
 
 
 			if segment == "track" then
 				 local destination = reaper.BR_GetMouseCursorContext_Item()
 				 
 				 if not destination then 
-	
+					
 				 	if pcall(Button.Insert, b, 'mouse') then else
 				 		if missing_item(b, i) then end
 				 	end
@@ -749,11 +749,13 @@ function main()
 				 	
 				 	if pcall(midi_to_audio, b.item, destination) then 
 				 		b.lastClick = 0
-				 		break
+				 		
 				 	else
 				 		if missing_item(b, i) then end
+				 		b.lastClick = 0
 				 	end
 				 else 
+
 				 	if pcall(Button.Insert, b, 'mouse') then else
 				 		
 				 		if missing_item(b, i) then end
