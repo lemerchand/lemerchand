@@ -1,20 +1,20 @@
-s kont=c6
-s kont=c5
-s kont=c4
-s kont=c3
-s kont=c2
-s kont=c
-s kont=c
-hello
-there
-dolly
-s piano =c
-s kon=c
-s kon=c
-s kon=c2
-s kon=c23
-s kon=16
-s kon=12
-c
-s kon=c16
 s kon=c17
+s kon=c16
+c
+s kon=12
+s kon=16
+s kon=c23
+s kon=c2
+s kon=c
+s kon=c
+s piano =c
+dolly
+there
+hello
+s kont=c
+s kont=c
+s kont=c2
+s kont=c3
+s kont=c4
+s kont=c5
+s kont=c6

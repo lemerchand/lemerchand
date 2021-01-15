@@ -756,9 +756,6 @@ function main()
 		-- if the user was dragging a bookmark....
 		if b.lastClick == 1 and b.mouseUp then
 			
-			for b, bookmark in ipairs(bookmarks) do
-				bookmark.active = false
-			end
 
 			local itemType
 			local window, segment, details = reaper.BR_GetMouseCursorContext()
@@ -803,8 +800,11 @@ function main()
 						b.active = false
 						reaper.MIDIEditor_OnCommand(reaper.MIDIEditor_GetActive(),2)
 					else
+						for b, bookmark in ipairs(bookmarks) do
+							bookmark.active = false
+						end
 						if pcall(Button.restore_ME, b) then else
-							missing_item(b, i)
+							if missing_item(b, i) then end
 						end
 					end
 				end
