@@ -4,6 +4,51 @@ function cons(text, p)
 	reaper.ShowConsoleMsg('\n' .. tostring(text))
 end
 
+function clear_all_bookmarks(closeWindow)
+	for e = #Elements, 1, -1 do
+		if Elements[e].btype == "bookmark" then table.remove(Elements, e) end
+	end
+
+	bookmarks = {}
+	update_ui()
+
+	if closeWindow then 
+		close_all_MEWS()		
+	end
+end
+
+function load_bookmark(itemGuid, takeGuid, savedgroups)
+
+	local item = reaper.BR_GetMediaItemByGUID(0, itemGuid)
+	local take = reaper.GetMediaItemTakeByGUID(0, takeGuid)
+
+	local retval, name = reaper.GetSetMediaItemTakeInfo_String(take, 'P_NAME', "", false)
+	local track = reaper.GetMediaItemInfo_Value(item, 'P_TRACK')
+
+	-- now acquire the name of the parent track, as well as it's color
+	local retval, trackName = reaper.GetTrackName(track)
+	local color = reaper.GetTrackColor(track)
+
+	table.insert(bookmarks, Button:Create(nil, nil, 'bookmark', trackName, name, take, item, track, itemGuid, takeGuid, 150, 25, "", color))
+
+	local groups = {}
+	local i = 1
+
+	while savedgroups ~= '' do
+		if savedgroups:find(',') then
+			local s, e = savedgroups:find(',')
+			local t = savedgroups:sub(1, s - 1)
+			if t then
+				table.insert(bookmarks[#bookmarks].groups, tonumber(t))
+			end
+			savedgroups = savedgroups:sub(e + 1)
+		end
+		
+		i = i + 1
+	end
+end
+
+
 function get_open_MEWS()
 	 local retval, list = reaper.JS_MIDIEditor_ListAll()
 	 local parsedlist = {}

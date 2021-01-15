@@ -1018,7 +1018,7 @@ function Tooltip:Create(tip, x, y, c, fgColor, bgColor, font, fontSize)
 	}
 
 	setmetatable(this, Tooltip)
-	table.insert(Elements, this)
+	
 	return this
 
 end
