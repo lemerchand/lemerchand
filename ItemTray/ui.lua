@@ -307,12 +307,15 @@ function Button:restore_ME()
 end
 
 
-function Button:Rename()
-	local retval, takeName = reaper.GetUserInputs("Item Name", 1, 'Item Name:', self.name)
-	if not retval then return end
+function Button:Rename(name)
 
-	self.name = takeName
-	reaper.GetSetMediaItemTakeInfo_String( self.take, 'P_NAME', takeName, true )
+	if not name then 
+		local retval, name = reaper.GetUserInputs("Item Name", 1, 'Item Name:', self.name)
+		if not retval then return end
+	end
+
+	self.name = name
+	reaper.GetSetMediaItemTakeInfo_String( self.take, 'P_NAME', name, true )
 end
 
 function Button:Insert(location)
@@ -351,7 +354,15 @@ function Button:Remove(all, i)
 	end
 end
 
-
+function Button:is_in_group(group)
+	for k, g in ipairs(groups) do
+		if g == group then 
+			for gg, bgroup in ipairs(self.groups) do
+				if bgroup == k then return true end
+			end
+		end
+	end
+end
 
 -------------------------------------------END: BUTTON--------------------------------------------------------
 --------------------------------------------------------------------------------------------------------------
@@ -804,21 +815,31 @@ function Toggle:Draw()
 			self.mouseDown = true
 			self.clickTemp = gfx.mouse_cap
 
+			if gfx.mouse_cap == 4 
+				or gfx.mouse_cap == 8 
+				or gfx.mouse_cap == 16 then self.mouseDown = false end
+
+			if self.clickTemp == 2 then self.rightClick = true
+			elseif gfx.mouse_cap == 5 then self.ctrlLeftClick = true
+			elseif gfx.mouse_cap == 9 then self.shiftLeftClick = true
+			elseif gfx.mouse_cap == 10 then self.shiftRightClick = true
+			elseif gfx.mouse_cap == 17 then self.altLeftClick = true
+			elseif gfx.mouse_cap == 18 then self.altRightClick = true
+			elseif gfx.mouse_cap == 64 then self.middleClick = true
+			end
+
 		elseif gfx.mouse_cap == 1 and self.mouseDown == true then
 
 		elseif gfx.mouse_cap == 0 and self.mouseDown == true then
 
 			if self.clickTemp == 1 then 
 				self.leftClick = true
-				if self.state == true then self.state = false else self.state = true end
-			elseif self.clickTemp == 2 then self.rightClick = true
-			elseif self.clickTemp == 5 then self.ctrlLeftClick = true
-			elseif self.clickTemp == 9 then self.shiftLeftClick = true
-			elseif self.clickTemp == 10 then self.shiftRightClick = true
-			elseif self.clickTemp == 17 then self.altLeftClick = true
-			elseif self.clickTemp == 18 then self.altRightClick = true
-			elseif self.clickTemp == 64 then self.middleClick = true
+				if self.state == true then self.state = false 
+				else 
+					self.state = true 
+				end
 			end
+
 
 			self.mouseDown = false
 			self.mouseUp = true

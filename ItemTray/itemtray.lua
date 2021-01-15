@@ -1,4 +1,4 @@
--- @version 0.661b
+-- @version 0.665b
 -- @author Lemerchand
 -- @provides
 --    [main] .
@@ -7,14 +7,13 @@
 --    [nomain] vf.lua
 --    [nomain] imgs/*.png
 -- @changelog
+--    + Shift-click group to select all items
+--    + Prefix all item names in a group with group name
 --    + Shift-click to view multiple pins
---    + Only one error when items not found on load
---    + Fixed midi to audio trigger
---    + Script now looks for alternate items
---    + Added Birdbird's midi-to-audio trigger
+--    + Am I forgetting something?
 
 local scriptName = "Item Tray"
-local versionNumber = ' 0.661b'
+local versionNumber = ' 0.665b'
 local projectPath = reaper.GetProjectPath(0)
 function reaperDoFile(file) local info = debug.getinfo(1, 'S'); script_path = info.source:match[[^@?(.*[\/])[^\/]-$]]; dofile(script_path .. file); end
 reaperDoFile('ui.lua')
@@ -34,50 +33,48 @@ local frm_settings = Frame:Create(5, -13, nil, nil, '', 'settings', true)
 -----------------------------------
 
 local btn_add = Button:Create(
-	nil, nil, 'control', "", nil, nil, nil, nil, nil, nil, 40, 25, '', nil, '/imgs/pin.png', 11)
+nil, nil, 'control', "", nil, nil, nil, nil, nil, nil, 40, 25, '', nil, '/imgs/pin.png', 11)
 btn_add.id = 'add'
 btn_add.help = 'Pin selected items to tray\nHotkey: Ctrl+Alt+Enter\n\nRight-Click to add all items'
 
 local btn_clear = Button:Create(
-	nil, nil, 'control', "", nil, nil, nil, nil, nil, nil, 40, 25, '', nil, '/imgs/clear.png', 12)
+nil, nil, 'control', "", nil, nil, nil, nil, nil, nil, 40, 25, '', nil, '/imgs/clear.png', 12)
 btn_clear.id = 'clear'
 btn_clear.help = 'Clear all pins.\n\nRight-click to clear all pins \nand close all midi editors'
 
 local btn_closeMEWs = Button:Create(
-	nil, nil, 'control', "", nil, nil, nil, nil, nil, nil, 40, 25, '', nil, '/imgs/exit.png', 13)
+nil, nil, 'control', "", nil, nil, nil, nil, nil, nil, 40, 25, '', nil, '/imgs/exit.png', 13)
 btn_closeMEWs.id = 'closeMEWS'
 btn_closeMEWs.help = 'Close all midi editors\nHotkey: Ctrl+Alt+Backspace'
 
 local tgl_settings = Toggle:Create(
-	nil, nil, 'ui', '', false, 40, 25, nil, '/imgs/gears.png')
+nil, nil, 'ui', '', false, 40, 25, nil, '/imgs/gears.png')
 tgl_settings.help = 'Settings'
 tgl_settings.id = 'tglsettings'
 
 local search = TextField:Create(
-	nil, nil, 150, 22, "", false, false)
+nil, nil, 150, 22, "", false, false)
 
 local page = Page:Create(
-	nil, nil, 150, nil, 'control', 1)
+nil, nil, 150, nil, 'control', 1)
 page.id = 'pagecontrol'
 page.help = 'Pages contain groups.\n\nRight-click for more options'
 
 local btn_add_group = Button:Create(
-	nil, nil, 'control', '+', nil, nil, nil, nil, nil, nil, 
-	20, 20, 'Adds a group to \norganize pinned items\n\nRight-click a group \nfor more options')
+	nil, nil, 'control', '+', nil, nil, nil, nil, nil, nil,
+20, 20, 'Adds a group to \norganize pinned items\n\nRight-click a group \nfor more options')
 btn_add_group.id = 'addgroup'
 
-
 local btn_prev_page = Button:Create(
-	nil, nil, 'control', "<", nil, nil, nil, nil, nil, nil, 20, 20, 'Previous Page')
+nil, nil, 'control', "<", nil, nil, nil, nil, nil, nil, 20, 20, 'Previous Page')
 btn_prev_page.id = 'prevpage'
 
 local btn_next_page = Button:Create(
-	nil, nil, 'control', " >", nil, nil, nil, nil, nil, nil, 20, 20)
+nil, nil, 'control', " >", nil, nil, nil, nil, nil, nil, 20, 20)
 
 local btn_add_page = Button:Create(
-	nil, nil, 'control', ' +', nil, nil, nil, nil, nil, nil, 20, 20, 'Adds a page to organize groups', nil)
+nil, nil, 'control', ' +', nil, nil, nil, nil, nil, nil, 20, 20, 'Adds a page to organize groups', nil)
 btn_add_page.id = 'addpage'
-
 
 -----------------------------------
 --[ Settings]--
@@ -138,9 +135,9 @@ function load_project_settings()
 			end
 			
 		end
-		if errors > 0 then
-			reaper.MB('Some Bookmarks could not be restored.\nThey may have been deleted since the previous run.', 'Somethin\'s amiss', 0)
-		end
+	end
+	if errors > 0 then
+		reaper.MB('Some Bookmarks could not be restored.\nThey may have been deleted since the previous run.', 'Somethin\'s amiss', 0)
 	end
 	file:close()
 	
@@ -293,6 +290,8 @@ function display_groups(vertical)
 
 end
 
+
+
 function display_items(vertical)
 
 	local visible = {}
@@ -326,8 +325,8 @@ function display_items(vertical)
 				b.y = 3
 			else
 				b.w = 160
-				if b.x+b.w+150 > gfx.w-7 or not visible[i+1] then
-					b.w = gfx.w-20
+				if b.x + b.w + 150 > gfx.w - 7 or not visible[i + 1] then
+					b.w = gfx.w - 20
 				else b.w = 160
 				end
 				b.x = 10
@@ -350,7 +349,7 @@ function display_items(vertical)
 				if b.x + b.w >= gfx.w - 7 then
 					b.x = btn_add.x
 					b.y = visible[i - 1].y + 26
-				
+					
 				end
 			end
 		end
@@ -426,7 +425,6 @@ and increase their y (relative to the buttons above)
 		frm_settings.w = gfx.w - 10
 		frm_settings.h = 300
 		
-
 		frm_controls.w = gfx.w - 10
 		frm_controls.h = 70
 		
@@ -830,10 +828,14 @@ function main()
 			if b.leftClick then
 				update_ui()
 				
+			-- Select all grouped items 
+			elseif b.shiftLeftClick then
+				select_all_items_in_group(b)
+
 				-- for display additional group options
 			elseif b.rightClick then
 				gfx.x, gfx.y = gfx.mouse_x, gfx.mouse_y
-				local options = 'Rename Group'
+				local options = 'Select grouped items|Rename Group|Add group name to items|'
 				local pagecount = #page.pages.names
 				local pageoptions = {}
 				local pageoptions_index = {}
@@ -867,15 +869,18 @@ function main()
 
 				-- Add pagecount-2 to get the right menu item to the right if
 				if option == 1 then
+					select_all_items_in_group(b)
+				elseif option == 2 then
 					b:Rename()
-				elseif option == #pageoptions_index + 2 then
+				elseif option == 3 then
+					add_group_name_to_grouped_items(b)
+				elseif option == #pageoptions_index + 4 then
 					page:Add()
-
 					b:Move(page.page)
 					
-				elseif option == #pageoptions_index + 3 then
+				elseif option == #pageoptions_index + 5 then
 					b:Remove(false, i)
-				elseif option == #pageoptions_index + 4 then
+				elseif option == #pageoptions_index + 6 then
 					
 					-- confrim deletion
 					local confirm = reaper.ShowMessageBox("Delete all groups in all pages?", "Confirm", 4)
@@ -887,7 +892,7 @@ function main()
 					-- the selected option index-1 should  be the right page
 
 				else
-					b:Move(pageoptions_index[option - 1])
+					b:Move(pageoptions_index[option - 3])
 
 				end
 				update_ui()

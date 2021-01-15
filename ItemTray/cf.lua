@@ -132,3 +132,54 @@ function midi_to_audio(source,item)
 	end
 
 end
+-----------------------------------
+--[			Groups 				]--
+-----------------------------------
+function add_group_name_to_grouped_items(group)
+
+	local groupNamePresent, removeGroupNames = false
+
+	for g, group in ipairs(groups) do
+		for b, bookmark in ipairs(bookmarks) do
+			if bookmark.name:find(group.txt .. ' - ') then groupNamePresent = true end
+			break
+		end
+	end
+
+	if groupNamePresent then 
+		local res = reaper.MB('There is already one or more group names present in one\nor more items.\n\nWould you like to remove them?',
+		 'What you trying to do, son?', 4)
+		if res == 6 then removeGroupNames = true else end
+	end
+
+	for b, bookmark in ipairs(bookmarks) do
+		if bookmark:is_in_group(group) then 
+
+			local newname = bookmark.name:gsub('untitled MIDI item', '')
+			local newname = newname:gsub('-glued%.*', '')
+
+			if removeGroupNames then
+				for g, oldgroup in ipairs(groups) do
+					if bookmark.name:find(oldgroup.txt .. ' %- ') then 
+						newname = newname:gsub(oldgroup.txt .. ' %- ', '')
+					end
+				end
+			end
+
+			local newname = group.txt .. ' - ' .. newname
+			bookmark:Rename(newname)
+		end
+	end
+
+end
+
+function select_all_items_in_group(b)
+	reaper.Main_OnCommand(40289, 0)
+
+	for ii, bookmark in ipairs(bookmarks)  do
+		if bookmark:is_in_group(b) then 
+			reaper.SetMediaItemSelected(bookmark.item, true)
+			reaper.UpdateArrange()
+		end
+	end
+end
