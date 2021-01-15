@@ -806,7 +806,7 @@ local function update_cmd(char)
 		elseif C.suffix:find("B") then set_selected_tracks('I_FXEN', -1, false)
 		end
 
-
+		if C.suffix:find('f') then reaper.Main_OnCommand(reaper.NamedCommandLookup('_S&M_TOGLFXCHAIN'), 0) end
 
 		--Look for custom color 
 		if C.suffix:find("c") then 
