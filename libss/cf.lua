@@ -383,5 +383,5 @@ end
 
 function cons(text, p)
 	if p == true then reaper.ClearConsole() end
-	reaper.ShowConsoleMsg(text)
+	reaper.ShowConsoleMsg('\n' .. tostring(text))
 end

@@ -72,7 +72,21 @@ cmd.alwaysActive = true
 local display = Display:Create(frame.x+15, frame.y+20, frame.w-135, frame.h-60)
 local display2 = Display:Create(frame.x+15, frame.y+frame.h-40, frame.w-120, frame.h)
 
+function dbg()
 
+	cons('--------------------------')
+	cons('--[    Track Sends     ]--')
+	cons('--------------------------')
+
+	cons('\n')
+	local trackcount = reaper.CountTracks(0)
+	for t = 0, tracks-1 do
+		local tr = reaper.GetTrack(0, t)
+		local ret, tname = reaper.GetTrackName(tr)
+		cons(tname .. ' : ' .. reaper.GetTrackNumSends(tr, 0))
+	end
+
+end
 
 
 ------------------------------
@@ -147,7 +161,7 @@ function CMD:Reset()
 	self.exclusive = false
 	self.destinationInput = ""
 	self.destination = ""
-	self.destinationSuffix = ""
+	self.destinationSuffix = nil
 	self.destinationID = nil
 end
 
@@ -718,7 +732,8 @@ local function update_cmd(char)
 				reaper.SetTrackSelected(reaper.GetTrack(0, totalTracks), true)
 			end
 			update_selected_tracks(sources)
-			
+		
+
 		--if there was an attempt to name (ie., ="sometext") then name the selected tracks
 		elseif C.renaming and (cmd.txt:sub(1,1) == "s" or cmd.txt:sub(1,1) == "S") and reaper.CountSelectedTracks(0) >= 1 then 
 			for i = 0, tracks-1 do
@@ -731,6 +746,7 @@ local function update_cmd(char)
 			C.renaming = nil 
 		end
 
+		if cmd.txt == 'dbg'	then dbg() end
 
 		if cmd.active and C.prefix == "C" then
 			
@@ -850,11 +866,22 @@ local function update_cmd(char)
 			end
 
 
-			if midiSourceChannel then midiSourceChannel = midiSourceChannel:sub(2) else midiSourceChannel = 0 end
-			if midiDestinationChannel then midiDestinationChannel = midiDestinationChannel:sub(2) else midiDestinationChannel = 0 end
 
-			if audioSourceChannel then audioSourceChannel = audioSourceChannel:sub(2) else audioSourceChannel = 0 end
-			if audioDestinationChannel then audioDestinationChannel = audioDestinationChannel:sub(2) else audioDestinationChannel = 0 end
+			if midiSourceChannel then 
+				midiSourceChannel = midiSourceChannel:sub(2) 
+			else midiSourceChannel = 0 end
+			
+			if midiDestinationChannel then 
+				midiDestinationChannel = midiDestinationChannel:sub(2) 
+			else midiDestinationChannel = 0 end
+
+			if audioSourceChannel then 
+				audioSourceChannel = audioSourceChannel:sub(2) 
+			else audioSourceChannel = 0 end
+			
+			if audioDestinationChannel then 
+				audioDestinationChannel = audioDestinationChannel:sub(2)
+			else audioDestinationChannel = 0 end
 			
 			audioSourceChannel = audioSourceChannel - 1
 			audioDestinationChannel = audioDestinationChannel - 1
@@ -864,14 +891,18 @@ local function update_cmd(char)
 			for tr = 0, tracks-1 do
 
 				if sources[tr] == true then 
-					 retval, buf = reaper.GetTrackName( reaper.GetTrack(0, tr))
-					 --cons('\n' .. buf .. "\n" )
+					 local retval, buf = reaper.GetTrackName( reaper.GetTrack(0, tr))
+					 local strack =reaper.GetTrack(0, tr)
+					 
+					 local tracksends = reaper.GetTrackNumSends(reaper.GetTrack(0, C.destinationID), 0)
+
+					 
 					if cmd.txt:find(">") then
 						reaper.CreateTrackSend(reaper.GetTrack(0, tr), reaper.GetTrack(0,C.destinationID))
-						reaper.BR_GetSetTrackSendInfo(reaper.GetTrack(0, tr), 0, reaper.GetTrackNumSends(reaper.GetTrack(0, C.destinationID), 0) , 'I_MIDI_SRCCHAN', true, tonumber(midiSourceChannel)) 
-						reaper.BR_GetSetTrackSendInfo(reaper.GetTrack(0, tr), 0, reaper.GetTrackNumSends(reaper.GetTrack(0, C.destinationID), 0) , 'I_MIDI_DSTCHAN', true, tonumber(midiDestinationChannel))
-						reaper.BR_GetSetTrackSendInfo(reaper.GetTrack(0, tr), 0, reaper.GetTrackNumSends(reaper.GetTrack(0, C.destinationID), 0) , 'I_SRCCHAN', true, tonumber(audioSourceChannel)) 
-						reaper.BR_GetSetTrackSendInfo(reaper.GetTrack(0, tr), 0, reaper.GetTrackNumSends(reaper.GetTrack(0, C.destinationID), 0) , 'I_DSTCHAN', true, tonumber(audioDestinationChannel))
+						reaper.BR_GetSetTrackSendInfo(strack, 0, tracksends , 'I_MIDI_SRCCHAN', true, tonumber(midiSourceChannel)) 
+						reaper.BR_GetSetTrackSendInfo(strack, 0, tracksends , 'I_MIDI_DSTCHAN', true, tonumber(midiDestinationChannel))
+						reaper.BR_GetSetTrackSendInfo(strack, 0, tracksends , 'I_SRCCHAN', true, tonumber(audioSourceChannel)) 
+						reaper.BR_GetSetTrackSendInfo(strack, 0, tracksends , 'I_DSTCHAN', true, tonumber(audioDestinationChannel))
 
 						if C.destinationSuffix:find("m%d+%+:") then midiSourceChannel = midiSourceChannel + 1 end
 						if C.destinationSuffix:find("m%d+%+?:%d+%+") then midiDestinationChannel = midiDestinationChannel + 1 end
@@ -881,10 +912,10 @@ local function update_cmd(char)
 					
 					elseif cmd.txt:find("<") then
 						reaper.CreateTrackSend(reaper.GetTrack(0,C.destinationID), reaper.GetTrack(0, tr))
-						reaper.BR_GetSetTrackSendInfo(reaper.GetTrack(0, tr), -1, reaper.GetTrackNumSends(reaper.GetTrack(0, tr), 0) , 'I_MIDI_SRCCHAN', true, tonumber(midiSourceChannel)) 
-						reaper.BR_GetSetTrackSendInfo(reaper.GetTrack(0, tr), -1, reaper.GetTrackNumSends(reaper.GetTrack(0, tr), 0) , 'I_MIDI_DSTCHAN', true, tonumber(midiDestinationChannel))
-						reaper.BR_GetSetTrackSendInfo(reaper.GetTrack(0, tr), -1, reaper.GetTrackNumSends(reaper.GetTrack(0, tr), 0) , 'I_SRCCHAN', true, tonumber(audioSourceChannel)) 
-						reaper.BR_GetSetTrackSendInfo(reaper.GetTrack(0, tr), -1, reaper.GetTrackNumSends(reaper.GetTrack(0, tr), 0) , 'I_DSTCHAN', true, tonumber(audioDestinationChannel))
+						reaper.BR_GetSetTrackSendInfo(strack, -1, tracksends, 0 , 'I_MIDI_SRCCHAN', true, tonumber(midiSourceChannel)) 
+						reaper.BR_GetSetTrackSendInfo(strack, -1, tracksends, 0 , 'I_MIDI_DSTCHAN', true, tonumber(midiDestinationChannel))
+						reaper.BR_GetSetTrackSendInfo(strack, -1, tracksends, 0 , 'I_SRCCHAN', true, tonumber(audioSourceChannel)) 
+						reaper.BR_GetSetTrackSendInfo(strack, -1, tracksends, 0 , 'I_DSTCHAN', true, tonumber(audioDestinationChannel))
 						
 						if C.destinationSuffix:find("m%d+%+:") then midiDestinationChannel = midiDestinationChannel + 1 end
 						if C.destinationSuffix:find("m%d+%+?:%d+%+") then midiSourceChannel = midiSourceChannel + 1 end
