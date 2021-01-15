@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Scripts by Lemerchand" commit="2a3ea4031d06003b34732e04bd95ab6bd169ae21">
+<index version="1" name="Scripts by Lemerchand" commit="383b4b0ebf8da89838bf97f933a4aa7773a7e27e">
   <category name="ItemTray">
     <reapack name="itemtray.lua" type="script">
       <version name="0.4b" author="Lemerchand" time="2021-01-10T16:44:05Z">
@@ -164,6 +164,23 @@
         <source file="imgs/newpage.png">https://github.com/lemerchand/lemerchand/raw/5702d4837b6fbecd582b4418f025e3a3af8f06ab/ItemTray/imgs/newpage.png</source>
         <source file="imgs/pin.png">https://github.com/lemerchand/lemerchand/raw/5702d4837b6fbecd582b4418f025e3a3af8f06ab/ItemTray/imgs/pin.png</source>
         <source file="imgs/search.png">https://github.com/lemerchand/lemerchand/raw/5702d4837b6fbecd582b4418f025e3a3af8f06ab/ItemTray/imgs/search.png</source>
+      </version>
+      <version name="0.665b" author="Lemerchand" time="2021-01-15T21:21:33Z">
+        <changelog><![CDATA[+ Shift-click group to select all items
++ Prefix all item names in a group with group name
++ Shift-click to view multiple pins
++ Am I forgetting something?]]></changelog>
+        <source main="main">https://github.com/lemerchand/lemerchand/raw/383b4b0ebf8da89838bf97f933a4aa7773a7e27e/ItemTray/itemtray.lua</source>
+        <source file="cf.lua">https://github.com/lemerchand/lemerchand/raw/383b4b0ebf8da89838bf97f933a4aa7773a7e27e/ItemTray/cf.lua</source>
+        <source file="ui.lua">https://github.com/lemerchand/lemerchand/raw/383b4b0ebf8da89838bf97f933a4aa7773a7e27e/ItemTray/ui.lua</source>
+        <source file="vf.lua">https://github.com/lemerchand/lemerchand/raw/383b4b0ebf8da89838bf97f933a4aa7773a7e27e/ItemTray/vf.lua</source>
+        <source file="imgs/add-file.png">https://github.com/lemerchand/lemerchand/raw/383b4b0ebf8da89838bf97f933a4aa7773a7e27e/ItemTray/imgs/add-file.png</source>
+        <source file="imgs/clear.png">https://github.com/lemerchand/lemerchand/raw/383b4b0ebf8da89838bf97f933a4aa7773a7e27e/ItemTray/imgs/clear.png</source>
+        <source file="imgs/exit.png">https://github.com/lemerchand/lemerchand/raw/383b4b0ebf8da89838bf97f933a4aa7773a7e27e/ItemTray/imgs/exit.png</source>
+        <source file="imgs/gears.png">https://github.com/lemerchand/lemerchand/raw/383b4b0ebf8da89838bf97f933a4aa7773a7e27e/ItemTray/imgs/gears.png</source>
+        <source file="imgs/newpage.png">https://github.com/lemerchand/lemerchand/raw/383b4b0ebf8da89838bf97f933a4aa7773a7e27e/ItemTray/imgs/newpage.png</source>
+        <source file="imgs/pin.png">https://github.com/lemerchand/lemerchand/raw/383b4b0ebf8da89838bf97f933a4aa7773a7e27e/ItemTray/imgs/pin.png</source>
+        <source file="imgs/search.png">https://github.com/lemerchand/lemerchand/raw/383b4b0ebf8da89838bf97f933a4aa7773a7e27e/ItemTray/imgs/search.png</source>
       </version>
     </reapack>
   </category>
