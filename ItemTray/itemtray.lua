@@ -326,7 +326,7 @@ function display_items(vertical)
 				b.y = 3
 			else
 				b.w = 160
-				if b.x+b.w+150 > gfx.w-7 then
+				if b.x+b.w+150 > gfx.w-7 or not visible[i+1] then
 					b.w = gfx.w-20
 				else b.w = 160
 				end
