@@ -1042,7 +1042,7 @@ function Tooltip:Draw()
 
 
 	if not enableHelp
-		or not self.tip 
+		or not self.tip or self.tip == ''
 		or self.hide == true then return end
 
 	
