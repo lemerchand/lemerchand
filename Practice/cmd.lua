@@ -1,4 +1,4 @@
--- @version 0.6.6b
+-- @version 0.6.9b
 -- @author Lemerchand
 -- @provides
 --     [main] .
@@ -891,18 +891,17 @@ local function update_cmd(char)
 			for tr = 0, tracks-1 do
 
 				if sources[tr] == true then 
-					 local retval, buf = reaper.GetTrackName( reaper.GetTrack(0, tr))
 					 local strack =reaper.GetTrack(0, tr)
 					 
-					 local tracksends = reaper.GetTrackNumSends(reaper.GetTrack(0, C.destinationID), 0)
-
 					 
 					if cmd.txt:find(">") then
-						reaper.CreateTrackSend(reaper.GetTrack(0, tr), reaper.GetTrack(0,C.destinationID))
-						reaper.BR_GetSetTrackSendInfo(strack, 0, tracksends , 'I_MIDI_SRCCHAN', true, tonumber(midiSourceChannel)) 
-						reaper.BR_GetSetTrackSendInfo(strack, 0, tracksends , 'I_MIDI_DSTCHAN', true, tonumber(midiDestinationChannel))
-						reaper.BR_GetSetTrackSendInfo(strack, 0, tracksends , 'I_SRCCHAN', true, tonumber(audioSourceChannel)) 
-						reaper.BR_GetSetTrackSendInfo(strack, 0, tracksends , 'I_DSTCHAN', true, tonumber(audioDestinationChannel))
+						local tracksends = reaper.GetTrackNumSends(reaper.GetTrack(0, tr), 0)
+
+						reaper.CreateTrackSend(strack, reaper.GetTrack(0,C.destinationID))
+						reaper.BR_GetSetTrackSendInfo(strack, 0, tracksends, 'I_MIDI_SRCCHAN', true, tonumber(midiSourceChannel)) 
+						reaper.BR_GetSetTrackSendInfo(strack, 0, tracksends, 'I_MIDI_DSTCHAN', true, tonumber(midiDestinationChannel))
+						reaper.BR_GetSetTrackSendInfo(strack, 0, tracksends, 'I_SRCCHAN', true, tonumber(audioSourceChannel)) 
+						reaper.BR_GetSetTrackSendInfo(strack, 0, tracksends, 'I_DSTCHAN', true, tonumber(audioDestinationChannel))
 
 						if C.destinationSuffix:find("m%d+%+:") then midiSourceChannel = midiSourceChannel + 1 end
 						if C.destinationSuffix:find("m%d+%+?:%d+%+") then midiDestinationChannel = midiDestinationChannel + 1 end
@@ -911,11 +910,13 @@ local function update_cmd(char)
 						if C.destinationSuffix:find("a%d+%+?:%d+%+") then audioDestinationChannel = audioDestinationChannel + 2 end
 					
 					elseif cmd.txt:find("<") then
-						reaper.CreateTrackSend(reaper.GetTrack(0,C.destinationID), reaper.GetTrack(0, tr))
-						reaper.BR_GetSetTrackSendInfo(strack, -1, tracksends, 0 , 'I_MIDI_SRCCHAN', true, tonumber(midiSourceChannel)) 
-						reaper.BR_GetSetTrackSendInfo(strack, -1, tracksends, 0 , 'I_MIDI_DSTCHAN', true, tonumber(midiDestinationChannel))
-						reaper.BR_GetSetTrackSendInfo(strack, -1, tracksends, 0 , 'I_SRCCHAN', true, tonumber(audioSourceChannel)) 
-						reaper.BR_GetSetTrackSendInfo(strack, -1, tracksends, 0 , 'I_DSTCHAN', true, tonumber(audioDestinationChannel))
+						local tracksends = reaper.GetTrackNumSends(reaper.GetTrack(0, tr), -1)
+
+						reaper.CreateTrackSend(reaper.GetTrack(0,C.destinationID), strack)
+						reaper.BR_GetSetTrackSendInfo(strack, -1, tracksends , 'I_MIDI_SRCCHAN', true, tonumber(midiSourceChannel)) 
+						reaper.BR_GetSetTrackSendInfo(strack, -1, tracksends , 'I_MIDI_DSTCHAN', true, tonumber(midiDestinationChannel))
+						reaper.BR_GetSetTrackSendInfo(strack, -1, tracksends , 'I_SRCCHAN', true, tonumber(audioSourceChannel)) 
+						reaper.BR_GetSetTrackSendInfo(strack, -1, tracksends , 'I_DSTCHAN', true, tonumber(audioDestinationChannel))
 						
 						if C.destinationSuffix:find("m%d+%+:") then midiDestinationChannel = midiDestinationChannel + 1 end
 						if C.destinationSuffix:find("m%d+%+?:%d+%+") then midiSourceChannel = midiSourceChannel + 1 end
