@@ -310,12 +310,12 @@ end
 function Button:Rename(name)
 
 	if not name then 
-		local retval, name = reaper.GetUserInputs("Item Name", 1, 'Item Name:', self.name)
+		retval, name = reaper.GetUserInputs("Item Name", 1, 'Item Name:', self.name)
 		if not retval then return end
 	end
 
 	self.name = name
-	reaper.GetSetMediaItemTakeInfo_String( self.take, 'P_NAME', name, true )
+	reaper.GetSetMediaItemTakeInfo_String( self.take, 'P_NAME', self.name, true )
 end
 
 function Button:Insert(location)
