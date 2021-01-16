@@ -332,8 +332,9 @@ end
 local function save_on_exit()
 	local file = io.open(script_path .. "soe.dat", 'w')
 	io.output(file)
-	for h =  20, 1, -1 do
+	for h =  1, 20 do
 		if C.history[h] then 
+			
 			file:write(C.history[h] .. '\n')
 		end
 	end
@@ -344,12 +345,18 @@ local function restore_on_load()
 	local file = io.open(script_path .. "soe.dat", 'r')
 	io.input(file)
 	if not file then return end
-	for h = 1, 20 do
-		local l = file:read()
-		if l and l ~= "" then C.history[h] = l end
+	local h = 1
+	while true do
+		line = file:read()
+		if not line then 
+			C.historySeek = #C.history + 1
+			file:close()
+			return 
+		else
+	 		C.history[h] = line
+	  	end
+	  	h = h + 1
 	end
-	file:close()
-	C.historySeek = #C.history+1
 end
 
 restore_on_load()
