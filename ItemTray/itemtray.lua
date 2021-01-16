@@ -1,4 +1,4 @@
--- @version 0.665b
+-- @version 0.6.65b
 -- @author Lemerchand
 -- @provides
 --    [main] .
@@ -13,7 +13,7 @@
 --    + Am I forgetting something?
 
 local scriptName = "Item Tray"
-local versionNumber = ' 0.665b'
+local versionNumber = ' 0.6.65b'
 local projectPath = reaper.GetProjectPath(0)
 function reaperDoFile(file) local info = debug.getinfo(1, 'S'); script_path = info.source:match[[^@?(.*[\/])[^\/]-$]]; dofile(script_path .. file); end
 reaperDoFile('ui.lua')
@@ -265,6 +265,10 @@ function display_groups(vertical)
 				first = false
 			else
 				b.x = frm_groups.x + 5
+				b.w = 160
+				if b.x+b.w+160 > frm_groups.w-3 or not visible[i+1] then 
+					b.w = frm_groups.w - 10 
+				end
 				b.y = frm_groups.y + 42
 				first = false
 			end
@@ -278,9 +282,10 @@ function display_groups(vertical)
 					b.y = visible[i - 1].y + 26
 				end
 			else
-				b.x = visible[i - 1].x + 155
+				b.w = visible[1].w
+				b.x = visible[i - 1].x + 165
 				b.y = visible[i - 1].y
-				if b.x + b.w >= frm_groups.x + frm_groups.w - 3 then
+				if b.x + b.w >= gfx.w - 7 then
 					b.x = btn_add.x
 					b.y = visible[i - 1].y + 26
 				end
@@ -327,7 +332,6 @@ function display_items(vertical)
 				b.w = 160
 				if b.x + b.w + 150 > gfx.w - 7 or not visible[i + 1] then
 					b.w = gfx.w - 20
-				else b.w = 160
 				end
 				b.x = 10
 				b.y = frm_groups.y + frm_groups.h + 25
