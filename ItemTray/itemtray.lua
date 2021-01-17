@@ -47,8 +47,14 @@ nil, nil, 'control', "", nil, nil, nil, nil, nil, nil, 40, 25, '', nil, '/imgs/e
 btn_closeMEWs.id = 'closeMEWS'
 btn_closeMEWs.help = 'Close all midi editors\nHotkey: Ctrl+Alt+Backspace'
 
+local tgl_pencil = Toggle:Create(
+nil, nil, 'control', '', false, 40, 25, nil, '/imgs/pencil.png', 15)
+tgl_pencil.id = 'pencil'
+tgl_pencil.help = 'Draw items onto arrange view'
+
+
 local tgl_settings = Toggle:Create(
-nil, nil, 'ui', '', false, 40, 25, nil, '/imgs/gears.png')
+nil, nil, 'ui', '', false, 40, 25, nil, '/imgs/gears.png', 14)
 tgl_settings.help = 'Settings'
 tgl_settings.id = 'tglsettings'
 
@@ -439,10 +445,15 @@ and increase their y (relative to the buttons above)
 		
 		btn_add.x = frm_controls.x + 5
 		btn_add.y = frm_controls.y + 22
+		
 		btn_clear.x = btn_add.x + btn_add.w + 5
 		btn_clear.y = btn_add.y
+		
 		btn_closeMEWs.x = btn_clear.x + btn_clear.w + 5
-		btn_clear.y = btn_add.y
+		btn_closeMEWs.y = btn_add.y
+
+		tgl_pencil.x = btn_closeMEWs.x + btn_closeMEWs.w + 5
+		tgl_pencil.y = btn_add.y
 
 		search.x = frm_controls.x + 7
 		search.y = btn_add.y + btn_add.h + 5
@@ -461,12 +472,18 @@ and increase their y (relative to the buttons above)
 		frm_groups.w = 315
 		frm_groups.h = gfx.h - 7
 		frm_groups.y = -13
+
 		btn_add.x = frm_controls.x + 5
 		btn_add.y = frm_controls.y + 22
+
 		btn_clear.x = btn_add.x + btn_add.w + 5
 		btn_clear.y = btn_add.y
+
 		btn_closeMEWs.x = btn_clear.x + btn_clear.w + 5
 		btn_closeMEWs.y = btn_add.y
+
+		tgl_pencil.x = btn_closeMEWs.x + btn_closeMEWs.w + 5
+		tgl_penicil.y = btn_add.y
 
 		frm_settings.x = tgl_settings.x + tgl_settings.w - 45
 		frm_settings.w = 500
@@ -549,6 +566,7 @@ function close_all_MEWS()
 end
 
 function onexit ()
+	reaper.JS_WindowMessage_ReleaseAll()
 	save_project_settings()
 	save_global_settings()
 	reaper.JS_Window_SetFocus(last_window)
@@ -666,6 +684,29 @@ function main()
 		elseif option == 2 then page:Rename()
 		elseif option == 3 then page:Remove(false)
 		elseif option == 4 then page:Remove(true)
+		end
+	end
+
+	if tgl_pencil.state then 
+		reaper.JS_Mouse_SetCursor(reaper.JS_Mouse_LoadCursor(185))
+		local window, segment, details = reaper.BR_GetMouseCursorContext()
+		if segment == 'track' then 
+			intercept_mouse() 
+			if reaper.JS_Mouse_GetState(1) == 1 then  
+				local mx, my = reaper.GetMousePosition()
+				local item, take = reaper.GetItemFromPoint( mx, my, false )
+				
+				if not item and details == 'empty' and clickTimer < 0
+					then bookmarks[1]:Insert('mouse') 
+						clickTimer = 1
+				end
+
+			elseif reaper.JS_Mouse_GetState(-1) == 2 then
+				reaper.Main_OnCommand(40528, 0)
+				reaper.Main_OnCommand(40697, 0)
+			end
+		elseif segment ~= 'track' then
+			reaper.JS_WindowMessage_ReleaseAll()
 		end
 	end
 	

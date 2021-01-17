@@ -183,3 +183,29 @@ function select_all_items_in_group(b)
 		end
 	end
 end
+
+
+-----------------------------------
+--[			Sequencer			]--
+-----------------------------------
+
+function intercept_mouse()
+	tIntercepts = { WM_LBUTTONDOWN   = false,
+		        WM_LBUTTONUP     = false,
+		        WM_LBUTTONDBLCLK = false,
+		        WM_MBUTTONDOWN   = false,
+		        WM_MBUTTONUP     = false,
+		        WM_MBUTTONDBLCLK = false,
+		        WM_RBUTTONDOWN   = false,
+		        WM_RBUTTONUP     = false,
+		        WM_RBUTTONDBLCLK = false,
+		        WM_MOUSEWHEEL    = false,
+		        WM_MOUSEHWHEEL   = false,
+		        WM_MOUSEMOVE     = false,
+		        WM_SETCURSOR     = false
+		      }
+	midiview = reaper.JS_Window_FromPoint(reaper.GetMousePosition())
+	for key, value in pairs(tIntercepts) do
+	    OK = reaper.JS_WindowMessage_Intercept(midiview, key, value)
+	end
+end

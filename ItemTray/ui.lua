@@ -694,7 +694,7 @@ end
 Toggle = {}
 Toggle.__index = Toggle
 
-function Toggle:Create(x, y, btype, txt, state, w, h, page, img)
+function Toggle:Create(x, y, btype, txt, state, w, h, page, img, imgind)
 
 	if font == nil then gfx.setfont(15, "Lucida Console", 11) end
 
@@ -734,12 +734,13 @@ function Toggle:Create(x, y, btype, txt, state, w, h, page, img)
 		block = false,
 		page = page or nil,
 		clickTemp = nil,
-		img = img or nil
+		img = img or nil,
+		imgind = imgind or nil
 	}
 	setmetatable(this, Toggle)
 	table.insert(Elements, this)
 
-	if img then gfx.loadimg(3, script_path .. img) end
+	if img then gfx.loadimg(imgind, script_path .. img) end
 
 	return this
 end
@@ -802,8 +803,9 @@ function Toggle:Draw()
 	gfx.drawstr(self.txt, 1 | 4, self.w + self.x, self.h + self.y + 2)
 
 	if self.img then 
-		gfx.x = self.x + self.w - 32
-		gfx.blit(3, .255, 0)
+		gfx.x = self.x + self.w/3
+		gfx.y = self.y + 5 
+		gfx.blit(self.imgind, .5, 0)
 	end
 
 	if self.block == false and hovering(self.x, self.y, self.w, self.h) then
