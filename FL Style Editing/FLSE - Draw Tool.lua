@@ -3,7 +3,6 @@ is_new_value,filename,section_ID,cmd_ID,mode,resolution,val = reaper.get_action_
 reaper.SetToggleCommandState(section_ID, cmd_ID, 1)
 reaper.RefreshToolbar2(section_ID, cmd_ID)
 
-
 -- Variables
 local leftClick = false
 local rightClick =  false
@@ -61,6 +60,7 @@ function set_selection_end()
 	if startingX > endingX then 
 		set_selection_start()
 		reaper.SetEditCurPos( startingX, false, false )
+		
 		-- Move edit cursor to the start of next grid line
 		reaper.Main_OnCommand(40647, 0)
 	else
@@ -86,11 +86,20 @@ function insert_midi_items(track, trackName)
 	reaper.MIDI_InsertNote( take, false, false, 0, length, 1, 100, 66, false )
 	reaper.GetSetMediaItemTakeInfo_String(take, 'P_NAME', trackName, true)
 	
+	-- Trim to avoid layers
+	reaper.Main_OnCommand(40930, 0)
 	-- Split items on grid
 	reaper.Main_OnCommand(40932, 0)
-
 	-- Remove selection
 	reaper.Main_OnCommand(40635, 0)
+
+	if startingX <= endingX then 
+		reaper.SetEditCurPos(startingX, true, false)
+	else
+		reaper.SetEditCurPos(endingX, true, false)
+	end
+	-- Move to left grid division
+	reaper.Main_OnCommand(40646, 0)
 
 end
 
@@ -117,20 +126,18 @@ end
 -----------------------------------
 
 function main()
-	reaper.JS_Mouse_SetCursor(reaper.JS_Mouse_LoadCursor(185))
+	
 	local window, segment, details = reaper.BR_GetMouseCursorContext()
-	if reaper.JS_Mouse_GetState(-1) == 5 
-	or reaper.JS_Mouse_GetState(-1) == 9
-	or reaper.JS_Mouse_GetState(-1) == 17
-	or reaper.JS_Mouse_GetState(-1) == 10
-	or reaper.JS_Mouse_GetState(-1) == 18 then 
+	if reaper.JS_Mouse_GetState(-1) >= 4 then 
 		reaper.JS_WindowMessage_ReleaseAll()
 	elseif segment == 'track' then
+		reaper.JS_Mouse_SetCursor(reaper.JS_Mouse_LoadCursor(185))
 		intercept_mouse()
-
+		reaper.Undo_BeginBlock()
 		-- Select track under mouse/save it as curTrack
 		reaper.Main_OnCommand(41110, 0)
 		local curTrack = reaper.GetSelectedTrack(0, 0)
+
 		----------------------------------------------------------------------------------
 		--- CODE FOR DETERMINING CHANGE OF TRACK
 		-- Leaving in case it is needed later
@@ -170,6 +177,7 @@ function main()
 		-- [3] Check for items under the house--if none...
 		-- [4] Set the time selection
 		if reaper.JS_Mouse_GetState(1) == 1 and not leftClick then
+			
 			leftClick = true 												-- [1]
 			reaper.PreventUIRefresh(2)										-- [2]
 
@@ -183,6 +191,7 @@ function main()
 			-- If the mouse is in an empty track lane
 			if not item and details == 'empty' then 
 				set_selection_start()										-- [4]
+			else leftClick = false
 			end
 
 		-- If LMB down and dragging...
@@ -197,7 +206,8 @@ function main()
 				set_selection_end()											-- [6]
 				insert_midi_items(curTrack, trackName)						-- [7]
 				leftClick = false											-- [8]
-				
+				reaper.Undo_EndBlock('Insert Triggers', -1)
+	
 		-----------------------------------
 		--[		  Removing Items		 ]--
 		-----------------------------------
@@ -232,7 +242,7 @@ function main()
 	--[			Defer Mngmt			 ]--
 	-----------------------------------
 
-	if reaper.JS_VKeys_GetState(-1):byte(32) == 1 then
+	if reaper.JS_VKeys_GetState(-1):byte(27) == 1 then
 		reaper.atexit(on_exit)
 		return
 	else
