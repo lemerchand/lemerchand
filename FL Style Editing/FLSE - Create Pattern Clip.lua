@@ -13,11 +13,11 @@ reaper.Undo_BeginBlock()
 --[		 Create Folder Track 	]--
 -----------------------------------
 function create_parent(tracks)
-	-- TODO: Al Gore Rhythmn to determine Pattern name
+	-- TODO: Al Gore Rhythm to determine Pattern name
 	local parentName = 'Pattern'
 
 	-- Find where to create, and insert
-	local index = reaper.GetMediaTrackInfo_Value(tracks[1], 'IP_TRACKNUMBER') - 1
+	local index = tracks[1].id
 	reaper.InsertTrackAtIndex(index, true)
 
 	-- Get the track, name it
@@ -40,9 +40,10 @@ end
 --[		Create Parent Item		]--
 -----------------------------------
 
-function insert_parent_item()
+function insert_parent_item(parent)
 	-- Set time selection to selected items
 	reaper.Main_OnCommand(40290, 0)
+	reaper.SetOnlyTrackSelected(parent.tr)
 	-- Insert and item
 	reaper.Main_OnCommand(40214, 0)
 
@@ -50,6 +51,14 @@ function insert_parent_item()
 	parentItem = reaper.GetSelectedMediaItem(0, 0)
 	parentItemTake = reaper.GetActiveTake(parentItem)
 	reaper.GetSetMediaItemTakeInfo_String(parentItemTake, 'P_NAME', '[SEQ] Pattern', true)
+end
+
+
+function restore_OG_selected_tracks(tracks)
+	local trackCount = reaper.CountTracks(0)
+	for i, track in ipairs(tracks) do
+		reaper.SetTrackSelected(track.tr, true)
+	end
 end
 
 
@@ -74,7 +83,7 @@ function main()
 	local itemCount = reaper.CountSelectedMediaItems(0)
 	for i = 0, itemCount -1 do
 		
-		dbg(i)
+
 		-- Get and select item's track
 		local track = reaper.GetMediaItemInfo_Value(
 			reaper.GetSelectedMediaItem(0,i), 'P_TRACK')
@@ -84,7 +93,8 @@ function main()
 		local depth = reaper.GetMediaTrackInfo_Value(track, 'I_FOLDERDEPTH')	-- [2]
 		if depth == 0 then 
 			isParent = false 
-			table.insert(tracks, track)
+			local trackID = reaper.GetMediaTrackInfo_Value(track, 'IP_TRACKNUMBER') - 1
+			table.insert(tracks, {id=trackID, tr=track})
 		elseif depth == 1 then 
 			isParent = true 
 		end
@@ -95,9 +105,6 @@ function main()
 		if isParent then 
 			local parentID = reaper.GetMediaTrackInfo_Value(track, 'IP_TRACKNUMBER') - 1
 			parent = {id=parentID, tr=track} 											-- [3]
-			reaper.SetTrackSelected(parent.tr, false)
-			move_tracks_to_parent(parent)
-			insert_parent_item()
 		end
 	end
 
@@ -105,9 +112,13 @@ function main()
 	-- the desired track under it
 	if not parent then 															-- [3b]
 		parent = create_parent(tracks)
-		move_tracks_to_parent(parent)
-		insert_parent_item()
+		insert_parent_item(parent)
 	end
+
+	restore_OG_selected_tracks(tracks)	
+	reaper.SetTrackSelected(parent.tr, false)
+	move_tracks_to_parent(parent)
+	
 	reaper.PreventUIRefresh(-1)
 end
 
