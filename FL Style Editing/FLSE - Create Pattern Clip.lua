@@ -8,16 +8,17 @@ end
 reaper.Undo_BeginBlock()
 
 
+if reaper.CountMediaItems(0) < 1 then return end
 
 -----------------------------------
 --[		 Create Folder Track 	]--
 -----------------------------------
 function create_parent(tracks)
-	-- TODO: Al Gore Rhythm to determine Pattern name
-	local parentName = 'Pattern'
+	
+	local parentName = 'New SEQ Track'
 
 	-- Find where to create, and insert
-	local index = tracks[1].id
+	local index = tracks[#tracks].id
 	reaper.InsertTrackAtIndex(index, true)
 
 	-- Get the track, name it
@@ -32,9 +33,26 @@ end
 --[		Move Selected Tracks	]--
 -----------------------------------
 function move_tracks_to_parent(parent)
+	
 	reaper.ReorderSelectedTracks(parent.id+1, 1)
+
 end
 
+function assign_name(parent)
+	local itemCount = reaper.CountMediaItems(0)
+	local patternCount = 0
+
+	for i = 0, itemCount - 1 do
+		local take = reaper.GetActiveTake(reaper.GetMediaItem(0, i))
+		local ret, takeName = reaper.GetSetMediaItemTakeInfo_String(take, 'P_NAME', '', false)
+
+		if takeName then if takeName:find('Pattern') then patternCount = patternCount + 1 end end
+	end
+
+	local parentTake = reaper.GetActiveTake(parent.item)
+	reaper.GetSetMediaItemTakeInfo_String(parentTake, 'P_NAME', 'Pattern ' .. patternCount + 1 , true)
+
+end
 
 -----------------------------------
 --[		Create Parent Item		]--
@@ -46,11 +64,8 @@ function insert_parent_item(parent)
 	reaper.SetOnlyTrackSelected(parent.tr)
 	-- Insert and item
 	reaper.Main_OnCommand(40214, 0)
+	parent.item = reaper.GetSelectedMediaItem(0, 0)
 
-	-- Set name
-	parentItem = reaper.GetSelectedMediaItem(0, 0)
-	parentItemTake = reaper.GetActiveTake(parentItem)
-	reaper.GetSetMediaItemTakeInfo_String(parentItemTake, 'P_NAME', '[SEQ] Pattern', true)
 end
 
 
@@ -61,6 +76,21 @@ function restore_OG_selected_tracks(tracks)
 	end
 end
 
+function colorize_tracks(parent)
+	reaper.SetTrackSelected(parent.tr, true)
+	-- Set parent track to the color of it's first child
+	reaper.Main_OnCommand(reaper.NamedCommandLookup('_SWS_COLTRACKNEXT'), 0)
+	-- Set all tracks in family to this color
+	reaper.Main_OnCommand(reaper.NamedCommandLookup('_SWS_COLCHILDREN'), 0)
+end
+
+function group_items()
+
+	-- Select all items in selections
+	reaper.Main_OnCommand(40717, 0)
+	-- Group Items
+	reaper.Main_OnCommand(40032, 0)
+end
 
 -----------------------------------
 --[			   Main				]--
@@ -70,7 +100,8 @@ function main()
 
 	reaper.PreventUIRefresh(1)
 
-	local parent
+	local parent = false
+	local isParent = false
 	local tracks = {}
 
 	-- Unselect all tracks
@@ -86,39 +117,33 @@ function main()
 
 		-- Get and select item's track
 		local track = reaper.GetMediaItemInfo_Value(
-			reaper.GetSelectedMediaItem(0,i), 'P_TRACK')
+				reaper.GetSelectedMediaItem(0,i), 'P_TRACK')
 		reaper.SetTrackSelected(track, true)									-- [1]
-
-		-- Evaluate folder status
-		local depth = reaper.GetMediaTrackInfo_Value(track, 'I_FOLDERDEPTH')	-- [2]
-		if depth == 0 then 
-			isParent = false 
-			local trackID = reaper.GetMediaTrackInfo_Value(track, 'IP_TRACKNUMBER') - 1
-			table.insert(tracks, {id=trackID, tr=track})
-		elseif depth == 1 then 
-			isParent = true 
+	
+		-- Evaluate family
+		local parentCheck = reaper.GetParentTrack(track) 
+		if parentCheck then
+			local parentID = reaper.GetMediaTrackInfo_Value(parentCheck, 'IP_TRACKNUMBER', '',  false) -1
+			parent = {id=parentID , tr=parentCheck}
+		else
+			table.insert(tracks, {id=reaper.GetMediaTrackInfo_Value(track, 'IP_TRACKNUMBER', '',  false) -1, tr=track})
 		end
 
-		-- If we find a parent, let's store it's data
-		-- Let's unselect it and it's items, and move
-		-- the desired tracks under it's caring wing
-		if isParent then 
-			local parentID = reaper.GetMediaTrackInfo_Value(track, 'IP_TRACKNUMBER') - 1
-			parent = {id=parentID, tr=track} 											-- [3]
-		end
 	end
 
-	-- If not parent is found, create one and move
-	-- the desired track under it
-	if not parent then 															-- [3b]
+	if not parent then
 		parent = create_parent(tracks)
-		insert_parent_item(parent)
 	end
 
+	insert_parent_item(parent)
 	restore_OG_selected_tracks(tracks)	
 	reaper.SetTrackSelected(parent.tr, false)
 	move_tracks_to_parent(parent)
+	colorize_tracks(parent)
 	
+	assign_name(parent)
+	group_items()
+
 	reaper.PreventUIRefresh(-1)
 end
 
