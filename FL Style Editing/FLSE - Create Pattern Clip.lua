@@ -38,6 +38,19 @@ function move_tracks_to_parent(parent)
 
 end
 
+function get_parent_item(parent)
+	-- Set time selection to selected items
+	reaper.Main_OnCommand(40290, 0)
+	reaper.SetOnlyTrackSelected(parent.tr)
+	-- Select from track in selection
+	reaper.Main_OnCommand(40718, 0)
+	local item = reaper.GetSelectedMediaItem(0, 0)
+	local take = reaper.GetActiveTake(item)
+	local ret, takeName = reaper.GetSetMediaItemTakeInfo_String(take, 'P_NAME', '', false)
+	if not takeName:find('Pattern') then return nil end
+	return item
+end
+
 function assign_name(parent)
 	local itemCount = reaper.CountMediaItems(0)
 	local patternCount = 0
@@ -46,7 +59,12 @@ function assign_name(parent)
 		local take = reaper.GetActiveTake(reaper.GetMediaItem(0, i))
 		local ret, takeName = reaper.GetSetMediaItemTakeInfo_String(take, 'P_NAME', '', false)
 
-		if takeName then if takeName:find('Pattern') then patternCount = patternCount + 1 end end
+		if takeName then 
+			if takeName:find('Pattern') then 
+				patternCount = patternCount + 1 
+
+			end 
+		end
 	end
 
 	local parentTake = reaper.GetActiveTake(parent.item)
@@ -152,14 +170,21 @@ function main()
 
 	if not parent then
 		parent = create_parent(tracks)
+		insert_parent_item(parent)
+		assign_name(parent)
+	else
+		parent.item = get_parent_item(parent)
+		
+		if not parent.item then
+			insert_parent_item(parent)
+			assign_name(parent)
+		end
 	end
 
-	insert_parent_item(parent)
 	restore_OG_selected_tracks(tracks)	
 	reaper.SetTrackSelected(parent.tr, false)
 	move_tracks_to_parent(parent)
 	colorize_tracks(parent)
-	assign_name(parent)
 	group_items(parent)
 
 	reaper.PreventUIRefresh(-1)
