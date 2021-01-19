@@ -62,7 +62,7 @@ function insert_parent_item(parent)
 	-- Set time selection to selected items
 	reaper.Main_OnCommand(40290, 0)
 	reaper.SetOnlyTrackSelected(parent.tr)
-	-- Insert and item
+	-- Insert an item
 	reaper.Main_OnCommand(40214, 0)
 	parent.item = reaper.GetSelectedMediaItem(0, 0)
 
@@ -84,12 +84,31 @@ function colorize_tracks(parent)
 	reaper.Main_OnCommand(reaper.NamedCommandLookup('_SWS_COLCHILDREN'), 0)
 end
 
-function group_items()
+function group_items(parent)
 
 	-- Select all items in selections
 	reaper.Main_OnCommand(40717, 0)
+	-- Get rid of tracks/items that aren't in the family 
+	-- Yea, kick those fuckers out--it's xmas what are they thinking?
+	unselect_irrelevant(parent)
 	-- Group Items
 	reaper.Main_OnCommand(40032, 0)
+	-- Remove time selection
+	reaper.Main_OnCommand(40635, 0)
+end
+
+function unselect_irrelevant(parent)
+	local trackCount = reaper.CountTracks(0)
+	for i = 0, trackCount - 1 do
+		local track = reaper.GetTrack(0, i)
+		local p = reaper.GetMediaTrackInfo_Value(track, 'P_PARTRACK')
+
+		if p ~= parent.tr and track ~= parent.tr then 
+			reaper.SetOnlyTrackSelected(track)
+			reaper.Main_OnCommand(reaper.NamedCommandLookup('_SWS_UNSELONTRACKS'), 0)	
+		end
+
+	end
 end
 
 -----------------------------------
@@ -140,13 +159,13 @@ function main()
 	reaper.SetTrackSelected(parent.tr, false)
 	move_tracks_to_parent(parent)
 	colorize_tracks(parent)
-	
 	assign_name(parent)
-	group_items()
+	group_items(parent)
 
 	reaper.PreventUIRefresh(-1)
 end
 
 -----------------------------------
 main()
-reaper.Undo_EndBlock('Create Pattern Clip', -1)
+-- TODO: if statement controls if it's edit or create
+reaper.Undo_EndBlock('Create/Edit Pattern Clip', -1)

@@ -83,7 +83,7 @@ function insert_midi_items(track, trackName)
 	local item = reaper.GetSelectedMediaItem(0, 0)
 	local take = reaper.GetActiveTake(item)
 	local length = reaper.BR_GetMidiSourceLenPPQ(take)
-	reaper.MIDI_InsertNote( take, false, false, 0, length, 1, 100, 66, false )
+	reaper.MIDI_InsertNote( take, false, false, 0, length, 1, 60, 66, false )
 	reaper.GetSetMediaItemTakeInfo_String(take, 'P_NAME', trackName, true)
 	
 	-- Trim to avoid layers
