@@ -1,4 +1,4 @@
--- @version .5
+-- @version 0.5
 -- @author Lemerchand
 -- @about FL Studio-style Editing Suite - Bind tiggers to Patterns
 -- @provides
