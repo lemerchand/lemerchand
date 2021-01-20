@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Scripts by Lemerchand" commit="be3c66711e633a3ed55a2f1be54011878d995fd1">
+<index version="1" name="Scripts by Lemerchand" commit="9c1c7ea905a8dbd7b608efe6fe33a427e042a3d2">
   <category name="ItemTray">
     <reapack name="itemtray.lua" type="script">
       <version name="0.4b" author="Lemerchand" time="2021-01-10T16:44:05Z">
@@ -384,6 +384,53 @@
         <source main="main">https://github.com/lemerchand/lemerchand/raw/2a3ea4031d06003b34732e04bd95ab6bd169ae21/Practice/cmd.lua</source>
         <source file="../libss/cf.lua">https://github.com/lemerchand/lemerchand/raw/2a3ea4031d06003b34732e04bd95ab6bd169ae21/libss/cf.lua</source>
         <source file="../libss/gui.lua">https://github.com/lemerchand/lemerchand/raw/2a3ea4031d06003b34732e04bd95ab6bd169ae21/libss/gui.lua</source>
+      </version>
+    </reapack>
+  </category>
+  <category name="SERA">
+    <reapack name="SERA - Create Pattern Clip.lua" type="script">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 FL Studio-style Editing Suite - Bind tiggers to Patterns\par}
+}
+]]></description>
+      </metadata>
+      <version name="0.5" author="Lemerchand" time="2021-01-20T01:26:09Z">
+        <changelog><![CDATA[+ None - this is the first release.]]></changelog>
+        <source main="main">https://github.com/lemerchand/lemerchand/raw/9c1c7ea905a8dbd7b608efe6fe33a427e042a3d2/SERA/SERA%20-%20Create%20Pattern%20Clip.lua</source>
+      </version>
+    </reapack>
+    <reapack name="SERA - Draw Tool.lua" type="script">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 FL Studio-style Editing Suite - Draw Tool. Left-click/drag draws. Right-click/drag erases. ESC exits.\par}
+}
+]]></description>
+      </metadata>
+      <version name="0.5" author="Lemerchand" time="2021-01-20T01:26:09Z">
+        <changelog><![CDATA[+ None - this is the first release.]]></changelog>
+        <source main="main">https://github.com/lemerchand/lemerchand/raw/9c1c7ea905a8dbd7b608efe6fe33a427e042a3d2/SERA/SERA%20-%20Draw%20Tool.lua</source>
+      </version>
+    </reapack>
+    <reapack name="SERA - Toggle Pattern Clip.lua" type="script">
+      <metadata>
+        <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 FL Studio-style Editing Suite - Toggle Patterns. Bind to Item Double-click Mouse Modifier\par}
+}
+]]></description>
+      </metadata>
+      <version name="0.5" author="Lemerchand" time="2021-01-20T01:26:09Z">
+        <changelog><![CDATA[+ None - this is the first release.]]></changelog>
+        <source main="main">https://github.com/lemerchand/lemerchand/raw/9c1c7ea905a8dbd7b608efe6fe33a427e042a3d2/SERA/SERA%20-%20Toggle%20Pattern%20Clip.lua</source>
       </version>
     </reapack>
   </category>
