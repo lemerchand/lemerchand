@@ -1,4 +1,4 @@
--- @version 0.5
+-- @version 0.5.2
 -- @author Lemerchand
 -- @about FL Studio-style Editing Suite - Draw Tool. Left-click/drag draws. Right-click/drag erases. ESC exits.
 -- @provides
