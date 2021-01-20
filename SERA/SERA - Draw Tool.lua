@@ -6,7 +6,23 @@ reaper.RefreshToolbar2(section_ID, cmd_ID)
 -- Variables
 local leftClick = false
 local rightClick =  false
-local lastTrack, lastTrackName, startingX, endingX
+local lastTrack, lastTrackName, startingX, endingX, startingCurPos
+
+local tIntercepts = {}
+
+function reset_intercepts()
+	tIntercepts = {
+		WM_LBUTTONDOWN = false,
+		WM_LBUTTONUP = false,
+		WM_LBUTTONDBLCLK = false,
+		WM_RBUTTONDOWN = false,
+		WM_RBUTTONUP = false,
+		WM_MOUSEMOVE = false,
+		WM_SETCURSOR = false
+	}
+end
+
+reset_intercepts()
 
 
 -- Degbug
@@ -16,15 +32,7 @@ function dbg(txt)
 end
 
 -- Mouse interceptions
-function intercept_mouse()
-	tIntercepts = {WM_LBUTTONDOWN = false,
-		WM_LBUTTONUP = false,
-		WM_LBUTTONDBLCLK = false,
-		WM_RBUTTONDOWN = false,
-		WM_RBUTTONUP = false,
-		WM_MOUSEMOVE = false,
-		WM_SETCURSOR = false
-	}
+function intercept_mouse(tInntercepts)
 	midiview = reaper.JS_Window_FromPoint(reaper.GetMousePosition())
 	for key, value in pairs(tIntercepts) do
 		OK = reaper.JS_WindowMessage_Intercept(midiview, key, value)
@@ -72,6 +80,7 @@ function set_selection_end()
 end
 
 function insert_midi_items(track, trackName)
+
 	-- Unselect all tracks
 	reaper.Main_OnCommand(40297, 0)
 	-- Selet target track
@@ -93,13 +102,6 @@ function insert_midi_items(track, trackName)
 	-- Remove selection
 	reaper.Main_OnCommand(40635, 0)
 
-	if startingX <= endingX then 
-		reaper.SetEditCurPos(startingX, true, false)
-	else
-		reaper.SetEditCurPos(endingX, true, false)
-	end
-	-- Move to left grid division
-	reaper.Main_OnCommand(40646, 0)
 
 end
 
@@ -113,12 +115,18 @@ function remove_items(track)
 	-- Select items in time selection
 	reaper.Main_OnCommand(40718, 0)
 	-- Remove item
-	reaper.Main_OnCommand(40697, 0)
+	reaper.Main_OnCommand(40006, 0)
 	-- Remove selection
 	reaper.Main_OnCommand(40635, 0)
 end
 
+function store_starting_cursor_pos()
+	startingCurPos = reaper.GetCursorPosition()
+end
 
+function restore_staring_cursor_pos()
+	reaper.SetEditCurPos(startingCurPos, true, false)
+end
 -----------------------------------
 --[			  					]--
 --[			   MAIN				]--
@@ -131,35 +139,14 @@ function main()
 	if reaper.JS_Mouse_GetState(-1) >= 4 then 
 		reaper.JS_WindowMessage_ReleaseAll()
 	elseif segment == 'track' then
+
 		reaper.JS_Mouse_SetCursor(reaper.JS_Mouse_LoadCursor(185))
 		intercept_mouse()
 		reaper.Undo_BeginBlock()
+		
 		-- Select track under mouse/save it as curTrack
 		reaper.Main_OnCommand(41110, 0)
 		local curTrack = reaper.GetSelectedTrack(0, 0)
-
-		----------------------------------------------------------------------------------
-		--- CODE FOR DETERMINING CHANGE OF TRACK
-		-- Leaving in case it is needed later
-		-- Check to see if the track has changed and the mouse is down...
-		-- If so, [1] end the current selection
-		-- [2a-b] Treat last track as if the mouse has been released
-		-- 		Reset the click so that it resets the start selection process over	
-
-		-- if curTrack ~= lastTrack and (rightClick or leftClick) then
-		--  	endingX =  reaper.BR_PositionAtMouseCursor( true )
-		--  	set_selection_end()												-- [1]
-
-		--  	if leftClick then 
-		--  		insert_midi_items(lastTrack, lastTrackName)					-- [2a]
-		 		
-		--  	end
-		--  	if rightClick then 
-		--  		remove_items(lastTrack)										-- [2b]
-		 		
-		--  	end
-		-- end
-		---------------------------------------------------------------------------------
 
 		-- Select the hovered-over track again (incase it got deselected)
 		-- Record current track as the last track and get it's name
@@ -173,14 +160,13 @@ function main()
 		-----------------------------------
 		-- If LMB down and it hasn't been clicked yet..
 		-- [1] Flag it
-		-- [2] Halt the UI refresh
 		-- [3] Check for items under the house--if none...
 		-- [4] Set the time selection
 		if reaper.JS_Mouse_GetState(1) == 1 and not leftClick then
-			
+			reaper.PreventUIRefresh(1)										
+			store_starting_cursor_pos()
 			leftClick = true 												-- [1]
-			reaper.PreventUIRefresh(2)										-- [2]
-
+			
 			-- Select track under mouse
 			local mx, my = reaper.GetMousePosition()						
 			local item, take = reaper.GetItemFromPoint(mx, my, false)		-- [3]
@@ -201,13 +187,17 @@ function main()
 		-- [8] Reset flag
 
 		elseif reaper.JS_Mouse_GetState(1) == 0 and leftClick then
-				reaper.PreventUIRefresh(-2)
+				reaper.PreventUIRefresh(1)
 				endingX = reaper.BR_PositionAtMouseCursor( true )
 				set_selection_end()											-- [6]
 				insert_midi_items(curTrack, trackName)						-- [7]
 				leftClick = false											-- [8]
-				reaper.Undo_EndBlock('Insert Triggers', -1)
-	
+				reaper.Undo_EndBlock('Insert Items', -1)
+				restore_staring_cursor_pos()
+				reaper.PreventUIRefresh(-1)
+				
+
+
 		-----------------------------------
 		--[		  Removing Items		 ]--
 		-----------------------------------
@@ -215,8 +205,11 @@ function main()
 		-- Flag rightClick, prevent UI refresh, set time selection start
 
 		elseif reaper.JS_Mouse_GetState(-1) == 2 and not rightClick then 
+			
+
 			rightClick = true
-			reaper.PreventUIRefresh(2)
+			store_starting_cursor_pos()
+			reaper.PreventUIRefresh(1)
 			-- Store to determine direction
 			startingX =  reaper.BR_PositionAtMouseCursor( true )
 			set_selection_start()
@@ -225,16 +218,18 @@ function main()
 		-- Prevent that refresh, end the time selection, remove the items
 		-- on curTrack, reset rightClick flag
 		elseif reaper.JS_Mouse_GetState(-1) == 0 and rightClick then
-			reaper.PreventUIRefresh(2)
+			reaper.PreventUIRefresh(1)
 			endingX = reaper.BR_PositionAtMouseCursor( true )
 			set_selection_end()
 			remove_items(curTrack)
+			reaper.Undo_EndBlock('Delete items', -1)
+			restore_staring_cursor_pos()
 			rightClick = false
+			reaper.PreventUIRefresh(-1)
+			
 		end
 			
-		-- Relieve UI Refresh prevention/Mouse intercepts
-		reaper.PreventUIRefresh(-2)
-	elseif segment ~= 'track' then
+	elseif segment ~= 'track'  then
 		reaper.JS_WindowMessage_ReleaseAll()
 	end
 	

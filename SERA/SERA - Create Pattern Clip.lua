@@ -186,6 +186,7 @@ function main()
 	move_tracks_to_parent(parent)
 	colorize_tracks(parent)
 	group_items(parent)
+	reaper.Main_OnCommand(41173, 0)
 
 	reaper.PreventUIRefresh(-1)
 end
