@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Scripts by Lemerchand" commit="4511208a33c26faeda094cb90f50d1e27bdeaf6a">
+<index version="1" name="Scripts by Lemerchand" commit="79e97f1eebf97f2d1ff58571cc16ea6290a0b154">
   <category name="ItemTray">
     <reapack name="itemtray.lua" type="script">
       <version name="0.4b" author="Lemerchand" time="2021-01-10T16:44:05Z">
@@ -406,6 +406,10 @@
         <changelog><![CDATA[+ None - this is the first release.]]></changelog>
         <source main="main">https://github.com/lemerchand/lemerchand/raw/4511208a33c26faeda094cb90f50d1e27bdeaf6a/SERA/SERA%20-%20Create%20Pattern%20Clip.lua</source>
       </version>
+      <version name="0.5.2" author="Lemerchand" time="2021-01-20T13:51:40Z">
+        <changelog><![CDATA[+ None - this is the first release.]]></changelog>
+        <source main="main">https://github.com/lemerchand/lemerchand/raw/79e97f1eebf97f2d1ff58571cc16ea6290a0b154/SERA/SERA%20-%20Create%20Pattern%20Clip.lua</source>
+      </version>
     </reapack>
     <reapack name="SERA - Draw Tool.lua" type="script">
       <metadata>
@@ -421,6 +425,10 @@
         <changelog><![CDATA[+ None - this is the first release.]]></changelog>
         <source main="main">https://github.com/lemerchand/lemerchand/raw/9c1c7ea905a8dbd7b608efe6fe33a427e042a3d2/SERA/SERA%20-%20Draw%20Tool.lua</source>
       </version>
+      <version name="0.5.2" author="Lemerchand" time="2021-01-20T13:51:40Z">
+        <changelog><![CDATA[+ None - this is the first release.]]></changelog>
+        <source main="main">https://github.com/lemerchand/lemerchand/raw/79e97f1eebf97f2d1ff58571cc16ea6290a0b154/SERA/SERA%20-%20Draw%20Tool.lua</source>
+      </version>
     </reapack>
     <reapack name="SERA - Make Pattern Clip Unique.lua" type="script">
       <metadata>
@@ -435,6 +443,10 @@
       <version name="0.5.1" author="Lemerchand" time="2021-01-20T13:47:53Z">
         <changelog><![CDATA[+ None - this is the first release.]]></changelog>
         <source main="main">https://github.com/lemerchand/lemerchand/raw/4511208a33c26faeda094cb90f50d1e27bdeaf6a/SERA/SERA%20-%20Make%20Pattern%20Clip%20Unique.lua</source>
+      </version>
+      <version name="0.5.2" author="Lemerchand" time="2021-01-20T13:51:40Z">
+        <changelog><![CDATA[+ None - this is the first release.]]></changelog>
+        <source main="main">https://github.com/lemerchand/lemerchand/raw/79e97f1eebf97f2d1ff58571cc16ea6290a0b154/SERA/SERA%20-%20Make%20Pattern%20Clip%20Unique.lua</source>
       </version>
     </reapack>
     <reapack name="SERA - Toggle Pattern Clip.lua" type="script">
@@ -454,6 +466,10 @@
       <version name="0.5.1" author="Lemerchand" time="2021-01-20T13:47:53Z">
         <changelog><![CDATA[+ None - this is the first release.]]></changelog>
         <source main="main">https://github.com/lemerchand/lemerchand/raw/4511208a33c26faeda094cb90f50d1e27bdeaf6a/SERA/SERA%20-%20Toggle%20Pattern%20Clip.lua</source>
+      </version>
+      <version name="0.5.2" author="Lemerchand" time="2021-01-20T13:51:40Z">
+        <changelog><![CDATA[+ None - this is the first release.]]></changelog>
+        <source main="main">https://github.com/lemerchand/lemerchand/raw/79e97f1eebf97f2d1ff58571cc16ea6290a0b154/SERA/SERA%20-%20Toggle%20Pattern%20Clip.lua</source>
       </version>
     </reapack>
   </category>
