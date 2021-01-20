@@ -1,3 +1,11 @@
+-- @version .5
+-- @author Lemerchand
+-- @about FL Studio-style Editing Suite - Draw Tool. Left-click/drag draws. Right-click/drag erases. ESC exits.
+-- @provides
+--    [main] .
+-- @changelog
+--    + None - this is the first release.
+
 -- Toolbar Code
 is_new_value,filename,section_ID,cmd_ID,mode,resolution,val = reaper.get_action_context()
 reaper.SetToggleCommandState(section_ID, cmd_ID, 1)

@@ -1,6 +1,12 @@
+-- @version .5
+-- @author Lemerchand
+-- @about FL Studio-style Editing Suite - Toggle Patterns. Bind to Item Double-click Mouse Modifier
+-- @provides
+--    [main] .
+-- @changelog
+--    + None - this is the first release.
+
 reaper.Undo_BeginBlock()
-
-
 
 function toggle_pattern(item, take)
 	local parent = reaper.GetMediaItemInfo_Value(item, 'P_TRACK')

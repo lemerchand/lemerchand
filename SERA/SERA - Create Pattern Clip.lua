@@ -1,3 +1,11 @@
+-- @version .5
+-- @author Lemerchand
+-- @about FL Studio-style Editing Suite - Bind tiggers to Patterns
+-- @provides
+--    [main] .
+-- @changelog
+--    + None - this is the first release.
+
 reaper.ClearConsole()
 
 function dbg(text, p)
