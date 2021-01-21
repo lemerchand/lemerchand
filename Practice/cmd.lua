@@ -1,9 +1,10 @@
--- @version 0.6.9b
+-- @version 0.7
 -- @author Lemerchand
 -- @provides
 --     [main] .
 --     [nomain] /libss/*.lua
 -- @changelog
+--     + Inspect track sends/receives when only one track
 --     + Logged commands persist on close
 --     + Enabled routing of midi and audio
 --     + Added help pages
@@ -17,9 +18,24 @@ reaper.ClearConsole()
 
 local mousex, mousey = reaper.GetMousePosition()
 
-gfx.init("ReaCon", 425, 310, false, mousex+50,mousey-200)
+local winwidth = 425
+local winheight = 310
+
+function load_settings()
+	local file = io.open(script_path .. 'settings.dat', 'r')
+	if not file then return end
+	io.input(file)
+	winwidth = file:read()
+	winheight = file:read()
+	file:close()
+
+end
+load_settings()
+
+gfx.init("ReaCon", winwidth, winheight, false, mousex+50,mousey-200)
 local win = reaper.JS_Window_Find("ReaCon", true)
 if win then reaper.JS_Window_AttachTopmostPin(win) end
+
 
 
 ----------------------------
@@ -332,16 +348,23 @@ end
 local function save_on_exit()
 	local file = io.open(script_path .. "soe.dat", 'w')
 	io.output(file)
-	for h =  1, 20 do
+	for h = 0, #C.history do
 		if C.history[h] then 
 			
 			file:write(C.history[h] .. '\n')
 		end
 	end
 	file:close()
+
+	local file = io.open(script_path .. 'settings.dat', 'w')
+	io.output(file)
+	file:write(gfx.w .. '\n')
+	file:write(gfx.h .. '\n')
+	file:close()
 end
 
 local function restore_on_load()
+
 	local file = io.open(script_path .. "soe.dat", 'r')
 	io.input(file)
 	if not file then return end
@@ -357,6 +380,9 @@ local function restore_on_load()
 	  	end
 	  	h = h + 1
 	end
+
+
+
 end
 
 restore_on_load()
@@ -549,10 +575,60 @@ local function select_tracks()
 	
 	end
 
+	if trackCount == 1 then inspect_track() end
+
 	display2:CommitPreview(trackCount)
 
 end
 
+
+function inspect_track()
+
+	local track = reaper.GetSelectedTrack(0, 0)
+	local trackSendCount = reaper.GetTrackNumSends(track, 0)
+	local trackReceiveCount = reaper.GetTrackNumSends(track, -1)
+
+
+	-- SENDS
+	display:AddLine('')
+	display:AddLine('   Sends: ' .. trackSendCount, yellow.r, yellow.g, yellow.b)
+	for i = 0, trackSendCount - 1 do
+		local send =  reaper.GetTrackSendInfo_Value( track, 0, i, 'P_DESTTRACK' )
+		local ret, sendName = reaper.GetTrackName(send)
+		local sendDChan = math.floor(reaper.GetTrackSendInfo_Value(track, 0, i, 'I_DSTCHAN')+1)
+		local sendSChan = math.floor(reaper.GetTrackSendInfo_Value(track, 0, i, 'I_SRCCHAN')+1)
+		local sendSMChan = math.floor(reaper.BR_GetSetTrackSendInfo(track, 0, i, 'I_MIDI_SRCCHAN', false, 0))
+		local sendDMChan = math.floor(reaper.BR_GetSetTrackSendInfo(track, 0, i, 'I_MIDI_DSTCHAN', false, 0))
+
+
+		display:AddLine('      ' .. i+1 .. '. ' .. sendName)
+		display:AddLine('          Audio: ' ..sendSChan .. ' : ' .. sendDChan)
+		
+		display:AddLine('          MIDI:  ' .. sendSMChan .. ' : ' .. sendDMChan)
+		display:AddLine('')
+	end
+
+	-- RECEIVES
+	
+	display:AddLine('   Receives: ' .. trackReceiveCount, yellow.r, yellow.g, yellow.b)
+	for i = 0, trackReceiveCount - 1 do
+		local rec =  reaper.GetTrackSendInfo_Value( track, -1, i, 'P_DESTTRACK' )
+		local ret, recName = reaper.GetTrackName(rec)
+		local recDChan = math.floor(reaper.GetTrackSendInfo_Value(track, -1, i, 'I_DSTCHAN')+1)
+		local recSChan = math.floor(reaper.GetTrackSendInfo_Value(track, -1, i, 'I_SRCCHAN')+1)
+		local recSMChan = math.floor(reaper.BR_GetSetTrackSendInfo(track, -1, i, 'I_MIDI_SRCCHAN', false, 0))
+		local recDMChan = math.floor(reaper.BR_GetSetTrackSendInfo(track, -1, i, 'I_MIDI_DSTCHAN', false, 0))
+
+
+		display:AddLine('      ' .. i+1 .. '. ' .. recName)
+		display:AddLine('          Audio: ' ..recSChan .. ' : ' .. recDChan)
+		
+		display:AddLine('          MIDI:  ' .. recSMChan .. ' : ' .. recDMChan)
+		display:AddLine('')
+	end
+
+
+end
 
 
 --Selects destination by name
@@ -1040,7 +1116,7 @@ function main()
 	if cmd.leftClick then cmd.active = true end
 
 	--Refresh the gui size 
-	if refresh == 75 then 
+	if refresh == 25 then 
 		refresh = 0
 		gui_size_update()
 	else 
