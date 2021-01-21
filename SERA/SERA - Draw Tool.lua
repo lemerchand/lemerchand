@@ -1,10 +1,11 @@
--- @version 0.5.2
+-- @version 0.5.3
 -- @author Lemerchand
 -- @about FL Studio-style Editing Suite - Draw Tool. Left-click/drag draws. Right-click/drag erases. ESC exits.
 -- @provides
 --    [main] .
 -- @changelog
---    + None - this is the first release.
+--    + Toggling pitches/opening midi items works in Draw Mode
+--    + Drag a pattern to copy it elsewhere and pool the midi
 
 -- Toolbar Code
 is_new_value,filename,section_ID,cmd_ID,mode,resolution,val = reaper.get_action_context()
@@ -14,6 +15,8 @@ reaper.RefreshToolbar2(section_ID, cmd_ID)
 -- Variables
 local leftClick = false
 local rightClick =  false
+local patternLeftClick = false
+local patternRightClick = false
 local lastTrack, lastTrackName, startingX, endingX, startingCurPos
 
 local tIntercepts = {}
@@ -22,7 +25,6 @@ function reset_intercepts()
 	tIntercepts = {
 		WM_LBUTTONDOWN = false,
 		WM_LBUTTONUP = false,
-		WM_LBUTTONDBLCLK = false,
 		WM_RBUTTONDOWN = false,
 		WM_RBUTTONUP = false,
 		WM_MOUSEMOVE = false,
@@ -135,6 +137,46 @@ end
 function restore_staring_cursor_pos()
 	reaper.SetEditCurPos(startingCurPos, true, false)
 end
+
+function hovering_over_pattern()
+
+	local mx, my = reaper.GetMousePosition()
+	local item = reaper.GetItemFromPoint(mx, my, true)
+	if not item then return nil end
+	local take = reaper.GetActiveTake(item)
+	
+
+	if is_pattern(take) then return item end
+
+
+end
+
+function is_pattern(take)
+	local takeName = reaper.GetTakeName(take)
+	if takeName:find('Pattern') then
+		reaper.JS_Mouse_SetCursor(reaper.JS_Mouse_LoadCursor(186))
+		return true
+	end
+	return false
+end
+
+function a_pattern_is_selected()
+	local itemCount = reaper.CountSelectedMediaItems(0)
+	local patternCount = 0
+
+	if itemCount == 0 then return false end
+	for i = 0, itemCount -1 do
+		local item = reaper.GetSelectedMediaItem(0, i)
+		local take = reaper.GetActiveTake(item)
+		if is_pattern(take) then 
+			patternCount = patternCount + 1
+		end
+	end
+
+	if patternCount == 1 then return true else return false end
+end
+
+
 -----------------------------------
 --[			  					]--
 --[			   MAIN				]--
@@ -142,16 +184,50 @@ end
 -----------------------------------
 
 function main()
-	
+reaper.Undo_BeginBlock()	
 	local window, segment, details = reaper.BR_GetMouseCursorContext()
-	if reaper.JS_Mouse_GetState(-1) >= 4 then 
+	local patternClipHover = hovering_over_pattern()
+
+	-- If the user is hovering over a pattern clip
+	-- 
+	if patternClipHover then
+		if reaper.JS_Mouse_GetState(1) == 1 and not patternLeftClick then
+			patternLeftClick = true
+			reaper.PreventUIRefresh(1)
+			reaper.SelectAllMediaItems(0, false)
+			reaper.SetMediaItemSelected(patternClipHover, true)
+			-- Select pattern's grouped items
+			reaper.Main_OnCommand(40034, 0)
+			reaper.UpdateArrange()
+		elseif reaper.JS_Mouse_GetState(1) == 0 then
+			patternLeftClick = false
+		end
+	
+	elseif reaper.JS_Mouse_GetState(1) == 0 and  patternLeftClick then
+		reaper.PreventUIRefresh(1)
+		if details == 'empty' and a_pattern_is_selected() then 
+			
+			-- Copy pattern
+			reaper.Main_OnCommand(40698, 0)
+			-- Edit cursor to mouse
+			reaper.Main_OnCommand(40513, 0)
+			-- Paste and pool
+			reaper.Main_OnCommand(41072, 0)
+		end
+
+		reaper.PreventUIRefresh(-1)
+		patternLeftClick = false
+	
+
+
+	elseif reaper.JS_Mouse_GetState(-1) >= 4 then 
 		reaper.JS_WindowMessage_ReleaseAll()
+
 	elseif segment == 'track' then
 
 		reaper.JS_Mouse_SetCursor(reaper.JS_Mouse_LoadCursor(185))
 		intercept_mouse()
-		reaper.Undo_BeginBlock()
-		
+
 		-- Select track under mouse/save it as curTrack
 		reaper.Main_OnCommand(41110, 0)
 		local curTrack = reaper.GetSelectedTrack(0, 0)
@@ -170,7 +246,8 @@ function main()
 		-- [1] Flag it
 		-- [3] Check for items under the house--if none...
 		-- [4] Set the time selection
-		if reaper.JS_Mouse_GetState(1) == 1 and not leftClick then
+		if reaper.JS_Mouse_GetState(1) == 1 and not leftClick and not patternLeftClick then
+		
 			reaper.PreventUIRefresh(1)										
 			store_starting_cursor_pos()
 			leftClick = true 												-- [1]
@@ -187,6 +264,8 @@ function main()
 				set_selection_start()										-- [4]
 			else leftClick = false
 			end
+			
+
 
 		-- If LMB down and dragging...
 		-- [5] Compare OG mouse xpos to current

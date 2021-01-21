@@ -1,4 +1,4 @@
--- @version 0.5.2
+-- @version 0.5.3
 -- @author Lemerchand
 -- @about FL Studio-style Editing Suite - Make Pattern Clip unique. Bind to hotkey or toolbar.
 -- @provides

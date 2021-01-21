@@ -1,4 +1,4 @@
--- @version 0.5.2
+-- @version 0.5.3
 -- @author Lemerchand
 -- @about FL Studio-style Editing Suite - Toggle Patterns. Bind to Item Double-click Mouse Modifier
 -- @provides
