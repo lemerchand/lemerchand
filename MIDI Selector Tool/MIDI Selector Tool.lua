@@ -1,4 +1,4 @@
--- @version 1.2.41
+-- @version 1.2.6
 -- @author Lemerchand
 -- @provides
 --    [main=midi_editor] .
@@ -6,14 +6,17 @@
 --    [nomain] libs/*.lua
 --    [nomain] default_lament.config
 --    [nomain] preset_actions/preset_template.lua
+--    [nomain] preset_actions/preset_template_time_selection.lua
 -- @changelog
+--    + Option to export presets to actions as Time Selection Only (Alt+Shift+Right-click)
+--    + Fixed Default not being default on load
 --    + Added sharp/flat toggle
 --    + Improved behavior on Preset Overwrite
 --    + Updating no longer overwrites user's settings
 --    + Exported presets now have 'MST_' as a prefix in Actions List
 
 
-local v = " v1.2.4b"
+local v = " v1.2.6"
 local name = "MST5K"
 local path = ""
 
@@ -54,7 +57,7 @@ update_settings(path, '/lament.config')
 
 local presets = get_presets(path) 
 
-gfx.init(name .. " " .. v, 248, 680, dockOnStart, window_xPos, window_yPos)
+gfx.init(name .. " " .. v, 248, 685, dockOnStart, window_xPos, window_yPos)
 
 -- Keep on top
 local win = reaper.JS_Window_Find(name .. " " .. v, true)
@@ -81,7 +84,7 @@ local htFloatAtPos 		= "Choose x/y coordinates\nfor the window to load."
 local htLengthTgle		= "Filter by note length.\nR-click: reset.\nCtrl+L-click: exclusive select."
 local htTimeThreshold	= "Threshold in ppq to catch notes\nwith imperfect lengths or times."
 local htDdwnScales		= "Select a scale then Shift+R-Click\na note to set pitches."
-local htDdwnPresets		= "Select a preset\nShift+R-Click: save preset.\nCtrl+L-click: delete current preset\nAlt+R-click: export to actions"
+local htDdwnPresets		= "Select a preset\nShift+R-Click: save preset.\nCtrl+L-click: delete current preset\nAlt+R-click: export to actions\nAlt+Shift+R-click: export\n to actions (time selection only)"
 
 -------------------------------
 --Midi Note and BeatsThangs---
@@ -281,12 +284,18 @@ sldr_timeThreshold = H_slider:Create(frm_time.x + 10, frm_time.y+frm_time.h - 20
 
 --Status bar
 --For now status needs to be global
-status = Status:Create(10, frm_time.y + frm_time.h + 27, 227, 65, "INFO", nil, nil, "Hover over a control for more info!")
+status = Status:Create(10, frm_time.y + frm_time.h + 27, 227, 75, "INFO", nil, nil, "Hover over a control for more info!")
 
 ddwn_scaleName = Dropdown:Create(frm_pitch.x+52, frm_pitch.y+frm_pitch.h-15, frm_pitch.w-62 , nil, scaleName, 1, 1, htDdwnScales)
 
-
-local ddwn_presets = Dropdown:Create(frm_general.x+10, btn_select.y+43, frm_general.w-20, nil, presets, 1, 1, htDdwnPresets, load_preset, path)
+for p, preset in ipairs(presets) do
+	if preset == 'Default Preset' then 
+		defaultPreset = p 
+		break
+	end
+	
+end
+local ddwn_presets = Dropdown:Create(frm_general.x+10, btn_select.y+43, frm_general.w-20, nil, presets, defaultPreset, defaultPreset, htDdwnPresets, load_preset, path)
 
 
 ---Handle tabs
@@ -585,9 +594,15 @@ function main()
 		end		
 	end
 
-	if ddwn_presets.altRightClick then 
-		create_preset_action(path, ddwn_presets.choices[ddwn_presets.selected])
+
+	if ddwn_presets.altShiftRightClick then
+		create_preset_action(path, ddwn_presets.choices[ddwn_presets.selected], true)
 	end
+
+	if ddwn_presets.altRightClick then 
+		create_preset_action(path, ddwn_presets.choices[ddwn_presets.selected], false)
+	end
+
 
 end
 
