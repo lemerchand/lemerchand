@@ -36,7 +36,7 @@ function create_preset_action(path, preset, selection)
 	file:close()
 
 	if selection then 
-		file = io.open(path .. '/preset_actions/MST_' .. preset .. 'time_selection.lua', 'w')
+		file = io.open(path .. '/preset_actions/MST_' .. preset .. '_time_selection.lua', 'w')
 	else
 		file = io.open(path .. '/preset_actions/MST_' .. preset .. '.lua', 'w')
 	end
@@ -47,7 +47,7 @@ function create_preset_action(path, preset, selection)
 	end
 	file:close()
 	if selection then 
-		reaper.AddRemoveReaScript(true,  32060, path .. '/preset_actions/MST_' .. preset .. "time_selection.lua", true)
+		reaper.AddRemoveReaScript(true,  32060, path .. '/preset_actions/MST_' .. preset .. "_time_selection.lua", true)
 	else
 		reaper.AddRemoveReaScript(true,  32060, path .. '/preset_actions/MST_' .. preset .. ".lua", true)
 	end
