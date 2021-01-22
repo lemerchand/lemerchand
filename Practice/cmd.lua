@@ -637,7 +637,7 @@ local function select_destination(sources)
 
 	reaper.PreventUIRefresh(1)
 	
-	
+	local trackCount = 0
 	display:ClearLines()
 	display2:ClearLines()
 
@@ -645,6 +645,7 @@ local function select_destination(sources)
 	for i=0, tracks-1 do
 		local t = reaper.GetTrack(0, i )
 		local retval, buf = reaper.GetTrackName( t )
+
 		
 		local muted = reaper.GetMediaTrackInfo_Value(t, 'B_MUTE')
 		local soloed = reaper.GetMediaTrackInfo_Value(t, 'I_SOLO')
@@ -671,13 +672,14 @@ local function select_destination(sources)
 			reaper.SetTrackSelected( t, true ) 
 			display:AddLine(i+1 .. ": " .. buf:sub(1,14) .. levelMod, r, g, b)
 			C.destinationID = i
+			trackCount = trackCount + 1
 			
 		--if the string is an exact match	
 		elseif string.lower(buf) == C.destinationInput or string.lower(buf .. " ") == C.destinationInput or string.lower(buf .. "  ") == C.destinationInput then 
 			reaper.SetTrackSelected( t, true ) 
 			display:AddLine(i+1 .. ": " .. buf:sub(1,14) .. levelMod, r, g, b)
 			C.destinationID = i
-			
+			trackCount = trackCount + 1
 
 		else 
 			--finds close matches
@@ -685,7 +687,7 @@ local function select_destination(sources)
 				reaper.SetTrackSelected( t, true ) 
 				display:AddLine(i+1 .. ": " .. buf:sub(1,14) .. levelMod, r, g, b)
 				C.destinationID = i
-				
+				trackCount = trackCount + 1
 			
 
 			--if i is not a match deselect
@@ -698,8 +700,7 @@ local function select_destination(sources)
 
 	
 	end
-
-
+	if trackCount == 1 then inspect_track() end
 
 	display2:CommitPreview(-1, sources)
 	
