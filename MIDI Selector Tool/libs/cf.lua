@@ -18,25 +18,39 @@ function restore_on_exit(path)
 end
 
 
-function create_preset_action(path, preset)
-	
-	local file = io.open(path .. 'preset_actions/preset_template.lua', 'r')
-	io.input()
+function create_preset_action(path, preset, selection)
+	local file
+	if selection then 
+		file = io.open(path .. 'preset_actions/preset_template_time_selection.lua', 'r')
+		io.input()
+	else
+		file = io.open(path .. 'preset_actions/preset_template.lua', 'r')
+		io.input()
+	end
 	local t = {}
 
 	for line in file:lines() do
 		 table.insert(t, line)
 	end
+
 	file:close()
 
-	local file = io.open(path .. '/preset_actions/MST_' .. preset .. '.lua', 'w')
+	if selection then 
+		file = io.open(path .. '/preset_actions/MST_' .. preset .. '_time_selection.lua', 'w')
+	else
+		file = io.open(path .. '/preset_actions/MST_' .. preset .. '.lua', 'w')
+	end
 	io.output()
 	file:write("local name = '" .. preset .. "'\n")
 	for i, line in pairs(t) do
 		file:write(line .. "\n") 
 	end
 	file:close()
-	reaper.AddRemoveReaScript(true,  32060, path .. '/preset_actions/MST_' .. preset .. ".lua", true)
+	if selection then 
+		reaper.AddRemoveReaScript(true,  32060, path .. '/preset_actions/MST_' .. preset .. "_time_selection.lua", true)
+	else
+		reaper.AddRemoveReaScript(true,  32060, path .. '/preset_actions/MST_' .. preset .. ".lua", true)
+	end
 end
 
 function note_under_mouse_index()

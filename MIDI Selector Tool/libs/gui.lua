@@ -1036,6 +1036,7 @@ function Dropdown:Create(x,y,w,h,choices, default, selected, help, func, arg)
 		ctrlLeftClick = false,
 		rightClick = false,
 		altRightClick = false,
+		altShiftRightClick = false,
 		choicesHide = true,
 		hide = false,
 		block = false,
@@ -1075,7 +1076,8 @@ function Dropdown:Draw()
 		self.mouseOver = true 
 		if gfx.mouse_cap >= 1 and self.mouseDown == false then 
 			self.leftClick = true
-			if gfx.mouse_cap == 4 or gfx.mouse_cap == 8 or gfx.mouse_cap == 16 then self.mouse_down = false
+			if gfx.mouse_cap == 4 or gfx.mouse_cap == 8 
+				or gfx.mouse_cap == 16 or gfx.mouse_cap == 24 then self.mouse_down = false
 			else
 				self.mouseDown = true
 				if gfx.mouse_cap == 1 then if self.choicesHide == true then self.choicesHide = false else self.choicesHide = true end
@@ -1086,7 +1088,7 @@ function Dropdown:Draw()
 				elseif gfx.mouse_cap == 17 then self.altLeftClick = true
 				elseif gfx.mouse_cap == 18 then self.altRightClick = true
 				elseif gfx.mouse_cap == 64 then self.middleClick = true
-				
+				elseif gfx.mouse_cap == 26 then self.altShiftRightClick = true
 				end
 			end
 		elseif gfx.mouse_cap == 0 and self.mouseDown == true then
@@ -1149,6 +1151,7 @@ function Dropdown:ResetClicks()
 	self.shiftRightClick = false
 	self.altLeftClick = false
 	self.altRightClick = false
+	self.altShiftRightClick = false
 
 end
 function Dropdown:Add(choice)
