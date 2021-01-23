@@ -195,6 +195,11 @@ function insert_sample(track)
 	local p2 = 'ReaSamplOmatic5000'
 	
 	local fxCount =reaper.TrackFX_GetCount(track)
+	if fxCount == 0 then 
+		reaper.TrackFX_GetByName(track, 'ReaSamplOmatic5000 (Cockos)', true)
+		fxCount = 1
+	end
+
 
 	for i = 0, fxCount -1 do
 		
@@ -207,6 +212,7 @@ function insert_sample(track)
 			reaper.JS_WindowMessage_Send(me, "WM_COMMAND", 42121, 0, 0, 0)
 			reaper.TrackFX_Show(track, i, 2 )
 			break
+
 		end
 	end
 	reaper.PreventUIRefresh(-1)
