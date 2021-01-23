@@ -17,7 +17,7 @@ local leftClick = false
 local rightClick =  false
 local patternLeftClick = false
 local patternRightClick = false
-local lastTrack, lastTrackName, startingX, endingX, startingCurPos
+local lastTrack, lastTrackName, startingX, endingX, startingCurPos, mouseDownContext
 
 local tIntercepts = {}
 
@@ -176,6 +176,45 @@ function a_pattern_is_selected()
 	if patternCount == 1 then return true else return false end
 end
 
+function insert_sample(track)
+	if track == nil then
+		-- Insert a new track with rs5k template
+		-- Assign new track to track
+
+		-- New track
+		reaper.Main_OnCommand(40001, 0)
+		reaper.Main_OnCommand(reaper.NamedCommandLookup('_S&M_APPLY_TRTEMPLATE1'), 0)
+
+		-- Get new track
+		track = reaper.GetSelectedTrack(0, 0)
+	end
+
+	reaper.PreventUIRefresh(1)
+		
+	local p1 = '(RS5K)'
+	local p2 = 'ReaSamplOmatic5000'
+	
+	local fxCount =reaper.TrackFX_GetCount(track)
+
+	for i = 0, fxCount -1 do
+		
+		local ret, fx = reaper.TrackFX_GetFXName(track, i, '')
+		if fx:find(p1) or fx:find(p2) then
+			
+			reaper.TrackFX_Show(track, i, 3 )
+			
+			local me = reaper.JS_Window_Find("Media Explorer", true)
+			reaper.JS_WindowMessage_Send(me, "WM_COMMAND", 42121, 0, 0, 0)
+			reaper.TrackFX_Show(track, i, 2 )
+			break
+		end
+	end
+	reaper.PreventUIRefresh(-1)
+	reaper.JS_WindowMessage_ReleaseAll()
+	return
+
+
+end
 
 -----------------------------------
 --[			  					]--
@@ -187,7 +226,7 @@ function main()
 reaper.Undo_BeginBlock()	
 	local window, segment, details = reaper.BR_GetMouseCursorContext()
 	local patternClipHover = hovering_over_pattern()
-
+	
 	-- If the user is hovering over a pattern clip
 	-- 
 	if patternClipHover then
@@ -202,7 +241,22 @@ reaper.Undo_BeginBlock()
 		elseif reaper.JS_Mouse_GetState(1) == 0 then
 			patternLeftClick = false
 		end
-	
+
+	elseif window == 'unknown' then
+		-- Fuck this media explorer bullshit	
+		if reaper.JS_Mouse_GetState(1) == 1 then 
+			local me = reaper.JS_Window_Find("Media Explorer", true)
+			local winChild = reaper.JS_Window_GetFocus()
+			local win =  reaper.JS_Window_GetParent( winChild )
+			if win == me then
+				
+				intercept_mouse()
+				reaper.JS_WindowMessage_Post (me, "WM_LBUTTONUP", 0, 0, 0, 0)
+				mouseDownContext = 'me' 
+				reaper.JS_Mouse_SetCursor(reaper.JS_Mouse_LoadCursor(182))
+			end
+		end
+
 	elseif reaper.JS_Mouse_GetState(1) == 0 and  patternLeftClick then
 		reaper.PreventUIRefresh(1)
 		if details == 'empty' and a_pattern_is_selected() then 
@@ -222,6 +276,38 @@ reaper.Undo_BeginBlock()
 
 	elseif reaper.JS_Mouse_GetState(-1) >= 4 then 
 		reaper.JS_WindowMessage_ReleaseAll()
+
+	-----------------------------------
+	-----------------------------------
+	--[			Sample Load			]--
+	-----------------------------------
+	-----------------------------------
+
+	-- if the user drags onto the tcp
+	elseif window == 'tcp' then 
+		if mouseDownContext == 'me' then reaper.JS_Mouse_SetCursor(reaper.JS_Mouse_LoadCursor(182)) end
+		-- if the user is dragging into the tcp
+		if (reaper.JS_Mouse_GetState(-1) == 1 or reaper.JS_Mouse_GetState(-1) == 2) 
+		and mouseDownContext == 'track' then
+			intercept_mouse()
+
+		elseif reaper.JS_Mouse_GetState(-1) == 0 and mouseDownContext == 'me' then
+			local track = reaper.BR_GetMouseCursorContext_Track()
+			insert_sample(track)
+			mouseDownContext = nil
+
+		elseif mouseDownContext ~= 'me' then
+			reaper.JS_WindowMessage_ReleaseAll()
+			
+		end
+
+
+
+	-----------------------------------
+	-----------------------------------
+	--[			  Drawing			]--
+	-----------------------------------
+	-----------------------------------
 
 	elseif segment == 'track' then
 
@@ -250,7 +336,8 @@ reaper.Undo_BeginBlock()
 		
 			reaper.PreventUIRefresh(1)										
 			store_starting_cursor_pos()
-			leftClick = true 												-- [1]
+			leftClick = true 	
+			mouseDownContext = 'track'										-- [1]
 			
 			-- Select track under mouse
 			local mx, my = reaper.GetMousePosition()						
@@ -279,6 +366,7 @@ reaper.Undo_BeginBlock()
 				set_selection_end()											-- [6]
 				insert_midi_items(curTrack, trackName)						-- [7]
 				leftClick = false											-- [8]
+				mouseDownContext = nil
 				reaper.Undo_EndBlock('Insert Items', -1)
 				restore_staring_cursor_pos()
 				reaper.PreventUIRefresh(-1)
@@ -295,6 +383,7 @@ reaper.Undo_BeginBlock()
 			
 
 			rightClick = true
+			mouseDownContext = 'track'
 			store_starting_cursor_pos()
 			reaper.PreventUIRefresh(1)
 			-- Store to determine direction
@@ -312,6 +401,7 @@ reaper.Undo_BeginBlock()
 			reaper.Undo_EndBlock('Delete items', -1)
 			restore_staring_cursor_pos()
 			rightClick = false
+			mouseDownContext = nil
 			reaper.PreventUIRefresh(-1)
 			
 		end
