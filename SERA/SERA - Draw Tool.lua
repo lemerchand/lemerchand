@@ -37,7 +37,8 @@ reset_intercepts()
 
 -- Degbug
 reaper.ClearConsole()
-function dbg(txt)
+function dbg(txt, clear)
+	if clear then reaper.ClearConsole() end
 	reaper.ShowConsoleMsg('\n' .. tostring(txt))
 end
 
@@ -144,8 +145,6 @@ function hovering_over_pattern()
 	local item = reaper.GetItemFromPoint(mx, my, true)
 	if not item then return nil end
 	local take = reaper.GetActiveTake(item)
-	
-
 	if is_pattern(take) then return item end
 
 
@@ -177,6 +176,7 @@ function a_pattern_is_selected()
 end
 
 function insert_sample(track)
+	reaper.PreventUIRefresh(1)
 	if track == nil then
 		-- Insert a new track with rs5k template
 		-- Assign new track to track
@@ -189,8 +189,7 @@ function insert_sample(track)
 		track = reaper.GetSelectedTrack(0, 0)
 	end
 
-	reaper.PreventUIRefresh(1)
-		
+			
 	local p1 = '(RS5K)'
 	local p2 = 'ReaSamplOmatic5000'
 	
@@ -215,6 +214,7 @@ function insert_sample(track)
 
 		end
 	end
+	mouseDownContext = nil
 	reaper.PreventUIRefresh(-1)
 	reaper.JS_WindowMessage_ReleaseAll()
 	return
@@ -229,13 +229,14 @@ end
 -----------------------------------
 
 function main()
-reaper.Undo_BeginBlock()	
+	--dbg(mouseDownContext, true)
+	reaper.Undo_BeginBlock()	
 	local window, segment, details = reaper.BR_GetMouseCursorContext()
 	local patternClipHover = hovering_over_pattern()
 	
 	-- If the user is hovering over a pattern clip
 	-- 
-	if patternClipHover then
+	if segment == 'track' and patternClipHover then
 		if reaper.JS_Mouse_GetState(1) == 1 and not patternLeftClick then
 			patternLeftClick = true
 			reaper.PreventUIRefresh(1)
@@ -250,10 +251,11 @@ reaper.Undo_BeginBlock()
 
 	elseif window == 'unknown' then
 		-- Fuck this media explorer bullshit	
-		if reaper.JS_Mouse_GetState(1) == 1 then 
-			local me = reaper.JS_Window_Find("Media Explorer", true)
+		if reaper.JS_Mouse_GetState(-1) == 1 then 
 			local winChild = reaper.JS_Window_GetFocus()
 			local win =  reaper.JS_Window_GetParent( winChild )
+			local me = reaper.JS_Window_Find("Media Explorer", true)
+
 			if win == me then
 				
 				intercept_mouse()
@@ -261,6 +263,10 @@ reaper.Undo_BeginBlock()
 				mouseDownContext = 'me' 
 				reaper.JS_Mouse_SetCursor(reaper.JS_Mouse_LoadCursor(182))
 			end
+		else
+			reaper.JS_WindowMessage_ReleaseAll()
+			mouseDownContext = nil
+
 		end
 
 	elseif reaper.JS_Mouse_GetState(1) == 0 and  patternLeftClick then
@@ -278,7 +284,6 @@ reaper.Undo_BeginBlock()
 		reaper.PreventUIRefresh(-1)
 		patternLeftClick = false
 	
-
 
 	elseif reaper.JS_Mouse_GetState(-1) >= 4 then 
 		reaper.JS_WindowMessage_ReleaseAll()
@@ -304,7 +309,8 @@ reaper.Undo_BeginBlock()
 
 		elseif mouseDownContext ~= 'me' then
 			reaper.JS_WindowMessage_ReleaseAll()
-			
+			mouseDownContext = nil
+
 		end
 
 
@@ -327,9 +333,9 @@ reaper.Undo_BeginBlock()
 		-- Select the hovered-over track again (incase it got deselected)
 		-- Record current track as the last track and get it's name
 		reaper.SetTrackSelected(curTrack, true)
-		lastTrack = curTrack
+		
 		local retval, trackName = reaper.GetTrackName(curTrack)
-		lastTrackName = trackName
+		
 	
 		-----------------------------------
 		--[			Addng Items			]--
@@ -387,7 +393,6 @@ reaper.Undo_BeginBlock()
 
 		elseif reaper.JS_Mouse_GetState(-1) == 2 and not rightClick then 
 			
-
 			rightClick = true
 			mouseDownContext = 'track'
 			store_starting_cursor_pos()
