@@ -418,11 +418,6 @@ function main()
     elseif reaper.JS_Mouse_GetState(1) == 0 and patternLeftClick then
         handle_release_pattern_left_drag()
     elseif reaper.JS_Mouse_GetState(-1) >= 4 then
-        -----------------------------------
-        -----------------------------------
-        --[			Sample Load			]--
-        -----------------------------------
-        -----------------------------------
         -- if the user drags onto the tcp
         reaper.JS_WindowMessage_ReleaseAll()
     elseif window == "tcp" then
@@ -438,11 +433,19 @@ function main()
     -----------------------------------
 
     if reaper.JS_VKeys_GetState(-1):byte(27) == 1 then
+        -- On ESC, stop the script
+        reaper.atexit(on_exit)
+        return
+    elseif reaper.GetToggleCommandState(cmd_ID) == 0 then
+        -- If the toggle state of the command is "OFF", don't run, call atexit
+        -- (This check is needed for Auto-Arm functionality to be able to work right)
         reaper.atexit(on_exit)
         return
     else
+        -- Else just run
         reaper.defer(main)
     end
 end
+
 main()
 reaper.atexit(on_exit)
