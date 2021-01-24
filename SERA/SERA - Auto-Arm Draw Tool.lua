@@ -1,39 +1,54 @@
-local SERA_DRAW_COMMAND_ID = reaper.NamedCommandLookup("_RS038a6e6902fc58765c054f947aba1262f5c094e7")
-is_new_value, filename, section_ID, cmd_ID, mode, resolution, val = reaper.get_action_context()
+-----------------------------------
+--- SCRIPT STATE
+-----------------------------------
 
-state = {
+local SERA_DRAW_COMMAND_ID = reaper.NamedCommandLookup("_RS038a6e6902fc58765c054f947aba1262f5c094e7")
+local is_new_value, filename, section_ID, cmd_ID, mode, resolution, val = reaper.get_action_context()
+
+local state = {
     currently_drawing = false
 }
 
-function init()
+-----------------------------------
+--- SETUP/TEARDOWN HANDLERS
+-----------------------------------
+
+local function init()
     -- Arm toolbar button
     reaper.SetToggleCommandState(section_ID, cmd_ID, 1)
     reaper.RefreshToolbar2(section_ID, cmd_ID)
 end
 
-function on_exit()
+-- TODO: Should we also force-quit the Draw Tool if it's active here?
+-- Stopping the Auto-Arm script with the Draw tool enabled can lead to some funky states
+local function on_exit()
     -- Set toolbar button to off
     reaper.SetToggleCommandState(section_ID, cmd_ID, 0)
     reaper.RefreshToolbar2(section_ID, cmd_ID)
 end
 
-function opposite_drawing_state()
-    currently_drawing = reaper.GetToggleCommandState(SERA_DRAW_COMMAND_ID)
-    if currently_drawing == 0 then
-        return 1
-    elseif currently_drawing == 1 then
-        return 0
+-----------------------------------
+--- HELPER FUNCTIONS
+-----------------------------------
+
+local function set_draw_command_state(toggle_state)
+    -- If the desired toggle state is "on", then we need to run "SERA - Draw Tool.lua"
+    if toggle_state == 1 then
+        reaper.Main_OnCommand(SERA_DRAW_COMMAND_ID, 0)
     end
-end
-
-function set_draw_command_state(state)
-    reaper.Main_OnCommand(SERA_DRAW_COMMAND_ID, 0)
-    reaper.SetToggleCommandState(0, SERA_DRAW_COMMAND_ID, state)
+    -- Update the toolbar and the current state of the draw tool
+    reaper.SetToggleCommandState(0, SERA_DRAW_COMMAND_ID, toggle_state)
     reaper.RefreshToolbar2(0, SERA_DRAW_COMMAND_ID)
+    state.currently_drawing = reaper.GetToggleCommandState(SERA_DRAW_COMMAND_ID)
 end
 
-function main()
+-----------------------------------
+--- MAIN
+-----------------------------------
+
+local function main()
     reaper.PreventUIRefresh(1)
+
     local window, segment, details = reaper.BR_GetMouseCursorContext()
     state.currently_drawing = reaper.GetToggleCommandState(SERA_DRAW_COMMAND_ID)
 
@@ -44,7 +59,9 @@ function main()
             -- If it doesn't have a parent track, it obviously can't belong to a SEQ pattern
             if parent_track == nil then
                 -- Toggle off drawing
-                set_draw_command_state(0)
+                if state.currently_drawing == 1 then
+                    set_draw_command_state(0)
+                end
             end
             -- If it does have a parent track
             if parent_track ~= nil then
@@ -60,6 +77,7 @@ function main()
         end
     end
 
+    -- On ESC, shut off the script
     if reaper.JS_VKeys_GetState(-1):byte(27) == 1 then
         reaper.atexit(on_exit)
         return
@@ -69,6 +87,10 @@ function main()
 
     reaper.PreventUIRefresh(-1)
 end
+
+-----------------------------------
+--- INVOKE
+-----------------------------------
 
 init()
 main()
