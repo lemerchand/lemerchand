@@ -1,4 +1,4 @@
--- @version 1.2.67
+-- @version 1.2.68
 -- @author Lemerchand
 -- @provides
 --    [main=midi_editor] .
@@ -8,6 +8,7 @@
 --    [nomain] preset_actions/preset_template.lua
 --    [nomain] preset_actions/preset_template_time_selection.lua
 -- @changelog
+--    + Hopefully blurriness is gone for retina
 --    + Option to export presets to actions as Time Selection Only (Alt+Shift+Right-click)
 --    + Fixed Default not being default on load
 --    + Added sharp/flat toggle
@@ -16,10 +17,10 @@
 --    + Exported presets now have 'MST_' as a prefix in Actions List
 
 
-local v = " v1.2.67"
+local v = " v1.2.68"
 local name = "MST5K"
 local path = ""
-
+gfx.ext_retina = 1.0
 
 --Load UI Library
 function reaperDoFile(file) local info = debug.getinfo(1,'S'); path = info.source:match[[^@?(.*[\/])[^\/]-$]]; dofile(path .. file); end
