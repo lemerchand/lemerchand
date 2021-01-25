@@ -6,8 +6,6 @@ reaper.ClearConsole()
 
 -- Window Init
 local winwidth, winheight = 450, 400
-local refreshRate = 5
-
 local mousex, mousey = reaper.GetMousePosition()
 gfx.init("ReaCon", winwidth, winheight, false, mousex+50,mousey-200)
 local win = reaper.JS_Window_Find("ReaCon", true)
@@ -25,10 +23,15 @@ local blue = {r=.25, g=.5, b=.9}
 local grey = {r=.41, g=.4, b=.37}
 local yellow = {r=.75, g=.7, b=.3}
 local something = {r=.65, g=.25, b=.35}
+-----------------------------------
 
+
+-----------------------------------
+--[		Create CLI Object		]--
 -----------------------------------
 
 c = CLI:Create()
+
 
 -----------------------------------
 --[				UI				]--
@@ -39,29 +42,13 @@ display = Display:Create(nil, nil, nil, nil)
 display2 = Display:Create(nil, nil, nil, nil)
 
 update_ui()
---------------------------------
+-----------------------------------
 
 -----------------------------------
 --[			Variables			]--
 -----------------------------------
 local exitOnCommand = false
-
-
-
------------------------------------
---[			Functions			]--
------------------------------------
-function update_display()
-	display:ClearLines()
-	if c.prefix then display:AddLine('Prefix: ' .. c.prefix) end
-	if c.trackStr then display:AddLine('Tracks: ' .. c.trackStr) end
-	if c.args then display:AddLine('Args: ' .. c.args) end
-	if c.rop then display:AddLine('ROP: ' .. c.rop) end
-	if c.routing then display:AddLine('Routing ' .. c.routing) end
-
-end
-
-
+local refreshRate = 5
 
 -----------------------------------
 --[			MAIN				]--
@@ -94,38 +81,32 @@ function main()
 		
 		-- if ctrl+backspace or the user clears out the cmd then clear text
 		elseif (char == 8 
-			and gfx.mouse_cap == 04) then 
+			and gfx.mouse_cap == 04) or (cmd.txt == '' and c.engaged) then 
 				cmd.txt = ""
-		
+				c:Reset()
 		--if up arrow
 		elseif char == 30064 then 
-			
 			
 		--if down arrow	
 		elseif char == 1685026670 then
 
-			else --user is typing
-				--if the user presses ctrl+enter then exit after commit
-				if gfx.mouse_cap == 04 
-					and char == 13 then 
-						exitOnCommand = true
+		elseif char ~= 0  then--user is typing
+			--if the user presses ctrl+enter then exit after commit
+			if gfx.mouse_cap == 04 
+				and char == 13 then 
+					exitOnCommand = true
+			end
 
-				end
-
-				-- Send characters to the textfield
-				cmd:Change(char)
-				--update_cmd(char)
-				-- Parse the CLI
-				c:Parse(cmd.txt)
-				update_display()
+			-- Send characters to the textfield
+			cmd:Change(char)
+			-- Parse the CLI
+			c:Parse(cmd.txt)
+			update_cli()
+			update_display()
 		end
 		
-
 		reaper.defer(main)
 	end
-	--
-
-
 
 	-- Handle UI refresh
 	refreshRate = refresh(refreshRate)
