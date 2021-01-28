@@ -437,7 +437,7 @@ function CLI:update_cli()
 		self:Select_secondary_tracks()
 	end
 
-	if cmd.returned then  
+	if cmd.returned and cmd.txt ~= '' then  
 		reaper.PreventUIRefresh(1)
 		reaper.Undo_BeginBlock()
 		table.insert(self.history, 1, cmd.txt)

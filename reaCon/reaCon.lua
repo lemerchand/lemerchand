@@ -16,7 +16,7 @@ local win = reaper.JS_Window_Find("ReaCon", true)
 if win then reaper.JS_Window_AttachTopmostPin(win) end
 
 ----------------------------
---UI Colors-------------
+--UI Colors--------------
 ----------------------------
 
 default = {r=.7, g=.7, b=.7}
@@ -70,7 +70,7 @@ function main()
 	-- Handdle keyboard input
 	local char = gfx.getchar()
 	-- Exit on ESC
-	if char == 27 or exitOnCommand then 
+	if exitOnCommand then 
 		reaper.atexit(exit)
 		return
 	-- Otherwise, handle input and defer 
@@ -112,10 +112,10 @@ function main()
 			c:update_cli()
 			update_display()
 			--dbg(true)
-			log(cmd.cpos)
+			--log(cmd.cpos)
 		
 		end
-		
+		if cmd.leftClick then cmd.active = true end
 		reaper.defer(main)
 	end
 
