@@ -1,3 +1,5 @@
+
+
 Elements = {}
 
 function draw_elements()
@@ -100,6 +102,7 @@ function update_ui()
 	display2.w = mainFrame.w - 20
 	display2.y = display.y + display.h + 20
 	display2.h = cmd.y-5
+
 
 end
 
@@ -368,21 +371,30 @@ function Display:Draw()
 
 	for l = 1, #self.lines.line do
 		
-
+		local splitStr = colorSplit(self.lines.line[l])
 
 		if self.lines.col[l] ~= -1 then manualOffsetX = self.lines.col[l] else manualOffsetX = 0 end
 
 		local lineMod = l%heightCap
 		if lineMod == 0 then lineMod = heightCap end
 
-		gfx.set(self.lines.r[l], self.lines.g[l], self.lines.b[l])
-		gfx.x, gfx.y = self.x + offsetX + manualOffsetX, self.y + lineMod*self.fontSize
-		gfx.drawstr(self.lines.line[l])
 		
+		gfx.x, gfx.y = self.x + offsetX + manualOffsetX, self.y + lineMod*self.fontSize
+		
+		if #splitStr == 0 then 
+			gfx.set(self.lines.r[l], self.lines.g[l], self.lines.b[l])
+			gfx.drawstr(self.lines.line[l])
+		else
+			for t, section in ipairs(splitStr) do
+				gfx.set(section.color.r, section.color.g, section.color.b)
+				gfx.drawstr(section.rstr)
+			end
+		end
+
+
 		if lineMod == heightCap then 
 			offsetX = offsetX + self:GetOffset()
 		end
-
 
 
 	end

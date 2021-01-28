@@ -1,11 +1,15 @@
 function reaperDoFile(file) local info = debug.getinfo(1,'S'); script_path = info.source:match[[^@?(.*[\/])[^\/]-$]]; dofile(script_path .. file); end
 reaperDoFile('ui.lua')
 reaperDoFile('functions.lua')
-
+reaperDoFile('contexts.lua')
 reaper.ClearConsole()
 
 -- Window Init
 local winwidth, winheight = 450, 400
+
+
+windwidth, winheight = load_window_settings()
+
 local mousex, mousey = reaper.GetMousePosition()
 gfx.init("ReaCon", winwidth, winheight, false, mousex+50,mousey-200)
 local win = reaper.JS_Window_Find("ReaCon", true)
@@ -15,14 +19,14 @@ if win then reaper.JS_Window_AttachTopmostPin(win) end
 --UI Colors-------------
 ----------------------------
 
-local default = {r=.7, g=.7, b=.7}
-local white = {r=.8, g=.8, b=.8}
-local red = {r=.7, g=.1, b=.2}
-local green = {r=.2, g=.65, b=.11}
-local blue = {r=.25, g=.5, b=.9}
-local grey = {r=.41, g=.4, b=.37}
-local yellow = {r=.75, g=.7, b=.3}
-local something = {r=.65, g=.25, b=.35}
+default = {r=.7, g=.7, b=.7}
+white = {r=.8, g=.8, b=.8}
+red = {r=.7, g=.1, b=.2}
+green = {r=.2, g=.65, b=.11}
+blue = {r=.25, g=.5, b=.9}
+grey = {r=.41, g=.4, b=.37}
+yellow = {r=.75, g=.7, b=.3}
+something = {r=.65, g=.25, b=.35}
 -----------------------------------
 
 
@@ -32,6 +36,8 @@ local something = {r=.65, g=.25, b=.35}
 
 c = CLI:Create()
 
+c.history = load_file_into_table('history.dat')
+if not c.history then c.history = {} end
 
 -----------------------------------
 --[				UI				]--
@@ -42,6 +48,7 @@ display = Display:Create(nil, nil, nil, nil)
 display2 = Display:Create(nil, nil, nil, nil)
 
 update_ui()
+update_display()
 -----------------------------------
 
 -----------------------------------
@@ -59,6 +66,7 @@ function main()
 	fill_background()
 	draw_elements()
 
+
 	-- Handdle keyboard input
 	local char = gfx.getchar()
 	-- Exit on ESC
@@ -71,7 +79,7 @@ function main()
 		-- if "/" then activate cmd
 		if char == 47 
 			and cmd.active == false then cmd.active = true 
-		
+		elseif gfx.mouse_cap == 5 then dbg()
 		--Undo/redo
 		elseif char == 26 
 			and gfx.mouse_cap == 12 then 
@@ -80,17 +88,17 @@ function main()
 			then reaper.Main_OnCommand(40029, 0)
 		
 		-- if ctrl+backspace or the user clears out the cmd then clear text
-		elseif (char == 8 
-			and gfx.mouse_cap == 04) or (cmd.txt == '' and c.engaged) then 
+		elseif (char == 8 and gfx.mouse_cap == 04) 
+			or (cmd.cpos <=0 and c.engaged) then 
 				cmd.txt = ""
 				c:Reset()
 		--if up arrow
 		elseif char == 30064 then 
-			
+			c:PrevCLI()
 		--if down arrow	
 		elseif char == 1685026670 then
-
-		elseif char ~= 0  then--user is typing
+			c:NextCLI()
+		elseif char ~= 0 then --user is typing
 			--if the user presses ctrl+enter then exit after commit
 			if gfx.mouse_cap == 04 
 				and char == 13 then 
@@ -101,8 +109,11 @@ function main()
 			cmd:Change(char)
 			-- Parse the CLI
 			c:Parse(cmd.txt)
-			update_cli()
+			c:update_cli()
 			update_display()
+			--dbg(true)
+			log(cmd.cpos)
+		
 		end
 		
 		reaper.defer(main)
@@ -110,5 +121,13 @@ function main()
 
 	-- Handle UI refresh
 	refreshRate = refresh(refreshRate)
+	if reaper.JS_Window_GetFocus() == win then 
+		reaper.JS_Window_SetOpacity( win, 'ALPHA',  1) 
+
+	else
+		reaper.JS_Window_SetOpacity(win, 'ALPHA', .84)
+		refreshRate = 50
+	end
 end
 main()
+reaper.Undo_EndBlock('ReaCon Trials', -1)

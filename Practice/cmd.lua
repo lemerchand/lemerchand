@@ -851,12 +851,9 @@ local function update_cmd(char)
 		end
 
 		if C.prefix == "D" then
-			
 			for tr = tracks-1, 0, -1 do
 				if reaper.IsTrackSelected(reaper.GetTrack(0,tr)) then reaper.DeleteTrack(reaper.GetTrack(0, tr)) end
 			end	
-
-
 		end
 
 
