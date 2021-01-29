@@ -18,14 +18,17 @@ if win then reaper.JS_Window_AttachTopmostPin(win) end
 --UI Colors--------------
 ----------------------------
 
-default = {r=.7, g=.7, b=.7}
+default = {r=.75, g=.75, b=.75}
 white = {r=.95, g=.95, b=.95}
 red = {r=.7, g=.1, b=.2}
+orange = {r=1, g=.6, b=0}
+yellow = {r=.75, g=.7, b=.3}
 green = {r=.2, g=.65, b=.11}
 blue = {r=.25, g=.5, b=.9}
-grey = {r=.41, g=.4, b=.37}
-yellow = {r=.75, g=.7, b=.3}
+violet = {r=.5, g=.1, b=.7}
+grey = {r=.41, g=.4, b=.4}
 something = {r=.65, g=.25, b=.35}
+
 -----------------------------------
 
 
@@ -91,7 +94,7 @@ function main()
 		
 		-- if ctrl+backspace or the user clears out the cmd then clear text
 		elseif (char == 8 and gfx.mouse_cap == 04) 
-			or (cmd.cpos <=0 and c.engaged) then 
+			or (cmd.cpos < 0 and c.engaged) then 
 				cmd.txt = ""
 				c:Reset()
 		--if up arrow

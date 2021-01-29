@@ -20,7 +20,7 @@ end
 function main_display()
 	display:ClearLines()
 	display2:ClearLines()
-	display:AddLine('**rThis is** **ywhere** **gI will** **bput some** **sinfo**')
+	display:AddLine('**oThis is** **vwhere** **gI will** **bput some** **sinfo**')
 
 end
 

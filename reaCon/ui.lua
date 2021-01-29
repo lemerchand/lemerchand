@@ -4,15 +4,18 @@ Elements = {}
 ----------------------------
 --Custom Colors-------------
 ----------------------------
+-- default = {r=.75, g=.75, b=.75}
+-- white = {r=.95, g=.95, b=.95}
+-- red = {r=.7, g=.1, b=.2}
+-- orange = {r=1, .6, 0}
+-- yellow = {r=.75, g=.7, b=.3}
+-- green = {r=.2, g=.65, b=.11}
+-- blue = {r=.25, g=.5, b=.9}
+-- violet = {r=.5, g=.1, .6}
+-- grey = {r=.41, g=.4, b=.37}
+-- something = {r=.65, g=.25, b=.35}
 
--- local default = {r=.7, g=.7, b=.7}
--- local white = {r=.8, g=.8, b=.8}
--- local red = {r=.7, g=.1, b=.2}
--- local green = {r=.2, g=.65, b=.11}
--- local blue = {r=.25, g=.5, b=.9}
--- local grey = {r=.41, g=.4, b=.37}
--- local yellow = {r=.75, g=.7, b=.3}
--- local something = {r=.65, g=.25, b=.35}
+
 
 function colorSplit(str)
 	local result = {}
@@ -44,6 +47,8 @@ function get_color_by_letter(c)
 	elseif c == 'e' then return grey
 	elseif c == 'y' then return yellow
 	elseif c == 's' then return something
+	elseif c == 'o' then return orange
+	elseif c == 'v' then return violet
 	else 
 		return default
 	end
@@ -306,6 +311,7 @@ function TextField:Change(char)
 	gfx.setfont(3, self.font, self.fontSize)
 
 	if self.txt == "" then self.cpos = 0 end
+	
 
 	if self.active and char == 1919379572 and self.cpos < string.len(self.txt) then
 		self.cpos = self. cpos + 1
@@ -330,9 +336,10 @@ function TextField:Change(char)
 	end
 
 
-	if self.active and char == 8 and self.cpos > 0 then 
+	if self.active and char == 8 then 
 		self.txt = self.txt:sub(1, self.cpos-1) .. self.txt:sub(self.cpos+1)
 		self.cpos = self.cpos - 1
+		if self.cpos == -1 then self.cpos = 0 end
 	elseif self.active and char == 6579564 then
 		self.txt = self.txt:sub(1, self.cpos) .. self.txt:sub(self.cpos+2)
 	elseif self.active and char == 13 then 
