@@ -1,58 +1,10 @@
-----------------------------
---Custom Colors-------------
-----------------------------
-
--- local default = {r=.7, g=.7, b=.7}
--- local white = {r=.8, g=.8, b=.8}
--- local red = {r=.7, g=.1, b=.2}
--- local green = {r=.2, g=.65, b=.11}
--- local blue = {r=.25, g=.5, b=.9}
--- local grey = {r=.41, g=.4, b=.37}
--- local yellow = {r=.75, g=.7, b=.3}
--- local something = {r=.65, g=.25, b=.35}
-
-function colorSplit(str)
-
-	local result = {}
-	
-	local tmp = str
- -- **ePlay - Winds**
-	while true do
-		local c, t, e = str:match('%*%*(%a)(.-)(%*%*)')
-		if c and t and e then 
-			tmp = str:sub(1, str:find(c)-3)
-			table.insert(result, {color=default, rstr=tmp})
-			table.insert(result, {color=get_color_by_letter(c), rstr=t})
-
-			local ss, se = str:find(t..e)
-			if not se then break end
-			str = str:sub(se+2)
-			
-		else 
-			table.insert(result, {color=default, rstr=str})
-			break
-		end
-	end
-	return result
-end
-
-function get_color_by_letter(c)
-	if c == 'r' then return red 
-	elseif c == 'w' then return white
-	elseif c == 'g' then return green
-	elseif c == 'b' then return blue
-	elseif c == 'e' then return grey
-	elseif c == 'y' then return yellow
-	elseif c == 's' then return something
-	else 
-		return default
-	end
-end
 
 --------------------------------------------------------------------------------------------------------------
 ----------------------------------File Functions----------------------------------------------------------------
 --------------------------------------------------------------------------------------------------------------
+function exitnosave()
 
+end
 function exit()
 	save_window_settings()
 	save_history()
@@ -76,8 +28,13 @@ function load_window_settings()
 		local line = file:read()
 		if not line then break end
 
-		width = line:match('width=(%d+)')
-		height = line:match('height=(%d+)')
+		if line:match('width=(%d+)') then 
+			width = line:match('width=(%d+)') 
+		elseif line:match('height=(%d+)') then
+			height = line:match('height=(%d+)')
+
+		end
+
 
 	end	
 	file:close()
@@ -112,6 +69,11 @@ function load_file_into_table(filename)
 	return t
 end
 
+--------------------------------------------------------------------------------------------------------------
+----------------------------------Debug Functions----------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------
+
+
 function log(txt, clear)
 	if clear then reaper.ClearConsole() end
 	reaper.ShowConsoleMsg('\n' .. tostring(txt))
@@ -125,6 +87,7 @@ function dbg(clear)
 	if c.prefix then
 		log('Prefix: ' ..  c.prefix)
 	end
+	log('Cpos: ' .. cmd.cpos)
 	log('\n\n---------------------------')
 	log('--c.Tracks:')
 	log('----------------------------')
@@ -143,6 +106,7 @@ function dbg(clear)
 	log('\n\n---------------------------')
 	log('--Routing:')
 	log('----------------------------')
+	if c.rop then log('C.rop: ' .. c.rop) end
 	if c.routing then 
 		log(c.secondary.name[1])
 		log('\n\t' .. c.routing)
@@ -152,12 +116,6 @@ function dbg(clear)
 	log('----------------------------')
 
 end
-
---------------------------------------------------------------------------------------------------------------
-----------------------------------MAIN Functions----------------------------------------------------------------
---------------------------------------------------------------------------------------------------------------
-
-
 
 
 --------------------------------------------------------------------------------------------------------------
@@ -301,6 +259,10 @@ function CLI:NextCLI()
 	end
 	cmd.cpos = string.len(cmd.txt)
 end
+
+--------------------------------------------------------------------------------------------------------------
+----------------------------------MAIN Functions----------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------
 function CLI:Parse(txt)
 	
 	--self.engaged = true
@@ -315,15 +277,15 @@ function CLI:Parse(txt)
 	if prefix then trimmed = txt:sub(prefix+1) end
 
 	-- If a routing symbol occurs, split the string (second half)
-	if trimmed:find('[<>]') then 
-		self.rop = trimmed:match('[<>]')
-		trimmedRouting = trimmed:sub(trimmed:find('[<>]')+1)
+	if trimmed:find('[<>%{%}]') then 
+		self.rop = trimmed:match('[<>%{%}]')
+		trimmedRouting = trimmed:sub(trimmed:find('[<>%{%}]')+1)
 	else self.rop = nil
 	end
 	
 	-- If a routing symbol occurs, split string (first half)
 	if trimmedRouting then 
-		trimmed = trimmed:sub(1, trimmed:find('[<>]')-1)
+		trimmed = trimmed:sub(1, trimmed:find('[<>%{%}]')-1)
 	end
 
 	-- Look for the end of tracks
@@ -410,32 +372,45 @@ end
 
 function CLI:update_cli()
 	
+	-- Engage ad store selected tracks
 	if not c.engaged and cmd.txt ~= "" then 
 		c.prevSelectedTracks = store_selected_tracks()
 		c.engaged = true
 	end
 
-	if self.prefix == 't' or self.prefix == 'T'
+	-- Display the right prefix information
+	local p = cmd.txt:sub(1,1)
+	if p == 't' or p == 'T'
 		and (not self.args and not self.rop) then
 			self.context = 'SELECTTRACKS'
-			if self.prefix == 't' then 
+			if p == 't' then 
 				self.exclusive = false
 			else self.exclusive = true 
 			end
 			self:Select_tracks()
-	elseif self.prefix == 'c' then 
-	elseif self.prefix == 'C' then 
-	elseif self.prefix == 'R' then
+	elseif p == 'c'
+		or p == 'C' then  
+			c.context = "CLEAR"
+	elseif p == 'R' then
 		self.context = 'REMOVETRACKS'
 		self:Select_tracks()
-	elseif self.prefix == 'n' then
+	elseif p == 'n' then
 		self.context = 'CREATETRACKS'
 	end	
 
-	if self.rop then
+	-- Display routing and adoption info
+	if self.rop == '<' or self.rop == '>' then
 		self.context = 'SECONDARY'
 		self:Select_secondary_tracks()
+	elseif self.rop == '{' or self.rop == '}' then
+
+		self.context = 'ADOPTION'
+		self:Select_secondary_tracks()
 	end
+
+-----------------------------------
+--[		  User Commited		 	]--
+-----------------------------------
 
 	if cmd.returned and cmd.txt ~= '' then  
 		reaper.PreventUIRefresh(1)
@@ -443,8 +418,8 @@ function CLI:update_cli()
 		table.insert(self.history, 1, cmd.txt)
 		c.historySeek = 0
 
+		-- New tracks
 		if self.prefix == 'n' then 
-
 			--unselect ll tracks
 			reaper.Main_OnCommand(40297, 0)
 			self.newtracks = self:Parse_tracks(self.trackStr)
@@ -463,13 +438,19 @@ function CLI:update_cli()
 			end
 		end
 
+		-- Handle arguments
 		if self.args then 
 			if c.context=="SECONDARY" then select_tracks_from_list(self.tracks.userData) end
 			self:handle_args() 
 		end
 
-		if self.rop then self:handle_routing() 	end
+		-- Handle Routing
+		if self.rop == '<' or self.rop == '>' then self:handle_routing() end
 
+		-- Handle adoption
+		if self.rop == '{' or self.rop == '}' then self:handle_adoption() end
+
+		--Handle everythig else
 		if not self.args and not self.rop then handle_else() end
 
 		
@@ -706,6 +687,24 @@ function CLI:handle_routing()
 	end	
 end
 
+function CLI:handle_adoption()
+	-- unselect all trcks
+	reaper.Main_OnCommand(40297, 0)
+	for i, t in ipairs(c.tracks.userData) do
+		reaper.SetTrackSelected(t, true)
+	end
+	
+	
+	if c.rop == '}' then 
+		
+		reaper.ReorderSelectedTracks(c.secondary.id[1]+1, 1)
+		
+	elseif c.rop == '{' then
+		reaper.ReorderSelectedTracks(c.secondary.id[1], 0)
+	end
+
+end
+
 function handle_else()
 	local tracks = reaper.CountTracks(0)
 
@@ -727,7 +726,7 @@ function handle_else()
 	elseif c.prefix == 'R' then 
 		for tr = tracks-1, 0, -1 do
 			if reaper.IsTrackSelected(reaper.GetTrack(0,tr)) then reaper.DeleteTrack(reaper.GetTrack(0, tr)) end
-		end		
+		end	
 	end
 end
 

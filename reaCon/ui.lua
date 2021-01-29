@@ -1,6 +1,53 @@
 
-
 Elements = {}
+
+----------------------------
+--Custom Colors-------------
+----------------------------
+
+-- local default = {r=.7, g=.7, b=.7}
+-- local white = {r=.8, g=.8, b=.8}
+-- local red = {r=.7, g=.1, b=.2}
+-- local green = {r=.2, g=.65, b=.11}
+-- local blue = {r=.25, g=.5, b=.9}
+-- local grey = {r=.41, g=.4, b=.37}
+-- local yellow = {r=.75, g=.7, b=.3}
+-- local something = {r=.65, g=.25, b=.35}
+
+function colorSplit(str)
+	local result = {}
+	local tmp = str
+	while true do
+		local c, t, e = str:match('%*%*(%a)(.-)(%*%*)')
+		if c and t and e then 
+			tmp = str:sub(1, str:find(c)-3)
+			table.insert(result, {color=default, rstr=tmp})
+			table.insert(result, {color=get_color_by_letter(c), rstr=t})
+
+			local ss, se = str:find(t..e)
+			if not se then break end
+			str = str:sub(se+2)
+			
+		else 
+			table.insert(result, {color=default, rstr=str})
+			break
+		end
+	end
+	return result
+end
+
+function get_color_by_letter(c)
+	if c == 'r' then return red 
+	elseif c == 'w' then return white
+	elseif c == 'g' then return green
+	elseif c == 'b' then return blue
+	elseif c == 'e' then return grey
+	elseif c == 'y' then return yellow
+	elseif c == 's' then return something
+	else 
+		return default
+	end
+end
 
 function draw_elements()
 	for e, element in ipairs(Elements) do
@@ -283,7 +330,7 @@ function TextField:Change(char)
 	end
 
 
-	if self.active and char == 8 then 
+	if self.active and char == 8 and self.cpos > 0 then 
 		self.txt = self.txt:sub(1, self.cpos-1) .. self.txt:sub(self.cpos+1)
 		self.cpos = self.cpos - 1
 	elseif self.active and char == 6579564 then

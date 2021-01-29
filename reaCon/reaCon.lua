@@ -8,8 +8,7 @@ reaper.ClearConsole()
 local winwidth, winheight = 450, 400
 
 
-windwidth, winheight = load_window_settings()
-
+winwidth, winheight = load_window_settings()
 local mousex, mousey = reaper.GetMousePosition()
 gfx.init("ReaCon", winwidth, winheight, false, mousex+50,mousey-200)
 local win = reaper.JS_Window_Find("ReaCon", true)
@@ -20,7 +19,7 @@ if win then reaper.JS_Window_AttachTopmostPin(win) end
 ----------------------------
 
 default = {r=.7, g=.7, b=.7}
-white = {r=.8, g=.8, b=.8}
+white = {r=.95, g=.95, b=.95}
 red = {r=.7, g=.1, b=.2}
 green = {r=.2, g=.65, b=.11}
 blue = {r=.25, g=.5, b=.9}
@@ -73,6 +72,9 @@ function main()
 	if exitOnCommand then 
 		reaper.atexit(exit)
 		return
+	elseif cmd.txt:find('/ns') then
+		reaper.atexit(exitnosave)
+
 	-- Otherwise, handle input and defer 
 	else
 
@@ -98,11 +100,20 @@ function main()
 		--if down arrow	
 		elseif char == 1685026670 then
 			c:NextCLI()
+
+		elseif cmd.txt:find('/dbg') then
+			cmd.txt = cmd.txt:gsub('/dbg', '')
+			cmd.cpos = string.len(cmd.txt)
+			dbg(false)
+
+
 		elseif char ~= 0 then --user is typing
 			--if the user presses ctrl+enter then exit after commit
 			if gfx.mouse_cap == 04 
 				and char == 13 then 
 					exitOnCommand = true
+			elseif char == 8 and cmd.cpos <= 1 then
+				c:Reset()
 			end
 
 			-- Send characters to the textfield
