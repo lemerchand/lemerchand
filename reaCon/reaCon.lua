@@ -144,4 +144,5 @@ function main()
 	end
 end
 main()
+reaper.atexit(exit)
 reaper.Undo_EndBlock('ReaCon Trials', -1)
