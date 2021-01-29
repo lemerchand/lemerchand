@@ -27,7 +27,6 @@ function track_display(tracks)
 
 	local trackCount = reaper.CountTracks(0)
 	for i = 0, trackCount -1 do
-		local r, g, b = default.r, default.g, default.b
 
 		local track = reaper.GetTrack(0, i)
 		if reaper.IsTrackSelected(track) then

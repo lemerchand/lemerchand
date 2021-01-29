@@ -16,7 +16,7 @@ function colorSplit(str)
 	local result = {}
 	
 	local tmp = str
-
+ -- **ePlay - Winds**
 	while true do
 		local c, t, e = str:match('%*%*(%a)(.-)(%*%*)')
 		if c and t and e then 
@@ -25,9 +25,9 @@ function colorSplit(str)
 			table.insert(result, {color=get_color_by_letter(c), rstr=t})
 
 			local ss, se = str:find(t..e)
+			if not se then break end
 			str = str:sub(se+2)
 			
-
 		else 
 			table.insert(result, {color=default, rstr=str})
 			break
