@@ -3,7 +3,9 @@
 -- @about A REAPER command line
 -- @provides
 --    [main] .
---    [nomain] *.lua
+--    [nomain] ui.lua
+--    [nomain] functions.lua
+--    [nomain] contexts.lua
 -- @changelog
 --    + None yet, yeet
 
