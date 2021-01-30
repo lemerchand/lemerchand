@@ -189,9 +189,9 @@ end
 function display_inspect_track()
 	local track = reaper.GetSelectedTrack(0, 0)
 	local trackPan = reaper.GetMediaTrackInfo_Value(track, 'D_PAN')
-	if trackPan == 0 then trackPan = '**g0 **'
-	elseif trackPan < 0 then trackPan = tostring(math.floor((trackPan*100)*-1)) .. 'L'
-	elseif trackPan > 0 then trackPan = tostring(math.floor(trackPan*100)) .. 'R'
+	if trackPan == 0 then trackPan = '**gC **'
+	elseif trackPan < 0 then trackPan = tostring(math.floor((trackPan*100)*-1)) .. '% L'
+	elseif trackPan > 0 then trackPan = tostring(math.floor(trackPan*100)) .. '% R'
 	end	
 	display:AddLine('   **oPan: **' .. trackPan)
 	
