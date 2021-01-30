@@ -1,4 +1,4 @@
--- @version 0.3
+-- @version 0.3.0
 -- @author Lemerchand
 -- @about A REAPER command line
 -- @provides
