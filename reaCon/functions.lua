@@ -1,4 +1,4 @@
-
+-- @noindex
 --------------------------------------------------------------------------------------------------------------
 ----------------------------------File Functions----------------------------------------------------------------
 --------------------------------------------------------------------------------------------------------------
@@ -387,6 +387,9 @@ function CLI:update_cli()
 				self.exclusive = false
 			else self.exclusive = true 
 			end
+			-- Select all tracks
+			-- This is a hacky way around my new parsing algo
+			reaper.Main_OnCommand(40296, 0)
 			self:Select_tracks()
 	elseif p == 'c'
 		or p == 'C' then  
@@ -418,8 +421,13 @@ function CLI:update_cli()
 		table.insert(self.history, 1, cmd.txt)
 		c.historySeek = 0
 
+
+		if cmd.txt == '/su' then
+			c.context = 'SCRIPTUTILS'
+			return 
+
 		-- New tracks
-		if self.prefix == 'n' then 
+		elseif self.prefix == 'n' then 
 			--unselect ll tracks
 			reaper.Main_OnCommand(40297, 0)
 			self.newtracks = self:Parse_tracks(self.trackStr)

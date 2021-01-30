@@ -1,3 +1,12 @@
+-- @version 0.3
+-- @author Lemerchand
+-- @about A REAPER command line
+-- @provides
+--    [main] .
+--    [nomain] *.lua
+-- @changelog
+--    + None yet, yeet
+
 function reaperDoFile(file) local info = debug.getinfo(1,'S'); script_path = info.source:match[[^@?(.*[\/])[^\/]-$]]; dofile(script_path .. file); end
 reaperDoFile('ui.lua')
 reaperDoFile('functions.lua')
@@ -84,7 +93,6 @@ function main()
 		-- if "/" then activate cmd
 		if char == 47 
 			and cmd.active == false then cmd.active = true 
-		elseif gfx.mouse_cap == 5 then dbg()
 		--Undo/redo
 		elseif char == 26 
 			and gfx.mouse_cap == 12 then 

@@ -1,3 +1,7 @@
+-- @noindex
+
+local lastChar = ''
+
 function update_display()
 	if c.context == 'SELECTTRACKS' then
 		track_display(c.tracks)
@@ -13,6 +17,8 @@ function update_display()
 		main_display()
 	elseif c.context == 'CLEAR' then 
 		clear_tracks_display()
+	elseif c.context == 'SCRIPTUTILS' then
+		scriptutils_display()
 	end
 end
 
@@ -181,13 +187,22 @@ function help_tracks()
 end
 
 function display_inspect_track()
-	
 	local track = reaper.GetSelectedTrack(0, 0)
+	local trackPan = reaper.GetMediaTrackInfo_Value(track, 'D_PAN')
+	if trackPan == 0 then trackPan = '**g0 **'
+	elseif trackPan < 0 then trackPan = tostring(math.floor((trackPan*100)*-1)) .. 'L'
+	elseif trackPan > 0 then trackPan = tostring(math.floor(trackPan*100)) .. 'R'
+	end	
+	display:AddLine('   **oPan: **' .. trackPan)
+	
 	local trackSendCount = reaper.GetTrackNumSends(track, 0)
 	local trackReceiveCount = reaper.GetTrackNumSends(track, -1)
+	if trackSendCount == 0 and trackSendCount == 0 then return end
+	
+	if trackSendCount == 0 then goto receives end
 	-- SENDS
 	display:AddLine('')
-	display:AddLine('   Sends: ' .. trackSendCount, yellow.r, yellow.g, yellow.b)
+	display:AddLine('   **oSends:** ' .. trackSendCount)
 	for i = 0, trackSendCount - 1 do
 		local send =  reaper.GetTrackSendInfo_Value( track, 0, i, 'P_DESTTRACK' )
 		local ret, sendName = reaper.GetTrackName(send)
@@ -196,37 +211,65 @@ function display_inspect_track()
 		local sendSMChan = math.floor(reaper.BR_GetSetTrackSendInfo(track, 0, i, 'I_MIDI_SRCCHAN', false, 0))
 		local sendDMChan = math.floor(reaper.BR_GetSetTrackSendInfo(track, 0, i, 'I_MIDI_DSTCHAN', false, 0))
 
-
-		display:AddLine('      ' .. i+1 .. '. ' .. sendName)
-		display:AddLine('          Audio: ' ..sendSChan .. ' : ' .. sendDChan)
+		display:AddLine('      **b' .. i+1 .. '. ' .. sendName .. '**')
+		if sendSChan ~= -1 and sendDChan ~= -1 then
+			display:AddLine('          Audio: ' ..sendSChan .. ' : ' .. sendDChan)
+		end	
 		
+		if sendSMChan == 0 then sendSMChan = 'A' end
+		if sendDMChan == 0 then sendDMChan = 'A' end
 		display:AddLine('          MIDI:  ' .. sendSMChan .. ' : ' .. sendDMChan)
 		display:AddLine('')
 	end
 
+	::receives::
 	-- RECEIVES
-
-	display:AddLine('   Receives: ' .. trackReceiveCount, yellow.r, yellow.g, yellow.b)
+	if trackReceiveCount == 0 then return end
+	display:AddLine('   **oReceives:** ' .. trackReceiveCount, yellow.r, yellow.g, yellow.b)
 	for i = 0, trackReceiveCount - 1 do
-		local rec =  reaper.GetTrackSendInfo_Value( track, -1, i, 'P_DESTTRACK' )
+		local rec =  reaper.GetTrackSendInfo_Value( track, -1, i, 'P_SRCTRACK' )
 		local ret, recName = reaper.GetTrackName(rec)
 		local recDChan = math.floor(reaper.GetTrackSendInfo_Value(track, -1, i, 'I_DSTCHAN')+1)
 		local recSChan = math.floor(reaper.GetTrackSendInfo_Value(track, -1, i, 'I_SRCCHAN')+1)
 		local recSMChan = math.floor(reaper.BR_GetSetTrackSendInfo(track, -1, i, 'I_MIDI_SRCCHAN', false, 0))
 		local recDMChan = math.floor(reaper.BR_GetSetTrackSendInfo(track, -1, i, 'I_MIDI_DSTCHAN', false, 0))
 
-
-		display:AddLine('      ' .. i+1 .. '. ' .. recName)
-		display:AddLine('          Audio: ' ..recSChan .. ' : ' .. recDChan)
+		display:AddLine('      **b' .. i+1 .. '. ' .. recName .. '**')
+		if recSChan ~= -1 and recDChan ~= -1 then 
+			display:AddLine('          Audio: ' ..recSChan .. ' : ' .. recDChan)
+		end
 		
+		if recSMChan == 0 then recSMChan = 'A' end
+		if recDMChan == 0 then recDMChan = 'A' end
 		display:AddLine('          MIDI:  ' .. recSMChan .. ' : ' .. recDMChan)
 		display:AddLine('')
 	end
-
-
-
 end
 
+
+function scriptutils_display()
+		
+		display:ClearLines()
+		display2:ClearLines()
+		local window, segment, details = reaper.BR_GetMouseCursorContext()
+		local char = gfx.getchar()
+		local mouse = reaper.JS_Mouse_GetState(-1)
+		display:AddLine("**yScripting Utilities**")
+		display:AddLine('')								
+		display:AddLine("**bMouse Cap:** " .. mouse)
+		display:AddLine("**bLast Character:** " .. lastChar )
+		display2:AddLine("**sPress** **w'ESC'** **sto return**")
+		if char ~= 0 and char ~= lastChar then lastChar = char end
+		if char == 27 then 
+			
+			cmd.txt = ''
+			cmd.active = true
+			c.context = 'MAIN' 
+			update_display()
+		else
+			reaper.defer(scriptutils_display)
+		end
+end
 
 
 function intends_to_mute()
