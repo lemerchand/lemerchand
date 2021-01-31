@@ -576,8 +576,10 @@ function CLI:handle_args()
 	elseif self.args:find("B") then set_sel_track_params('I_FXEN', -1, true)
 	end
 
+	-- Toggle show/hide FX
 	if c.args:find('f') then reaper.Main_OnCommand(reaper.NamedCommandLookup('_S&M_TOGLFXCHAIN'), 0) end
 	
+
 	--Look for custom color 
 	if c.args:find("c") then 
 		local color = ""
@@ -716,7 +718,6 @@ end
 function handle_else()
 	local tracks = reaper.CountTracks(0)
 
-	if cmd.txt == 'dbg'then dbg() end
 
 	if cmd.txt == "C" then
 		for i = 0, tracks - 1 do

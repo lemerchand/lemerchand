@@ -188,6 +188,7 @@ end
 
 function display_inspect_track()
 	local track = reaper.GetSelectedTrack(0, 0)
+	-- Pan
 	local trackPan = reaper.GetMediaTrackInfo_Value(track, 'D_PAN')
 	if trackPan == 0 then trackPan = '**gC **'
 	elseif trackPan < 0 then trackPan = tostring(math.floor((trackPan*100)*-1)) .. '% L'
@@ -195,6 +196,19 @@ function display_inspect_track()
 	end	
 	display:AddLine('   **oPan: **' .. trackPan)
 	
+	-- Rec mode
+	local recInput = reaper.GetMediaTrackInfo_Value(track, 'I_RECINPUT')
+	if recInput == 1024 then 
+		recInput = 'Stereo'
+	elseif recInput == 6112 then recInput = '**bMIDI:** All'
+	elseif recInput >= 6113 and recInput <= 6128 then 
+		recInput = '**bMIDI:** ' .. math.floor(recInput-6112)
+	else recInput = '**bMono:** ' .. math.floor(recInput + 1)
+	end
+	display:AddLine('   **oInput: **')
+	display:AddLine('      ' .. recInput)
+
+	-- Sends
 	local trackSendCount = reaper.GetTrackNumSends(track, 0)
 	local trackReceiveCount = reaper.GetTrackNumSends(track, -1)
 	if trackSendCount == 0 and trackSendCount == 0 then return end
@@ -244,6 +258,13 @@ function display_inspect_track()
 		display:AddLine('          MIDI:  ' .. recSMChan .. ' : ' .. recDMChan)
 		display:AddLine('')
 	end
+
+	local notes =  reaper.NF_GetSWSTrackNotes( track )
+	display:AddLine('**oNotes: **')
+	for line in notes:gmatch('[^\n]+') do
+		display:AddLine('   ' .. line)
+	end
+
 end
 
 
