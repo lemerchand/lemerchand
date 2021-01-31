@@ -1,4 +1,4 @@
--- @version 1.2.68
+-- @version 1.2.71
 -- @author Lemerchand
 -- @provides
 --    [main=midi_editor] .
@@ -8,19 +8,15 @@
 --    [nomain] preset_actions/preset_template.lua
 --    [nomain] preset_actions/preset_template_time_selection.lua
 -- @changelog
---    + Hopefully blurriness is gone for retina
---    + Option to export presets to actions as Time Selection Only (Alt+Shift+Right-click)
---    + Fixed Default not being default on load
---    + Added sharp/flat toggle
---    + Improved behavior on Preset Overwrite
---    + Updating no longer overwrites user's settings
---    + Exported presets now have 'MST_' as a prefix in Actions List
+--    + Refocus midi editor after selection
+--    + Removed Retina code until I can scale things
 
 
-local v = " v1.2.68"
+
+local v = " v1.2.71"
 local name = "MST5K"
 local path = ""
-gfx.ext_retina = 1.0
+--gfx.ext_retina = 1.0
 
 --Load UI Library
 function reaperDoFile(file) local info = debug.getinfo(1,'S'); path = info.source:match[[^@?(.*[\/])[^\/]-$]]; dofile(path .. file); end
@@ -336,7 +332,11 @@ function main()
 	-------------------------------
 	--SELECT BUTTON----------------
 	-------------------------------
-	if btn_select.leftClick  or char == 13 then select_notes(true, false, sldr_minVel.value, sldr_maxVel.value, ib_minNote.value, ib_maxNote.value, sldr_timeThreshold.value) end
+
+	if btn_select.leftClick  
+		or char == 13 then 
+			select_notes(true, false, sldr_minVel.value, sldr_maxVel.value, ib_minNote.value, ib_maxNote.value, sldr_timeThreshold.value) end
+
 	if btn_select.rightClick or gfx.mouse_cap == 8 and char == 13 then select_notes(true,true, sldr_minVel.value, sldr_maxVel.value, ib_minNote.value, ib_maxNote.value, sldr_timeThreshold.value) end
 	if btn_select.shiftLeftClick then
 		select_notes(true, false, sldr_minVel.value, sldr_maxVel.value, ib_minNote.value, ib_maxNote.value, sldr_timeThreshold.value)

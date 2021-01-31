@@ -399,8 +399,9 @@ function select_notes(clear, time_selection_select, minVel, maxVel, minNote, max
 	end
 
 
-
 	reaper.MIDI_Sort(take)
+	local activeME = reaper.MIDIEditor_GetActive()
+	reaper.JS_Window_SetFocus(activeME)
 end
 
 function set_from_selected(get_min_pitch, get_max_pitch, get_min_vel, get_max_vel, get_pitches, sldr_minVel, sldr_maxVel, ib_minNote, ib_maxNote)
