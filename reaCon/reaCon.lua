@@ -76,7 +76,8 @@ local refreshRate = 5
 
 function main()
 	-- Draw the UI
-	fill_background()
+	--fill_background()
+	gfx.clear = 3092271
 	draw_elements()
 
 
