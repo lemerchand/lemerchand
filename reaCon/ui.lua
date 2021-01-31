@@ -127,7 +127,8 @@ end
 function refresh(refresh)
 	if refresh == 0 then 
 		update_ui()
-		return 5
+		update_display()
+		return 10
 	else
 		return refresh -1
 	end
@@ -155,7 +156,30 @@ function update_ui()
 	display2.y = display.y + display.h + 20
 	display2.h = cmd.y-5
 
+	editor.x = mainFrame.x + 1
+	editor.y = mainFrame.y + 30
+	editor.w = mainFrame.w - 1
+	editor.h = display2.y - 35
 
+	
+	if c.context == 'TEXTEDITOR' then
+		c.subcontext = 'NONE'
+		btn_editNotes.y = mainFrame.y
+		btn_editNotes.txt = 'Save & Close'
+		btn_editNotes.hide = false
+		editor.hide = false
+		cmd.active = false
+		editor.active = true
+	elseif c.subcontext == 'INSPECTTRACK' then 
+		btn_editNotes.txt = 'Edit Notes'
+		btn_editNotes.x = mainFrame.w-100
+		btn_editNotes.y = display2.y-22
+		btn_editNotes.hide = false
+	else
+		editor.active = false
+		editor.hide = true
+		btn_editNotes.hide = true
+	end
 end
 
 
@@ -512,3 +536,326 @@ function Display:Reset()
 
 end
 ----------------------------------END: Display------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------
+----------------------------------CLASS: BUTTON---------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------
+Button = {}
+Button.__index = Button
+
+function Button:Create(x, y, txt, w, h, font, fontSize,hide)
+
+	if font == nil then gfx.setfont(16, "Lucida Console", 12, 'b') end
+
+	if w == nil then 
+		ww,hh = gfx.measurestr(txt)
+		w = ww + 19
+	end
+
+	if h == nil then 
+		ww,hh = gfx.measurestr(txt)
+		h = hh + 17
+	end
+
+	local this = {
+		x = x or 10,
+		y = y or 10,
+		txt = txt or "Button",
+		w=w or 30,
+		h=h or 30,
+		mouseOver = false,
+		mouseDown = false,
+		leftClick = false,
+		rightClick = false,
+		middleClick = false,
+		ctrlLeftClick = false,
+		ctrlRightClick = false,
+		shiftLeftClick = false,
+		shiftRightClick = false,
+		altLeftClick = false,
+		altRightClick = false,
+		hide = hide or false,
+		font = "Lucida Console",
+		fontSize = fontSize or 12
+	}
+	setmetatable(this, Button)
+	table.insert(Elements, this)
+	return this
+end
+
+function Button:ResetClicks()
+
+	self.leftClick = false
+	self.rightClick = false
+	self.middleClick = false
+	self.ctrlLeftClick = false
+	self.ctrlRightClick = false
+	self.shiftLeftClick = false
+	self.shiftRightClick = false
+	self.altLeftClick = false
+	self.altRightClick = false
+
+end
+
+function Button:Draw()
+
+	self:ResetClicks()
+	if self.hide then return end
+
+	gfx.setfont(16, self.font, self.fontSize, 'b')
+
+	draw_border(self.x, self.y, self.w, self.h)
+	gfx.x, gfx.y = self.x, self.y
+
+	if self.mouseDown == true then
+
+		gfx.set(.24,.24,.24,1)
+		gfx.rect(self.x+1,self.y+1,self.w-2,self.h-2, true)
+
+	elseif self.mouseOver then 
+
+		gfx.set(.31,.31,.31,1)
+		gfx.rect(self.x+1,self.y+1,self.w-2,self.h-2, true)
+
+	elseif self.mouseOver == false then
+
+		gfx.set(.27,.27,.27,1)
+		gfx.rect(self.x+1,self.y+1,self.w-2,self.h-2, true)
+
+	end
+
+	gfx.set(.7,.7,.7,1)
+	gfx.drawstr(self.txt, 1 | 4, self.w+self.x, self.h+self.y+3)
+
+	if hovering(self.x, self.y, self.w, self.h) then 
+		
+		self.mouseOver = true 
+		if gfx.mouse_cap >= 1 and self.mouseDown == false then 
+			
+			if gfx.mouse_cap == 4 or gfx.mouse_cap == 8 or gfx.mouse_cap == 16 then self.mouse_down = false
+			else
+				self.mouseDown = true
+				if gfx.mouse_cap == 1 then self.leftClick = true
+				elseif gfx.mouse_cap == 2 then self.rightClick = true
+				elseif gfx.mouse_cap == 5 then self.ctrlLeftClick = true
+				elseif gfx.mouse_cap == 9 then self.shiftLeftClick = true
+				elseif gfx.mouse_cap == 10 then self.shiftRightClick = true	
+				elseif gfx.mouse_cap == 17 then self.altLeftClick = true
+				elseif gfx.mouse_cap == 18 then self.altRightClick = true
+				elseif gfx.mouse_cap == 64 then self.middleClick = true
+				
+				end
+			end
+		elseif gfx.mouse_cap == 0 and self.mouseDown == true then
+			self.mouseDown = false
+		end
+	else
+		self.mouseOver = false
+		self.mouseDown = false
+	end
+end
+
+function Button:Reset()
+
+end
+-------------------------------------------END: BUTTON--------------------------------------------------------
+
+
+--------------------------------------------------------------------------------------------------------------
+----------------------------------CLASS: TEXT EDITOR-----------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------
+
+
+TextEditor = {}
+TextEditor.__index = TextEditor
+
+function TextEditor:Create(x,y, w, h, txt, active, multiline)
+
+	if font == nil then gfx.setfont(1, "Lucida Console", 13) end
+
+	if w == nil then 
+		ww,hh = gfx.measurestr(txt)
+		w = ww + 19
+	end
+
+	if h == nil then 
+		ww,hh = gfx.measurestr(txt)
+		h = hh + 17
+	end
+
+	local this = {
+		x = x or 10,
+		y = y or 10,
+		w = w,
+		h = h,
+		fontSize = fontSize or 12,
+		r = r or .7,
+		g = g or .7,
+		b = b or .7,
+		font = font or "Lucida Console",
+		hide = hide or false,
+		active = active or false,
+		hover = false,
+		multiline = multiline or true,
+		alwaysActive = false,
+		returned = false,
+		cposx = 0,
+		cposy = 1,
+		lines = {''},
+		blink = 0
+
+	}
+
+	setmetatable(this, TextEditor)
+	table.insert(Elements, this)
+	return this
+end
+
+function TextEditor:Draw()
+	self:ResetClicks()
+	if self.hide then return end
+
+	draw_border(self.x-1, self.y-1, self.w+2, self.h+2)
+	draw_border(self.x,self.y, self.w,self.h)
+	draw_border(self.x+1, self.y+1,self.w-2,self.h-2, .22,.22,.22, true)
+
+	gfx.x, gfx.y = self.x+5, self.y+5
+	gfx.set(self.r, self.g, self.b, 1)
+	gfx.setfont(1, self.font, self.fontSize)
+	
+	local txtlen = string.len(self.lines[self.cposy])
+	local charwidth = gfx.measurestr("-")
+
+
+	if self.active  and self.blink <= 15 then 
+		gfx.x = self.x+5 + (self.cposx * charwidth)
+		gfx.y = self.y + self.cposy * (self.fontSize + 2)
+		gfx.drawstr( "-")
+		self.blink = self.blink + 1
+	elseif self.active and  self.blink <=30 then
+		gfx.x = self.x+10 + (self.cposx * charwidth)
+		gfx.drawstr( " ")
+		self.blink = self.blink + 1
+	else
+		gfx.x = self.x+10 + (self.cposx * charwidth)
+		gfx.drawstr( "")
+		self.blink = 1
+	end
+
+	gfx.x, gfx.y = self.x+5, self.y+5
+	for l, line in ipairs(self.lines) do
+		gfx.drawstr(line)
+		gfx.x = self.x + 5
+		gfx.y = gfx.y + self.fontSize+2
+	end
+
+
+
+	if hovering(self.x, self.y, self.w, self.h) then
+		self.hover = true
+		if gfx.mouse_cap == 1 then self.leftClick = true
+			elseif gfx.mouse_cap == 2 then self.rightClick = true
+			elseif gfx.mouse_cap == 5 then self.ctrlLeftClick = true
+			elseif gfx.mouse_cap == 9 then self.shiftLeftClick = true
+			elseif gfx.mouse_cap == 10 then self.shiftRightClick = true	
+			elseif gfx.mouse_cap == 17 then self.altLeftClick = true
+			elseif gfx.mouse_cap == 18 then self.altRightClick = true
+			elseif gfx.mouse_cap == 64 then self.middleClick = true
+		end
+
+	else
+		self.hover = false
+		if gfx.mouse_cap == 1 or gfx.mouse_cap == 2 then self.active = false end
+	end
+
+end
+
+function TextEditor:Change(char)
+	gfx.setfont(3, self.font, self.fontSize)
+
+	if self.lines[self.cposy] == "" then self.cposx = 0 end
+	
+
+	if self.active and char == 1919379572 
+		and self.cposx < string.len(self.lines[self.cposy]) then
+		self.cposx = self. cposx + 1
+	elseif self.active and char == 1818584692 and self.cposx >=1 then
+		self.cposx = self.cposx - 1
+	elseif self.active 
+		and char == 6647396 then self.cposx = string.len(self.lines[self.cposy])
+	elseif self.active and char == 1752132965 then self.cposx = 0
+	-- if up arrow
+	elseif char == 30064 and self.cposy > 1 then 
+		self.cposy = self.cposy - 1
+	--if down arrow	
+	elseif char == 1685026670 and self.cposy < #self.lines then
+		self.cposy = self.cposy + 1
+	end
+
+
+	if self.active and gfx.measurestr(self.lines[self.cposy]) + self.x <= self.w-10 then
+		if char >= 33 and char <= 126 then 
+
+			self.lines[self.cposy] = self.lines[self.cposy]:sub(1,self.cposx) .. string.char(char) .. self.lines[self.cposy]:sub(self.cposx+1)
+
+			--self.lines[self.cposy] = self.lines[self.cposy] .. string.char(char) 
+			self.cposx = self.cposx + 1
+		elseif char == 32 then 
+			self.lines[self.cposy] = self.lines[self.cposy]:sub(1, self.cposx) .. " " .. self.lines[self.cposy]:sub(self.cposx+1)
+			self.cposx = self.cposx + 1
+		end
+	end
+
+
+	if self.active and char == 8 then
+		if self.cposx == 0 then 
+			self.cposx = string.len(self.lines[self.cposy-1])
+			self.lines[self.cposy-1] = self.lines[self.cposy-1] .. self.lines[self.cposy]
+			table.remove(self.lines, self.cposy)
+			self.cposy = self.cposy - 1
+
+		else
+			self.lines[self.cposy] = self.lines[self.cposy]:sub(1, self.cposx-1) .. self.lines[self.cposy]:sub(self.cposx+1)
+			self.cposx = self.cposx - 1
+		end
+	elseif self.active and char == 6579564 then
+		if self.cposx == string.len(self.lines[self.cposy]) then
+			self.lines[self.cposy] = self.lines[self.cposy] .. self.lines[self.cposy+1] 
+			table.remove(self.lines, self.cposy+1)
+		else
+			self.lines[self.cposy] = self.lines[self.cposy]:sub(1, self.cposx) .. self.lines[self.cposy]:sub(self.cposx+2)
+		end
+	elseif self.active and char == 13 then 
+		table.insert(self.lines, self.cposy+1, self.lines[self.cposy]:sub(self.cposx+1))
+		self.lines[self.cposy] = self.lines[self.cposy]:sub(1, self.cposx)
+		self.cposy = self.cposy + 1
+		self.cposx = 0
+	end
+
+
+	-- if the cursor x is longer than the current line
+	if self.cposx > string.len(self.lines[self.cposy]) then
+		self.cposx = string.len(self.lines[self.cposy])
+	end
+
+
+
+end
+
+
+function TextEditor:ResetClicks()
+
+	self.leftClick = false
+	self.rightClick = false
+	self.middleClick = false
+	self.ctrlLeftClick = false
+	self.ctrlRightClick = false
+	self.shiftLeftClick = false
+	self.shiftRightClick = false
+	self.altLeftClick = false
+	self.altRightClick = false
+
+end
+
+function TextEditor:Reset()
+
+end

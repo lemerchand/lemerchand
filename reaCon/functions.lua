@@ -159,6 +159,7 @@ function CLI:Create()
 		engaged = false,
 		candidates = {},
 		context = 'MAIN',
+		subcontext = 'NONE',
 		exclusive = false,
 		newtracks = {},
 		history = {},
@@ -202,6 +203,7 @@ function CLI:Reset()
 	self.engaged = false
 	self.candidates = {}
 	self.context = 'MAIN'
+	self.subcontext = 'NONE'
 	self.exclusive = false
 	self.historySeek = 0
 end
@@ -381,7 +383,8 @@ function CLI:update_cli()
 	-- Display the right prefix information
 	local p = cmd.txt:sub(1,1)
 	if p == 't' or p == 'T'
-		and (not self.args and not self.rop) then
+		and (not self.args and not self.rop) 
+		and self.context ~= 'TEXTEDITOR' then
 			self.context = 'SELECTTRACKS'
 			if p == 't' then 
 				self.exclusive = false
@@ -393,7 +396,7 @@ function CLI:update_cli()
 			self:Select_tracks()
 	elseif p == 'c'
 		or p == 'C' then  
-			c.context = "CLEAR"
+			self.context = "CLEAR"
 	elseif p == 'R' then
 		self.context = 'REMOVETRACKS'
 		self:Select_tracks()

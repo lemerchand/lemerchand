@@ -108,7 +108,12 @@ function track_display(tracks)
 		end
 	end
 
-if reaper.CountSelectedTracks(0) == 1 then display_inspect_track() end
+	if reaper.CountSelectedTracks(0) == 1 then 
+		c.subcontext = 'INSPECTTRACK'
+		display_inspect_track() 
+	else
+		c.subcontext = 'NONE'
+	end
 
 	-- Help Display
 	if c.context == 'SELECTTRACKS'
@@ -187,6 +192,7 @@ function help_tracks()
 end
 
 function display_inspect_track()
+
 	local track = reaper.GetSelectedTrack(0, 0)
 	-- Pan
 	local trackPan = reaper.GetMediaTrackInfo_Value(track, 'D_PAN')
@@ -211,7 +217,7 @@ function display_inspect_track()
 	-- Sends
 	local trackSendCount = reaper.GetTrackNumSends(track, 0)
 	local trackReceiveCount = reaper.GetTrackNumSends(track, -1)
-	if trackSendCount == 0 and trackSendCount == 0 then return end
+	if trackSendCount == 0 and trackSendCount == 0 then goto notes end
 	
 	if trackSendCount == 0 then goto receives end
 	-- SENDS
@@ -238,7 +244,7 @@ function display_inspect_track()
 
 	::receives::
 	-- RECEIVES
-	if trackReceiveCount == 0 then return end
+	if trackReceiveCount == 0 then goto notes end
 	display:AddLine('   **oReceives:** ' .. trackReceiveCount, yellow.r, yellow.g, yellow.b)
 	for i = 0, trackReceiveCount - 1 do
 		local rec =  reaper.GetTrackSendInfo_Value( track, -1, i, 'P_SRCTRACK' )
@@ -259,12 +265,14 @@ function display_inspect_track()
 		display:AddLine('')
 	end
 
+	::notes::
 	local notes =  reaper.NF_GetSWSTrackNotes( track )
-	display:AddLine('**oNotes: **')
+	display:AddLine('   **oNotes: **')
 	for line in notes:gmatch('[^\n]+') do
-		display:AddLine('   ' .. line)
+		display:AddLine('      ' .. line)
 	end
 
+	
 end
 
 
@@ -290,6 +298,26 @@ function scriptutils_display()
 		else
 			reaper.defer(scriptutils_display)
 		end
+end
+
+function text_editor_display()
+
+
+
+end
+
+function load_track_notes(track)
+	local trackNotes = reaper.NF_GetSWSTrackNotes(track)
+	editor.lines = {}
+	for line in trackNotes:gmatch('[^\n]+') do
+		table.insert(editor.lines, line)
+	end 
+	if #editor.lines == 0 then editor.lines[1] = '' end
+end
+
+function save_track_notes(track)
+	local str = table.concat(editor.lines)
+	reaper.NF_SetSWSTrackNotes(track, str)
 end
 
 

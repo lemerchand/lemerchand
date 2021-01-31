@@ -17,7 +17,7 @@ reaper.ClearConsole()
 
 -- Window Init
 local winwidth, winheight = 450, 400
-
+local wasUnfocused = false
 
 winwidth, winheight = load_window_settings()
 local mousex, mousey = reaper.GetMousePosition()
@@ -56,9 +56,20 @@ if not c.history then c.history = {} end
 --[				UI				]--
 -----------------------------------
 mainFrame = Frame:Create(nil, nil, nil, nil)
+
+-- Regular display
 cmd = TextField:Create(nil, nil, nil, nil, '', true, false)
 display = Display:Create(nil, nil, nil, nil)
 display2 = Display:Create(nil, nil, nil, nil)
+
+
+-- Inspection display
+btn_editNotes = Button:Create(nil, nil,'Edit Notes')
+btn_editNotes.hide = true
+
+-- Text editor display
+editor = TextEditor:Create(nil, nil, nil, nil, '', false)
+editor.hide = true
 
 update_ui()
 update_display()
@@ -68,7 +79,7 @@ update_display()
 --[			Variables			]--
 -----------------------------------
 local exitOnCommand = false
-local refreshRate = 5
+local refreshRate = 10
 
 -----------------------------------
 --[			MAIN				]--
@@ -80,6 +91,20 @@ function main()
 	gfx.clear = 3092271
 	draw_elements()
 
+	-- Handle alternate conexts
+	if c.context == 'TEXTEDITOR' then 
+		text_editor_display()
+	end
+
+	-- Handle button clicks
+	if btn_editNotes.leftClick and c.subcontext == 'INSPECTTRACK' then
+		load_track_notes(reaper.GetSelectedTrack(0, 0))
+		c.context = 'TEXTEDITOR'
+		c.subcontext = 'NONE'
+	elseif btn_editNotes.leftClick and c.context == 'TEXTEDITOR' then
+		save_track_notes(reaper.GetSelectedTrack(0, 0))
+		c.context = 'SELECTTRACKS'
+	end
 
 	-- Handdle keyboard input
 	local char = gfx.getchar()
@@ -93,8 +118,13 @@ function main()
 	-- Otherwise, handle input and defer 
 	else
 
+		-- If the text editor is active then it steals keystrokes
+		if editor.active then 
+			editor:Change(char)
+			
+
 		-- if "/" then activate cmd
-		if char == 47 
+		elseif char == 47 
 			and cmd.active == false then cmd.active = true 
 		--Undo/redo
 		elseif char == 26 
@@ -122,6 +152,11 @@ function main()
 
 
 		elseif char ~= 0 then --user is typing
+			if not reaper.JS_Window_Find( 'ReaCon', true ) then 
+				reaper.atexit(exit)
+			return end
+
+
 			--if the user presses ctrl+enter then exit after commit
 			if gfx.mouse_cap == 04 
 				and char == 13 then 
@@ -136,8 +171,8 @@ function main()
 			c:Parse(cmd.txt)
 			c:update_cli()
 			update_display()
-			--dbg(true)
-			--log(cmd.cpos)
+			-- dbg(true)
+			--log(c.context)
 		
 		end
 		if cmd.leftClick then cmd.active = true end
@@ -146,12 +181,15 @@ function main()
 
 	-- Handle UI refresh
 	refreshRate = refresh(refreshRate)
-	if reaper.JS_Window_GetFocus() == win then 
-		reaper.JS_Window_SetOpacity( win, 'ALPHA',  1) 
-
+	if reaper.JS_Window_GetFocus() == win then
+		if wasUnfocused then 
+			reaper.JS_Window_SetOpacity( win, 'ALPHA',  1) 
+			wasUnfocused = false
+		end
 	else
 		reaper.JS_Window_SetOpacity(win, 'ALPHA', .84)
 		refreshRate = 50
+		wasUnfocused = true
 	end
 end
 main()
