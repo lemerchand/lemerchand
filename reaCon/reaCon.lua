@@ -66,6 +66,11 @@ display2 = Display:Create(nil, nil, nil, nil)
 -- Inspection display
 btn_editNotes = Button:Create(nil, nil,'Edit Notes')
 btn_editNotes.hide = true
+btn_editNotes.border = false
+
+btn_cancel = Button:Create(nil, nil, 'Cancel')
+btn_cancel.hide = true
+btn_cancel.border = false
 
 -- Text editor display
 editor = TextEditor:Create(nil, nil, nil, nil, '', false)
@@ -91,19 +96,26 @@ function main()
 	gfx.clear = 3092271
 	draw_elements()
 
-	-- Handle alternate conexts
+	-- Handle alternate views
 	if c.context == 'TEXTEDITOR' then 
 		text_editor_display()
+		if btn_editNotes.leftClick  then
+				save_track_notes(reaper.GetSelectedTrack(0, 0))
+				c.context = 'SELECTTRACKS'
+		elseif btn_cancel.leftClick then 
+			c.subcontext = 'NONE'
+			c.context = 'SELECTTRACKS'
+			
+		end
 	end
 
 	-- Handle button clicks
 	if btn_editNotes.leftClick and c.subcontext == 'INSPECTTRACK' then
-		load_track_notes(reaper.GetSelectedTrack(0, 0))
+		local track = reaper.GetSelectedTrack(0, 0)
+		local ret, trackName = reaper.GetTrackName(track)
+		load_track_notes(track)
 		c.context = 'TEXTEDITOR'
-		c.subcontext = 'NONE'
-	elseif btn_editNotes.leftClick and c.context == 'TEXTEDITOR' then
-		save_track_notes(reaper.GetSelectedTrack(0, 0))
-		c.context = 'SELECTTRACKS'
+		c.subcontext = '**yTrack Notes: ** '.. trackName
 	end
 
 	-- Handdle keyboard input

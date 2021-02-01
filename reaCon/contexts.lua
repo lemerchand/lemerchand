@@ -302,6 +302,8 @@ end
 
 function text_editor_display()
 
+	display:ClearLines()
+	display:AddLine(c.subcontext)
 
 
 end
@@ -316,7 +318,7 @@ function load_track_notes(track)
 end
 
 function save_track_notes(track)
-	local str = table.concat(editor.lines)
+	local str = table.concat(editor.lines, '\n')
 	reaper.NF_SetSWSTrackNotes(track, str)
 end
 

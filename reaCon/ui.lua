@@ -159,26 +159,37 @@ function update_ui()
 	editor.x = mainFrame.x + 1
 	editor.y = mainFrame.y + 30
 	editor.w = mainFrame.w - 1
-	editor.h = display2.y - 35
+	editor.h = mainFrame.h - 30
 
+
+	btn_editNotes.x = mainFrame.x + mainFrame.w - btn_editNotes.w
+	btn_editNotes.y = mainFrame.y+1
+
+	btn_cancel.x = btn_editNotes.x - btn_cancel.w
+	btn_cancel.y = btn_editNotes.y
 	
 	if c.context == 'TEXTEDITOR' then
-		c.subcontext = 'NONE'
-		btn_editNotes.y = mainFrame.y
-		btn_editNotes.txt = 'Save & Close'
+		btn_editNotes.txt = 'Save/Close'
 		btn_editNotes.hide = false
-		editor.hide = false
+		btn_cancel.hide = false
+
 		cmd.active = false
 		editor.active = true
+
+		editor.hide = false
+		cmd.hide = true
+		display2.hide = true
+
 	elseif c.subcontext == 'INSPECTTRACK' then 
 		btn_editNotes.txt = 'Edit Notes'
-		btn_editNotes.x = mainFrame.w-100
-		btn_editNotes.y = display2.y-22
 		btn_editNotes.hide = false
 	else
 		editor.active = false
 		editor.hide = true
+		btn_cancel.hide = true
 		btn_editNotes.hide = true
+		display2.hide = false
+		cmd.hide = false
 	end
 end
 
@@ -575,7 +586,8 @@ function Button:Create(x, y, txt, w, h, font, fontSize,hide)
 		altRightClick = false,
 		hide = hide or false,
 		font = "Lucida Console",
-		fontSize = fontSize or 12
+		fontSize = fontSize or 12,
+		border = true
 	}
 	setmetatable(this, Button)
 	table.insert(Elements, this)
@@ -603,7 +615,7 @@ function Button:Draw()
 
 	gfx.setfont(16, self.font, self.fontSize, 'b')
 
-	draw_border(self.x, self.y, self.w, self.h)
+	if self.border then draw_border(self.x, self.y, self.w, self.h) end
 	gfx.x, gfx.y = self.x, self.y
 
 	if self.mouseDown == true then
@@ -722,13 +734,14 @@ function TextEditor:Draw()
 	gfx.set(self.r, self.g, self.b, 1)
 	gfx.setfont(1, self.font, self.fontSize)
 	
+	self:CheckBoundries()
 	local txtlen = string.len(self.lines[self.cposy])
 	local charwidth = gfx.measurestr("-")
 
 
 	if self.active  and self.blink <= 15 then 
 		gfx.x = self.x+5 + (self.cposx * charwidth)
-		gfx.y = self.y + self.cposy * (self.fontSize + 2)
+		gfx.y = self.y + self.cposy * (self.fontSize +2)-2
 		gfx.drawstr( "-")
 		self.blink = self.blink + 1
 	elseif self.active and  self.blink <=30 then
@@ -749,10 +762,14 @@ function TextEditor:Draw()
 	end
 
 
-
 	if hovering(self.x, self.y, self.w, self.h) then
 		self.hover = true
 		if gfx.mouse_cap == 1 then self.leftClick = true
+			self.cposx = math.floor((gfx.mouse_x-self.x) / (charwidth)) -1
+			self.cposy = math.floor((gfx.mouse_y-self.y) / (self.fontSize))
+			--log('x: ' .. self.cposx .. ' -- y: ' .. self.cposy)
+			self:CheckBoundries()
+
 			elseif gfx.mouse_cap == 2 then self.rightClick = true
 			elseif gfx.mouse_cap == 5 then self.ctrlLeftClick = true
 			elseif gfx.mouse_cap == 9 then self.shiftLeftClick = true
@@ -774,24 +791,66 @@ function TextEditor:Change(char)
 
 	if self.lines[self.cposy] == "" then self.cposx = 0 end
 	
-
-	if self.active and char == 1919379572 
-		and self.cposx < string.len(self.lines[self.cposy]) then
-		self.cposx = self. cposx + 1
-	elseif self.active and char == 1818584692 and self.cposx >=1 then
-		self.cposx = self.cposx - 1
-	elseif self.active 
-		and char == 6647396 then self.cposx = string.len(self.lines[self.cposy])
+	local lineLen = string.len(self.lines[self.cposy])
+	local lastLine = #self.lines
+	-- Right arrows
+	if self.active and char == 1919379572 then
+		if self.cposx == lineLen and self.cposy ~= lastLine then 
+			self.cposx = 0
+			self.cposy = self.cposy + 1
+		elseif self.cposx < lineLen then
+			self.cposx = self. cposx + 1
+		end
+	-- Left arrow
+	elseif self.active and char == 1818584692 then
+		if self.cposx == 0 and self.cposy ~= 1 then
+			self.cposx = string.len(self.lines[self.cposy-1])
+			self.cposy = self.cposy - 1
+		elseif self.cposx > 0 then  
+			self.cposx = self.cposx - 1
+		end
+	--End	
+	elseif self.active 	and char == 6647396 then 
+		self.cposx = lineLen
+	--Home
 	elseif self.active and char == 1752132965 then self.cposx = 0
-	-- if up arrow
-	elseif char == 30064 and self.cposy > 1 then 
+	-- Up arrow
+	elseif self.active and char == 30064 and self.cposy > 1 then 
 		self.cposy = self.cposy - 1
-	--if down arrow	
-	elseif char == 1685026670 and self.cposy < #self.lines then
+	-- Down arrow	
+	elseif self.active and char == 1685026670 and self.cposy < #self.lines then
 		self.cposy = self.cposy + 1
+	-- Backspace
+	elseif self.active and char == 8 then
+		if self.cposx == 0 and self.cposy ~= 1 then 
+			self.cposx = string.len(self.lines[self.cposy-1])
+			self.lines[self.cposy-1] = self.lines[self.cposy-1] .. self.lines[self.cposy]
+			table.remove(self.lines, self.cposy)
+			self.cposy = self.cposy - 1
+		else
+			self.lines[self.cposy] = self.lines[self.cposy]:sub(1, self.cposx-1) .. self.lines[self.cposy]:sub(self.cposx+1)
+			self.cposx = self.cposx - 1
+		end
+	-- Delete
+	elseif self.active and char == 6579564 then
+		-- If there is nthing to delete
+		if self.cposy == #self.lines 
+			and self.cposx == lineLen  then 
+		elseif self.cposx == lineLen then
+			self.lines[self.cposy] = self.lines[self.cposy] .. self.lines[self.cposy+1] 
+			table.remove(self.lines, self.cposy+1)
+		else
+			self.lines[self.cposy] = self.lines[self.cposy]:sub(1, self.cposx) .. self.lines[self.cposy]:sub(self.cposx+2)
+		end
+	-- Return
+	elseif self.active and char == 13 then 
+		table.insert(self.lines, self.cposy+1, self.lines[self.cposy]:sub(self.cposx+1))
+		self.lines[self.cposy] = self.lines[self.cposy]:sub(1, self.cposx)
+		self.cposy = self.cposy + 1
+		self.cposx = 0
 	end
 
-
+	-- Typing
 	if self.active and gfx.measurestr(self.lines[self.cposy]) + self.x <= self.w-10 then
 		if char >= 33 and char <= 126 then 
 
@@ -805,42 +864,24 @@ function TextEditor:Change(char)
 		end
 	end
 
+	self:CheckBoundries()
 
-	if self.active and char == 8 then
-		if self.cposx == 0 then 
-			self.cposx = string.len(self.lines[self.cposy-1])
-			self.lines[self.cposy-1] = self.lines[self.cposy-1] .. self.lines[self.cposy]
-			table.remove(self.lines, self.cposy)
-			self.cposy = self.cposy - 1
-
-		else
-			self.lines[self.cposy] = self.lines[self.cposy]:sub(1, self.cposx-1) .. self.lines[self.cposy]:sub(self.cposx+1)
-			self.cposx = self.cposx - 1
-		end
-	elseif self.active and char == 6579564 then
-		if self.cposx == string.len(self.lines[self.cposy]) then
-			self.lines[self.cposy] = self.lines[self.cposy] .. self.lines[self.cposy+1] 
-			table.remove(self.lines, self.cposy+1)
-		else
-			self.lines[self.cposy] = self.lines[self.cposy]:sub(1, self.cposx) .. self.lines[self.cposy]:sub(self.cposx+2)
-		end
-	elseif self.active and char == 13 then 
-		table.insert(self.lines, self.cposy+1, self.lines[self.cposy]:sub(self.cposx+1))
-		self.lines[self.cposy] = self.lines[self.cposy]:sub(1, self.cposx)
-		self.cposy = self.cposy + 1
-		self.cposx = 0
+end
+function TextEditor:CheckBoundries()
+	-- if the cursor x/y is longer than the current line
+	if self.cposy > #self.lines then
+		self.cposy = #self.lines
 	end
+	
+	if self.cposy < 1 then self.cposy = 1 end
 
-
-	-- if the cursor x is longer than the current line
 	if self.cposx > string.len(self.lines[self.cposy]) then
 		self.cposx = string.len(self.lines[self.cposy])
 	end
 
-
+	if self.cposx < 0 then self.cposx = 0 end
 
 end
-
 
 function TextEditor:ResetClicks()
 
