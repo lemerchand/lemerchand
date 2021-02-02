@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Scripts by Lemerchand" commit="3d5ded8b339ee3651992d96b09cf927d47d7cb6b">
+<index version="1" name="Scripts by Lemerchand" commit="9efbe04d1d5e3048251475c4857d1a89dc8120cb">
   <category name="ItemTray">
     <reapack name="itemtray.lua" type="script">
       <version name="0.4b" author="Lemerchand" time="2021-01-10T16:44:05Z">
@@ -492,6 +492,13 @@
         <source file="ui.lua">https://github.com/lemerchand/lemerchand/raw/3d5ded8b339ee3651992d96b09cf927d47d7cb6b/reaCon/ui.lua</source>
         <source file="functions.lua">https://github.com/lemerchand/lemerchand/raw/3d5ded8b339ee3651992d96b09cf927d47d7cb6b/reaCon/functions.lua</source>
         <source file="contexts.lua">https://github.com/lemerchand/lemerchand/raw/3d5ded8b339ee3651992d96b09cf927d47d7cb6b/reaCon/contexts.lua</source>
+      </version>
+      <version name="0.3.3" author="Lemerchand" time="2021-02-02T18:37:14Z">
+        <changelog><![CDATA[+ Began working on tracknotes]]></changelog>
+        <source main="main">https://github.com/lemerchand/lemerchand/raw/9efbe04d1d5e3048251475c4857d1a89dc8120cb/reaCon/reaCon.lua</source>
+        <source file="ui.lua">https://github.com/lemerchand/lemerchand/raw/9efbe04d1d5e3048251475c4857d1a89dc8120cb/reaCon/ui.lua</source>
+        <source file="functions.lua">https://github.com/lemerchand/lemerchand/raw/9efbe04d1d5e3048251475c4857d1a89dc8120cb/reaCon/functions.lua</source>
+        <source file="contexts.lua">https://github.com/lemerchand/lemerchand/raw/9efbe04d1d5e3048251475c4857d1a89dc8120cb/reaCon/contexts.lua</source>
       </version>
     </reapack>
   </category>
