@@ -1,4 +1,4 @@
--- @version 0.3.2
+-- @version 0.3.3
 -- @author Lemerchand
 -- @about A REAPER command line
 -- @provides
@@ -7,7 +7,7 @@
 --    [nomain] functions.lua
 --    [nomain] contexts.lua
 -- @changelog
---    + None yet, yeet
+--    + Began working on tracknotes
 
 function reaperDoFile(file) local info = debug.getinfo(1,'S'); script_path = info.source:match[[^@?(.*[\/])[^\/]-$]]; dofile(script_path .. file); end
 reaperDoFile('ui.lua')
@@ -105,7 +105,7 @@ function main()
 		elseif btn_cancel.leftClick then 
 			c.subcontext = 'NONE'
 			c.context = 'SELECTTRACKS'
-			
+
 		end
 	end
 
