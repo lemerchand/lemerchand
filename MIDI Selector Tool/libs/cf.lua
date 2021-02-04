@@ -1,5 +1,5 @@
 --@noindex
---Returns the index of the note under mouse cursor
+
 
 function save_on_exit(path, sharp)
 	local file = io.open(path .. 'soe.dat', 'w')
@@ -183,13 +183,13 @@ function get_settings(path, filename, beatPresets)
 		file = io.open(path .. filename, 'r')
 		io.input(file)
 	end
-	local dockOnStart = file:read()
-	local floatAtPos = file:read()
-	local floatAtPosX = file:read()
-	local floatAtPosY = file:read()
-	local floatAtMouse = file:read()
-	local floatAtMouseX = file:read()
-	local floatAtMouseY = file:read()
+	local dockOnStart = 	file:read()
+	local floatAtPos = 		file:read()
+	local floatAtPosX = 	tonumber(file:read())
+	local floatAtPosY = 	tonumber(file:read())
+	local floatAtMouse = 	file:read()
+	local floatAtMouseX = 	tonumber(file:read())
+	local floatAtMouseY = 	tonumber(file:read())
 	
 	for i=1, 16 do
 		b = file:read()
@@ -211,7 +211,7 @@ function set_settings(filename, dockOnStart, floatAtPos, floatAtPosX, floatAtPos
 	file:write(floatAtPosY.."\n")
 	file:write(floatAtMouse.."\n")
 	file:write(floatAtMouseX.."\n")
-	file:write(floatAtMouseY)
+	file:write(floatAtMouseY .. '\n')
 	file:close()
 end
 

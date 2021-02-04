@@ -1,4 +1,4 @@
--- @version 1.2.71
+-- @version 1.2.73
 -- @author Lemerchand
 -- @provides
 --    [main=midi_editor] .
@@ -13,7 +13,7 @@
 
 
 
-local v = " v1.2.71"
+local v = " v1.2.73"
 local name = "MST5K"
 local path = ""
 --gfx.ext_retina = 1.0
@@ -49,7 +49,7 @@ local function update_settings(path, filename)
 		window_yPos = mouse_y + floatAtMouseY
 	end
 end
-update_settings(path, '/lament.config')
+update_settings(path, 'lament.config')
 
 
 local presets = get_presets(path) 
@@ -489,7 +489,8 @@ function main()
 		end
 		if pp.shiftRightClick then
 			save_beat_preset(path .. 'lament.config', group_beatsToggles, p)
-			update_settings(path .. 'lament.config')
+			update_settings(path, 'lament.config')
+			
 		end
 	end
 
