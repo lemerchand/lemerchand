@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Scripts by Lemerchand" commit="9efbe04d1d5e3048251475c4857d1a89dc8120cb">
+<index version="1" name="Scripts by Lemerchand" commit="5bb6425b3cce243d99137983741356b5a6bf7453">
   <category name="ItemTray">
     <reapack name="itemtray.lua" type="script">
       <version name="0.4b" author="Lemerchand" time="2021-01-10T16:44:05Z">
@@ -417,6 +417,17 @@
         <source file="default_lament.config">https://github.com/lemerchand/lemerchand/raw/3d5ded8b339ee3651992d96b09cf927d47d7cb6b/MIDI%20Selector%20Tool/default_lament.config</source>
         <source file="preset_actions/preset_template.lua">https://github.com/lemerchand/lemerchand/raw/3d5ded8b339ee3651992d96b09cf927d47d7cb6b/MIDI%20Selector%20Tool/preset_actions/preset_template.lua</source>
         <source file="preset_actions/preset_template_time_selection.lua">https://github.com/lemerchand/lemerchand/raw/3d5ded8b339ee3651992d96b09cf927d47d7cb6b/MIDI%20Selector%20Tool/preset_actions/preset_template_time_selection.lua</source>
+      </version>
+      <version name="1.2.73" author="Lemerchand" time="2021-02-04T11:56:43Z">
+        <changelog><![CDATA[+ Refocus midi editor after selection
++ Removed Retina code until I can scale things]]></changelog>
+        <source main="midi_editor">https://github.com/lemerchand/lemerchand/raw/5bb6425b3cce243d99137983741356b5a6bf7453/MIDI%20Selector%20Tool/MIDI%20Selector%20Tool.lua</source>
+        <source file="presets/Default Preset.dat">https://github.com/lemerchand/lemerchand/raw/5bb6425b3cce243d99137983741356b5a6bf7453/MIDI%20Selector%20Tool/presets/Default%20Preset.dat</source>
+        <source file="libs/cf.lua">https://github.com/lemerchand/lemerchand/raw/5bb6425b3cce243d99137983741356b5a6bf7453/MIDI%20Selector%20Tool/libs/cf.lua</source>
+        <source file="libs/gui.lua">https://github.com/lemerchand/lemerchand/raw/5bb6425b3cce243d99137983741356b5a6bf7453/MIDI%20Selector%20Tool/libs/gui.lua</source>
+        <source file="default_lament.config">https://github.com/lemerchand/lemerchand/raw/5bb6425b3cce243d99137983741356b5a6bf7453/MIDI%20Selector%20Tool/default_lament.config</source>
+        <source file="preset_actions/preset_template.lua">https://github.com/lemerchand/lemerchand/raw/5bb6425b3cce243d99137983741356b5a6bf7453/MIDI%20Selector%20Tool/preset_actions/preset_template.lua</source>
+        <source file="preset_actions/preset_template_time_selection.lua">https://github.com/lemerchand/lemerchand/raw/5bb6425b3cce243d99137983741356b5a6bf7453/MIDI%20Selector%20Tool/preset_actions/preset_template_time_selection.lua</source>
       </version>
     </reapack>
   </category>
