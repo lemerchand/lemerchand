@@ -483,7 +483,7 @@ and increase their y (relative to the buttons above)
 		btn_closeMEWs.y = btn_add.y
 
 		tgl_pencil.x = btn_closeMEWs.x + btn_closeMEWs.w + 5
-		tgl_pencil.y = btn_add.y
+		tgl_penicil.y = btn_add.y
 
 		frm_settings.x = tgl_settings.x + tgl_settings.w - 45
 		frm_settings.w = 500
