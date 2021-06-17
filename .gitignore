@@ -1,4 +1,6 @@
 *.dat
 *.config
+*.conf
+/*.conf
 /*.config
 /*.dat
