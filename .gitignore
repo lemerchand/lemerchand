@@ -1,6 +1,11 @@
 *.dat
 *.config
 *.conf
+*.swp
+*./swp
+*.~
+/*.~
 /*.conf
 /*.config
 /*.dat
+
