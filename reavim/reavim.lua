@@ -52,15 +52,16 @@ function load_keybindings()
 end
 
 function ex_commands(cmds)
-    for cmd in cmds do
+    for i, cmd in ipairs(cmds) do
         reaper.ShowConsoleMsg(cmd)
+        reaper.Main_OnCommand(cmd, 0)
+        
     end
 end
 
 function check_cmds(q)
-    for i, cmd in ipairs(kb) do
-        reaper.ShowConsoleMsg(cmd[1])
-        --if q == cmd[1] then ex_commands(cmd[2]) end
+    for k, v in pairs(kb) do
+        if q == v[1] then ex_commands(v[2][1]) end
     end
 
 end
@@ -72,7 +73,6 @@ function init()
 end
 
 init()
-local cmd = ''
 
 function main()
     -- Draw the UI
@@ -96,4 +96,3 @@ function main()
 
 end
 
-main()
