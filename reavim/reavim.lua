@@ -1,16 +1,20 @@
+reaper.ClearConsole()
+local start_time = reaper.time_precise()
+
 function reaperDoFile(file)
     local info = debug.getinfo(1,'S'); script_path = info.source:match[[^@?(.*[\/])[^\/]-$]]; dofile(script_path .. file); 
 end
 reaperDoFile('ui.lua')
 
-winwidth, winheight = 500, 250
+winwidth, winheight = 1, 1
 local mousex, mousey = reaper.GetMousePosition()
-gfx.init("reavim", winwidth, winheight, false, mousex+50,mousey-200)
+gfx.init("reavim", winwidth, winheight, false, 1, 1)
 local win = reaper.JS_Window_Find("reavim", true)
-if win then reaper.JS_Window_AttachTopmostPin(win) end
+-- if win then reaper.JS_Window_AttachTopmostPin(win) end
+
 
 local dbg = true
-local timeout = 20
+local timeout = .135
 local kb = {}
 
 function default_settings()
@@ -53,7 +57,7 @@ end
 
 function ex_commands(cmds)
     for i, cmd in ipairs(cmds) do
-        reaper.ShowConsoleMsg(cmd)
+        -- reaper.ShowConsoleMsg(cmd)
         reaper.Main_OnCommand(cmd, 0)
         
     end
@@ -76,21 +80,22 @@ init()
 
 function main()
     -- Draw the UI
-    --fill_background()
+    
     gfx.clear = 3092271
     draw_elements()
-    char = gfx.getchar()
+    local char = gfx.getchar()
+    -- local char = reaper.JS_VKeys_GetState(start_time)
     if char ~= 0 then 
         cmd = cmd .. string.char(char)
     end
-    if timeout == 0 or char == 27 then
+    current_time = reaper.time_precise()
+    if (current_time - timeout >= start_time) or char == 27 then
         
         check_cmds(cmd)
         reaper.atexit()
         return
     else
-        timeout = timeout - 1
-        gfx.drawstr(timeout)
+         
         reaper.defer(main)
     end   
 

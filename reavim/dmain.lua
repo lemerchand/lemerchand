@@ -2,6 +2,5 @@ cmd = 'd'
 function reaperDoFile(file)
     local info = debug.getinfo(1,'S'); script_path = info.source:match[[^@?(.*[\/])[^\/]-$]]; dofile(script_path .. file); 
 end
-reaperDoFile('ui.lua')
 reaperDoFile('reavim.lua')
 main()
