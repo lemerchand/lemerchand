@@ -3,6 +3,7 @@
 *.conf
 *.swp
 *./swp
+*-kbs*
 *~
 /*~
 /*.conf
