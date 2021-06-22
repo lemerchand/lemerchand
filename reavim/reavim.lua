@@ -1,22 +1,13 @@
 reaper.ClearConsole()
 local start_time = reaper.time_precise()
 local last_focused =  reaper.JS_Window_GetFocus()
-
+local last_char = cmd
 
 function reaperDoFile(file)
     local info = debug.getinfo(1,'S'); script_path = info.source:match[[^@?(.*[\/])[^\/]-$]]; dofile(script_path .. file); 
 end
-reaperDoFile('ui.lua')
 
-winwidth, winheight = 1, 1
-local mousex, mousey = reaper.GetMousePosition()
-gfx.init("reavim", winwidth, winheight, false, 1, 1)
-local win = reaper.JS_Window_Find("reavim", true)
--- if win then reaper.JS_Window_AttachTopmostPin(win) end
-
-
-local dbg = true
-local timeout = .135
+local timeout = .155
 local kb = {
     main = {},
     midi = {}
@@ -26,14 +17,13 @@ function con(str)
     reaper.ShowConsoleMsg('\n' .. tostring(str))
 end
 
-con(reaper.JS_Window_GetTitle(last_focused))
 function default_settings()
     file = io.open(script_path ..'settings.conf', 'w')
     file:close()
 end
 
 function default_keybindings()
-    file = io.open(script_path .. cmd .. '-kbs.conf', 'w')
+    file = io.open(script_path .. 'confs/' .. cmd .. '-kbs.conf', 'w')
     file:close()
 end
 
@@ -46,10 +36,10 @@ function load_settings()
 end
 
 function load_keybindings()
-    local file = io.open(script_path .. cmd .. '-kbs.conf', 'r')
+    local file = io.open(script_path .. 'confs/' .. cmd .. '-kbs.conf', 'r')
     if file == nil then
         default_keybindings()
-        file = io.open(script_path .. cmd .. '-kbs.conf', 'r' )
+        file = io.open(script_path .. 'confs/' .. cmd .. '-kbs.conf', 'r' )
     end
 
     for line in file:lines() do
@@ -75,64 +65,87 @@ function load_keybindings()
 end
 
 function ex_commands(cmds)
+    reaper.PreventUIRefresh(1)
+    local midi = false
     for i, cmd in ipairs(cmds) do
         if cmd:sub(1,1) == 'm' then 
-            local midi = true
+            midi = true
             cmd = cmd:sub(2)
         end
-        if type(cmd) == "string" then 
+
+        if cmd:sub(1,1) == '_' then
             cmd = reaper.NamedCommandLookup(cmd)
         end
+
         if midi then 
-            reaper.MIDIEditor_OnCommand(reaper.MIDIEditor_GetActive, cmd)
+            reaper.MIDIEditor_OnCommand(reaper.MIDIEditor_GetActive(), cmd)
         else
             reaper.Main_OnCommand(cmd, 0)
         end
-
+    -- con(cmd)
     end
+    reaper.PreventUIRefresh(-1)
 end
 
 function check_cmds(q)
     lf_str = reaper.JS_Window_GetTitle(last_focused)
     if lf_str == 'trackview' then list = kb.main 
     elseif lf_str == 'midiview' then list = kb.midi
-        con('mididididid')
+    else list = kb.main
     end
-    for k, v in pairs(kb.main) do
-        con(v[1])
+    for k, v in pairs(list) do
         if q == v[1] then ex_commands(v[2][1]) end
     end
 
 end
 
 function init()
+    local intercept_level = reaper.JS_VKeys_Intercept(-1, 0)
+    reaper.JS_VKeys_Intercept(-1, - intercept_level)
     load_settings()
     load_keybindings()
+    reaper.JS_VKeys_Intercept(-1, 1)    
 
+end
+
+function onexit()
+    reaper.JS_VKeys_Intercept(-1, -1)    
+end
+
+function get_char()
+    local char = reaper.JS_VKeys_GetState(-1)    
+    for i = 1, 255 do
+        if char:byte(i) ~= 0 then 
+            return i+32
+        end
+    end
+    return nil 
 end
 
 init()
 
 function main()
-    -- Draw the UI
+    char = get_char()
+    if char == nil then  
+        last_char = ''
+    else
+        char = string.char(char):lower() 
+        if char ~= last_char then 
+            cmd = cmd .. char 
+            last_char = char
+            timeout = timeout + .250
 
-    gfx.clear = 3092271
-    draw_elements()
-    local char = gfx.getchar()
-    -- local char = reaper.JS_VKeys_GetState(start_time)
-    if char ~= 0 then 
-        cmd = cmd .. string.char(char)
+        end
     end
-    current_time = reaper.time_precise()
-    if (current_time - timeout >= start_time) or char == 27 then
 
+    current_time = reaper.time_precise()
+
+    if (current_time - timeout >= start_time) or char == 27 then
         check_cmds(cmd)
-        reaper.atexit()
+        reaper.atexit(onexit)
         return
     else
-
         reaper.defer(main)
     end   
-
 end
 
