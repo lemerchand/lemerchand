@@ -7,7 +7,7 @@ function reaperDoFile(file)
     local info = debug.getinfo(1,'S'); script_path = info.source:match[[^@?(.*[\/])[^\/]-$]]; dofile(script_path .. file); 
 end
 
-local timeout = .155
+local timeout = .255
 local kb = {
     main = {},
     midi = {}
