@@ -36,7 +36,7 @@ Then run the script (ie, press `Q`). Multikey will generate a file under `Bindin
 
 ```
 --Q Quantize items to grid
-main: 40316
+main: q 40316
 ```
 
 The `--` is a comment and is optional, although it's probably a good idea to keep track of your bindings. Besides, in the future I may use them to display a bindings list in GUI form. `main:` 
@@ -44,5 +44,5 @@ The `--` is a comment and is optional, although it's probably a good idea to kee
 What if we want to add the same keybinding to the MIDI Editor but for quantizing notes to the grid? In this case we just preface the MIDI Editor action with and `m` to let Multikey know it's meant to run a MIDI Editor action:
 ```
 -- Quantize events to grid
-midi: qq m40728
+midi: q m40728
 ```
