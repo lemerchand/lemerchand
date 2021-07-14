@@ -23,14 +23,14 @@ I have various split actions bound to `x`
 What about binding multiple actions to one key sequence? We can do that too!
 - RC - Enable click and begin recording
 - RCC - Enable click and countin and begin recording
-- CE - Copy item and move edit cursor to it's right edge (maybe you want to immediatley paste it, I don't know!)
+- CE - Copy item and move edit cursor to it's right edge (maybe you want to immediately paste it, I don't know!)
 
 
 ## Caveats
 It's all still in beta, and even when it isn't, one prerequisite will be being comfortable with editing configuration files.
 
 ## Setup
-In order for Multikey to know what key invoked it, it is necessary to have a separate script for each first key. These are in the `Keyscripts` folder and contain mini-scripts that you bind to the first key stroke. They then call the main script and look through the following keypresses. For example, if you wanted to bind quantizatino actions to `Q` you would go into the Action List and bind 'q-Multikey-Script.lua` to `Q.`
+In order for Multikey to know what key invoked it, it is necessary to have a separate script for each first key. These are in the `Keyscripts` folder and contain mini-scripts that you bind to the first key stroke. They then call the main script and look through the following key presses. For example, if you wanted to bind quantization actions to `Q` you would go into the Action List and load/bind 'q-Multikey-Script.lua` to `Q.`
 
 Then run the script (ie, press `Q`). Multikey will generate a file under `Bindings` called `q-Multikey-Bindings.conf.` In this file we define our keybindings. Let's look up 'Quantize Item Positionss to Grid' in the Actions List. Then in the conf file we might put:
 
@@ -41,7 +41,8 @@ main: 40316
 
 The `--` is a comment and is optional, although it's probably a good idea to keep track of your bindings. Besides, in the future I may use them to display a bindings list in GUI form. `main:` 
 
-
+What if we want to add the same keybinding to the MIDI Editor but for quantizing notes to the grid? In this case we just preface the MIDI Editor action with and `m` to let Multikey know it's meant to run a MIDI Editor action:
+```
 -- Quantize events to grid
 midi: qq m40728
 ```
