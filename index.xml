@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Scripts by Lemerchand" commit="3a50eeb617de638e5b8533faae2da0e1ad263d12">
+<index version="1" name="Scripts by Lemerchand" commit="882d4bcb76a484fc77f9ac559763da947f437307">
   <category name="ItemTray">
     <reapack name="itemtray.lua" type="script">
       <version name="0.4b" author="Lemerchand" time="2021-01-10T16:44:05Z">
@@ -445,6 +445,35 @@
 + Assess stamina after each keystroke (prevent uneccesary waiting) 
 + Catch modifer keys]]></changelog>
         <source main="main">https://github.com/lemerchand/lemerchand/raw/3a50eeb617de638e5b8533faae2da0e1ad263d12/multikey/multikey.lua</source>
+      </version>
+      <version name="1.061" author="Lemerchand" time="2021-07-15T04:48:28Z">
+        <changelog><![CDATA[+ Create debugging function
++ Assess stamina after each keystroke (prevent uneccesary waiting) 
++ Catch modifer keys]]></changelog>
+        <source main="main">https://github.com/lemerchand/lemerchand/raw/882d4bcb76a484fc77f9ac559763da947f437307/multikey/multikey.lua</source>
+        <source file="bindings/dummyfile.dum">https://github.com/lemerchand/lemerchand/raw/882d4bcb76a484fc77f9ac559763da947f437307/multikey/bindings/dummyfile.dum</source>
+        <source file="keyscripts/a-Multikey-Script.lua">https://github.com/lemerchand/lemerchand/raw/882d4bcb76a484fc77f9ac559763da947f437307/multikey/keyscripts/a-Multikey-Script.lua</source>
+        <source file="keyscripts/b-Multikey-Script.lua">https://github.com/lemerchand/lemerchand/raw/882d4bcb76a484fc77f9ac559763da947f437307/multikey/keyscripts/b-Multikey-Script.lua</source>
+        <source file="keyscripts/c-Multikey-Script.lua">https://github.com/lemerchand/lemerchand/raw/882d4bcb76a484fc77f9ac559763da947f437307/multikey/keyscripts/c-Multikey-Script.lua</source>
+        <source file="keyscripts/d-Multikey-Script.lua">https://github.com/lemerchand/lemerchand/raw/882d4bcb76a484fc77f9ac559763da947f437307/multikey/keyscripts/d-Multikey-Script.lua</source>
+        <source file="keyscripts/e-Multikey-Script.lua">https://github.com/lemerchand/lemerchand/raw/882d4bcb76a484fc77f9ac559763da947f437307/multikey/keyscripts/e-Multikey-Script.lua</source>
+        <source file="keyscripts/f-Multikey-Script.lua">https://github.com/lemerchand/lemerchand/raw/882d4bcb76a484fc77f9ac559763da947f437307/multikey/keyscripts/f-Multikey-Script.lua</source>
+        <source file="keyscripts/g-Multikey-Script.lua">https://github.com/lemerchand/lemerchand/raw/882d4bcb76a484fc77f9ac559763da947f437307/multikey/keyscripts/g-Multikey-Script.lua</source>
+        <source file="keyscripts/h-Multikey-Script.lua">https://github.com/lemerchand/lemerchand/raw/882d4bcb76a484fc77f9ac559763da947f437307/multikey/keyscripts/h-Multikey-Script.lua</source>
+        <source file="keyscripts/m-Multikey-Script.lua">https://github.com/lemerchand/lemerchand/raw/882d4bcb76a484fc77f9ac559763da947f437307/multikey/keyscripts/m-Multikey-Script.lua</source>
+        <source file="keyscripts/n-Multikey-Script.lua">https://github.com/lemerchand/lemerchand/raw/882d4bcb76a484fc77f9ac559763da947f437307/multikey/keyscripts/n-Multikey-Script.lua</source>
+        <source file="keyscripts/o-Multikey-Script.lua">https://github.com/lemerchand/lemerchand/raw/882d4bcb76a484fc77f9ac559763da947f437307/multikey/keyscripts/o-Multikey-Script.lua</source>
+        <source file="keyscripts/p-Multikey-Script.lua">https://github.com/lemerchand/lemerchand/raw/882d4bcb76a484fc77f9ac559763da947f437307/multikey/keyscripts/p-Multikey-Script.lua</source>
+        <source file="keyscripts/q-Multikey-Script.lua">https://github.com/lemerchand/lemerchand/raw/882d4bcb76a484fc77f9ac559763da947f437307/multikey/keyscripts/q-Multikey-Script.lua</source>
+        <source file="keyscripts/s-Multikey-Script.lua">https://github.com/lemerchand/lemerchand/raw/882d4bcb76a484fc77f9ac559763da947f437307/multikey/keyscripts/s-Multikey-Script.lua</source>
+        <source file="keyscripts/shift-g-Multikey-Script.lua">https://github.com/lemerchand/lemerchand/raw/882d4bcb76a484fc77f9ac559763da947f437307/multikey/keyscripts/shift-g-Multikey-Script.lua</source>
+        <source file="keyscripts/shift-m-Multikey-Bindings.lua">https://github.com/lemerchand/lemerchand/raw/882d4bcb76a484fc77f9ac559763da947f437307/multikey/keyscripts/shift-m-Multikey-Bindings.lua</source>
+        <source file="keyscripts/t-Multikey-Script.lua">https://github.com/lemerchand/lemerchand/raw/882d4bcb76a484fc77f9ac559763da947f437307/multikey/keyscripts/t-Multikey-Script.lua</source>
+        <source file="keyscripts/v-Multikey-Script.lua">https://github.com/lemerchand/lemerchand/raw/882d4bcb76a484fc77f9ac559763da947f437307/multikey/keyscripts/v-Multikey-Script.lua</source>
+        <source file="keyscripts/w-Multikey-Script.lua">https://github.com/lemerchand/lemerchand/raw/882d4bcb76a484fc77f9ac559763da947f437307/multikey/keyscripts/w-Multikey-Script.lua</source>
+        <source file="keyscripts/x-Multikey-Script.lua">https://github.com/lemerchand/lemerchand/raw/882d4bcb76a484fc77f9ac559763da947f437307/multikey/keyscripts/x-Multikey-Script.lua</source>
+        <source file="keyscripts/y-Multikey-Script.lua">https://github.com/lemerchand/lemerchand/raw/882d4bcb76a484fc77f9ac559763da947f437307/multikey/keyscripts/y-Multikey-Script.lua</source>
+        <source file="keyscripts/z-Multikey-Script.lua">https://github.com/lemerchand/lemerchand/raw/882d4bcb76a484fc77f9ac559763da947f437307/multikey/keyscripts/z-Multikey-Script.lua</source>
       </version>
     </reapack>
   </category>
