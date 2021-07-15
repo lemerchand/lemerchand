@@ -1,7 +1,9 @@
--- @version 1.05
+-- @version 1.06
 -- @author Lemerchand
 -- @provides
 --    [main] .
+--    [nomain] bindings
+--    [nomain] keyscripts
 -- @changelog
 --    + Create debugging function
 --    + Assess stamina after each keystroke (prevent uneccesary waiting) 
