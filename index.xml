@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="Scripts by Lemerchand" commit="5bb6425b3cce243d99137983741356b5a6bf7453">
+<index version="1" name="Scripts by Lemerchand" commit="3a50eeb617de638e5b8533faae2da0e1ad263d12">
   <category name="ItemTray">
     <reapack name="itemtray.lua" type="script">
       <version name="0.4b" author="Lemerchand" time="2021-01-10T16:44:05Z">
@@ -435,6 +435,16 @@
     <reapack name="Move selected notes to row under mouse.lua" type="script">
       <version name="1.0" author="Lemerchand" time="2020-12-22T23:48:03Z">
         <source main="midi_editor">https://github.com/lemerchand/lemerchand/raw/472b327f1f02449654fbe62b6c7a9329d5e90156/Misc%20MIDI%20Scripts/Move%20selected%20notes%20to%20row%20under%20mouse.lua</source>
+      </version>
+    </reapack>
+  </category>
+  <category name="multikey">
+    <reapack name="multikey.lua" type="script">
+      <version name="1.05" author="Lemerchand" time="2021-07-15T04:44:06Z">
+        <changelog><![CDATA[+ Create debugging function
++ Assess stamina after each keystroke (prevent uneccesary waiting) 
++ Catch modifer keys]]></changelog>
+        <source main="main">https://github.com/lemerchand/lemerchand/raw/3a50eeb617de638e5b8533faae2da0e1ad263d12/multikey/multikey.lua</source>
       </version>
     </reapack>
   </category>
