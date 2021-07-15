@@ -2,8 +2,8 @@
 -- @author Lemerchand
 -- @provides
 --    [main] .
---    [nomain] bindings
---    [nomain] keyscripts
+--    [nomain] bindings/*
+--    [nomain] keyscripts/*
 -- @changelog
 --    + Create debugging function
 --    + Assess stamina after each keystroke (prevent uneccesary waiting) 
