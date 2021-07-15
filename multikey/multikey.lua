@@ -2,7 +2,7 @@
 -- @author Lemerchand
 -- @provides
 --    [main] .
---    [nomain] bindings/*.conf
+--    [nomain] bindings/*.dum
 --    [nomain] keyscripts/*.lua
 -- @changelog
 --    + Create debugging function
