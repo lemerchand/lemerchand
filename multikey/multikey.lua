@@ -1,10 +1,10 @@
 -- @version .05
 -- @author Lemerchand
 -- @changelog
---	+ Create debugging function
+--    + Create debugging function
 --    + Assess stamina after each keystroke (prevent uneccesary waiting) 
 --    + Catch modifer keys
---	+ 
+ 
 
 reaper.ClearConsole()
 local settings = {
