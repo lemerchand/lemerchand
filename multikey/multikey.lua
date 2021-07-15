@@ -1,5 +1,7 @@
--- @version .05
+-- @version 1.05
 -- @author Lemerchand
+-- @provides
+--    [main] .
 -- @changelog
 --    + Create debugging function
 --    + Assess stamina after each keystroke (prevent uneccesary waiting) 
