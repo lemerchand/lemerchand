@@ -1,9 +1,9 @@
--- @version 1.061
+-- @version 1.062
 -- @author Lemerchand
 -- @provides
 --    [main] .
---    [nomain] bindings/*
---    [nomain] keyscripts/*
+--    [nomain] bindings/*.conf
+--    [nomain] keyscripts/*.lua
 -- @changelog
 --    + Create debugging function
 --    + Assess stamina after each keystroke (prevent uneccesary waiting) 
