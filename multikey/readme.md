@@ -34,10 +34,10 @@ In order for Multikey to know what key invoked it, it is necessary to have a sep
 
 I suggest opening the Actions List, clicking 'New Script' then 'Load Reascript', navigating to the 'Keyscript' folder, pressing Ctrl-A to select and load all of them at once. Then you can type 'multikey' into the Action List to see all of the bindings at once. It's possible to set them all once by making each one global, but (as tedious as it is) you should load the scripts separately for both Main and MIDI Editor. 
 
-[img]
+[://imgur.com/a/Em1r2gW]
 
 
-Now, for example, if you wanted to bind quantization actions to `Q` you would go into the Action List and load/bind 'q-Multikey-Script.lua` to `Q.`
+Now, for example, if you wanted to bind quantization actions to `Q` you would go into the Action List and load/bind 'q-Multikey-Script.lua' to `Q.`
 
 If you don't already have a bindings file for `Q` you can simply call `Q` and Multikey will generate a file under `Bindings` called `q-Multikey-Bindings.conf.` In this file we define our keybindings. Note that you do not have to have a separate bindings file for Main and MIDI Editor. Let's look up 'Quantize Item Positionss to Grid' in the Actions List. Then in the conf file we might put:
 
