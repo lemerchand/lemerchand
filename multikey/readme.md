@@ -67,4 +67,17 @@ Save your 'q-Multikey-Bindings.conf' script and select some off-time notes in th
 
 This is because Multikey uses a variable called 'timeout' that will tell the script to stop looking for new key presses after a specified time, or if the longest sequence of keys has already been pressed. This variable can be edited by editing the value in 'settings.conf' 
 
+Let's now make an action that works both in trackview and the MIDI Editor. Assign the 'm-Multikey-Script.lua' file to `M`. Run it to generate the bindings file, then open that in your text editor, and enter the following:
 
+```
+-- Insert or Edit marker at cursor
+all: mm 40171
+```
+There is no actino in the Action List for inserting a marker in the MIDI Editor. But with Mulitkey you can assign a key to the context `all` to run whatever action you want. Keep in mind, if it's a MIDI Editor command it must be prefaced with 'm.' In this case, we can assign a marker at the cursor with `mm` in trackview OR in the MIDI Editor. 
+
+Finally, if you want to emulate Custom Actions, you can simply chain them together. 
+
+```
+-- Turn on Metronome and enable Count in before record
+main: rcc 41745 _SWS_AWCOUNTRECON
+```
