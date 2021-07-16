@@ -13,7 +13,9 @@
 reaper.ClearConsole()
 local settings = {
 	debug = false,
+	default_timeout = .850,
 	timeout = .850,
+	extend_time_onkey = false
 }
 
 -- Collect dbg info from around the script for dbg function
@@ -115,7 +117,7 @@ function load_settings()
 		val = line:sub(key_end+1)
 
 		settings[key] = convert_var(val)
-
+		settings.default_timeout = settings.timeout
 	end
 end
 
@@ -239,6 +241,7 @@ function debug()
 	msg = msg .. '\nTimeout=\t' .. settings.timeout
 	msg = msg .. '\nStamina=\t' .. stamina
 	msg = msg .. '\nExhausted=\t' .. tostring(exhausted)
+	msg = msg .. '\nReset on key=\t' .. tostring(settings.extend_time_onkey)
 	msg = msg .. '\nExecuted cmd=\t' .. cmd
 	msg = msg .. '\nTime Lapse=\t' .. current_time - start_time
 	msg = msg .. '\nRemaining=' .. remaining
@@ -276,6 +279,10 @@ function main()
 			-- if it's a new key add it to the strokes
 			cmd = cmd .. char
 			last_char = char
+			if settings.extend_time_onkey then
+				settings.timeout = settings.timeout + settings.default_timeout
+			end
+
 		end
 	end
 
