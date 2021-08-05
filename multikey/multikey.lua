@@ -251,7 +251,7 @@ end
 -- Restore intercept lvl and last focused window
 function onexit() 
 	reaper.JS_VKeys_Intercept(-1, -1) 
-	reaper.JS_Window_SetFocus(last_focused)
+	-- reaper.JS_Window_SetFocus(last_focused)
 	if settings.debug then 
 		debug()
 	end
