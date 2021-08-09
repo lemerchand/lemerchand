@@ -13,7 +13,6 @@ local input = {
     text = "",
     flags = reaper.ImGui_InputTextFlags_EnterReturnsTrue()
 }
-
 local function draw()
     local rv, changed
     reaper.ImGui_PushItemWidth(ctx, reaper.ImGui_GetWindowWidth(ctx) - 16)
@@ -25,6 +24,7 @@ local function draw()
     )
     reaper.ImGui_PopItemWidth(ctx)
 
+    
 
     if changed then
 	display = input.text
