@@ -6,7 +6,7 @@
 --    [nomain] keyscripts/*.lua
 -- @changelog
 --    + Create debugging function
---    + Assess stamina after each keystroke (prevent uneccesary waiting) 
+--    + Assess stamina after each keystroke (prevent uneccesary waiting)
 --    + Catch modifer keys
 
 
@@ -50,7 +50,7 @@ function log(str) reaper.ShowConsoleMsg('\n' .. tostring(str)) end
 
 function init()
     -- Determine the view of the most recently focused window
-    -- TODO: Update this. Can it be done better, or does it just 
+    -- TODO: Update this. Can it be done better, or does it just
     -- need a more exhaustice list?
     local lf_str = reaper.JS_Window_GetTitle(last_focused)
 
@@ -80,7 +80,7 @@ function init()
 end
 
 -- XXX: This will generate a default settings file once that local functionality
--- exists. 
+-- exists.
 function restore_default_settings()
     file = io.open(script_path .. '../settings.conf', 'w')
     for k, b in pairs(settings) do
@@ -97,9 +97,9 @@ end
 
 -- convert pesky config file strings to bools and numbers
 function convert_var(val)
-    if val == 'true' then val = true 
-    elseif val == 'false' then val = false 
-    elseif val:match('%d+') then val = tonumber(val) 
+    if val == 'true' then val = true
+    elseif val == 'false' then val = false
+    elseif val:match('%d+') then val = tonumber(val)
     end
     return val
 end
@@ -207,7 +207,7 @@ function check_cmds(q)
     else
 	return false
     end
-end 
+end
 
 -- Looks for the longest string of chars possible to determine
 -- stamina. TODO: Update this to run after every key stroke
@@ -219,7 +219,7 @@ function find_longest_seq(cmd_list)
     return longest
 end
 
--- JS API get char. Does not distinguish between upper/lwr 
+-- JS API get char. Does not distinguish between upper/lwr
 -- hence +32
 function get_char()
     local char = reaper.JS_VKeys_GetState(-1)
@@ -231,7 +231,7 @@ function debug()
     -- Remaining possibilities
     local remaining = ''
     for i, c in ipairs(cmd_list) do
-	remaining = remaining .. '\n\t\t' .. c[1] 
+	remaining = remaining .. '\n\t\t' .. c[1]
     end
 
     -- --+--+--+--+--+--+--+--+--+--+--
@@ -249,10 +249,10 @@ function debug()
 end
 
 -- Restore intercept lvl and last focused window
-function onexit() 
-    reaper.JS_VKeys_Intercept(-1, -1) 
+function onexit()
+    reaper.JS_VKeys_Intercept(-1, -1)
     -- reaper.JS_Window_SetFocus(last_focused)
-    if settings.debug then 
+    if settings.debug then
 	debug()
     end
 
@@ -270,9 +270,9 @@ function main()
 	last_char = ''
     else
 	char = string.char(char):lower()
-	-- BUG: This removes the 0, 1, or 2 from the keycode 
+	-- BUG: This removes the 0, 1, or 2 from the keycode
 	-- I anticipate needign to change this to use GetMouseMods
-	-- Or at the very least, sub %d for ''  ONLY if it's paired with 
+	-- Or at the very least, sub %d for ''  ONLY if it's paired with
 	-- a char
 	char = char:gsub('%d', '')
 	if char ~= last_char then
@@ -280,7 +280,7 @@ function main()
 	    cmd = cmd .. char
 	    last_char = char
 	    if settings.extend_time_onkey then
-		settings.timeout = settings.timeout + settings.default_timeout
+	settings.timeout = settings.timeout + settings.default_timeout
 	    end
 
 	end

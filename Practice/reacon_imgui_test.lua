@@ -1,47 +1,64 @@
+local r = reaper
+
 local function log(str)
-    reaper.ShowConsoleMsg('\n' .. tostring(str))
+    r.ShowConsoleMsg('\n' .. tostring(str))
 end
 
-local ctx = reaper.ImGui_CreateContext("Reacon")
+local ctx = r.ImGui_CreateContext("Reacon")
 
 local function init()
-    reaper.ImGui_SetNextWindowSize(ctx, 600, 300)
+    r.ImGui_SetNextWindowSize(ctx, 600, 300)
 end
 
 local display = ""
 local input = {
     text = "",
-    flags = reaper.ImGui_InputTextFlags_EnterReturnsTrue()
+    flags = r.ImGui_InputTextFlags_EnterReturnsTrue()
 }
-local function draw()
-    local rv, changed
-    reaper.ImGui_PushItemWidth(ctx, reaper.ImGui_GetWindowWidth(ctx) - 16)
-    rv, display = reaper.ImGui_InputTextMultiline(
-	    ctx, "##display", display
-    )
-    changed, input.text = reaper.ImGui_InputText(
-	    ctx, "##input", input.text, input.flags, nil
-    )
-    reaper.ImGui_PopItemWidth(ctx)
 
-    
+local function display()
+    r.ImGui_BeginTable(ctx, "display", 5)	
+    r.ImGui_TableSetupColumn(ctx, '1')
+    r.ImGui_TableSetupColumn(ctx, '2')
+    r.ImGui_TableSetupColumn(ctx, '3')
+    r.ImGui_TableSetupColumn(ctx, '4')
+    r.ImGui_TableSetupColumn(ctx, '5')
+    r.ImGui_TableHeadersRow(ctx)
 
-    if changed then
-	display = input.text
-	input.text = ''
-    end
-    reaper.ImGui_End(ctx)
+    r.ImGui_TableNextRow(ctx) ; r.ImGui_TableSetColumnIndex(ctx, 0) ; r.ImGui_TextColored(ctx, 0xFF00FFFF, 'Ho') 
+    r.ImGui_TableNextRow(ctx) ; r.ImGui_TableSetColumnIndex(ctx, 0) ; r.ImGui_Text(ctx, 'Ho') 
+    r.ImGui_TableNextRow(ctx) ; r.ImGui_TableSetColumnIndex(ctx, 0) ; r.ImGui_Text(ctx, 'Ho') 
+    r.ImGui_TableNextRow(ctx) ; r.ImGui_TableSetColumnIndex(ctx, 0) ; r.ImGui_Text(ctx, 'Ho') 
+    r.ImGui_TableNextRow(ctx) ; r.ImGui_TableSetColumnIndex(ctx, 0) ; r.ImGui_Text(ctx, 'Ho') 
+
+    r.ImGui_EndTable(ctx)
 end
 
 local function main()
-    local visible, running = reaper.ImGui_Begin(ctx, "Reacon", true)
+    local rv, entered
+    r.ImGui_PushItemWidth(ctx, r.ImGui_GetWindowWidth(ctx) - 16)
+    display()
+    entered, input.text = r.ImGui_InputText(
+    ctx, "##input", input.text, input.flags
+    )
+    r.ImGui_PopItemWidth(ctx)
 
-    if visible then draw() end
+    if entered then
+	display = input.text
+	input.text = ''
+    end
+    r.ImGui_End(ctx)
+end
 
-    if running then reaper.defer(main)
-    else reaper.ImGui_DestroyContext(ctx)
+local function loop()
+    local visible, running = r.ImGui_Begin(ctx, "Reacon", true)
+
+    if visible then main() end
+
+    if running then r.defer(loop)
+    else r.ImGui_DestroyContext(ctx)
     end
 end
 
 init()
-main()
+loop()
