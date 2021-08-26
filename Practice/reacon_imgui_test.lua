@@ -16,7 +16,7 @@ local input = {
     flags = r.ImGui_InputTextFlags_EnterReturnsTrue()
 }
 
-local function display()
+local function display()	
     r.ImGui_BeginTable(ctx, "display", 5)	
     r.ImGui_TableSetupColumn(ctx, '1')
     r.ImGui_TableSetupColumn(ctx, '2')

@@ -1,3 +1,4 @@
+---@diagnostic disable: lowercase-global
 -- @version 0.3.3
 -- @author Lemerchand
 -- @about A REAPER command line
@@ -7,7 +8,7 @@
 --    [nomain] functions.lua
 --    [nomain] contexts.lua
 -- @changelog
---    + Began working on tracknotes
+--    + Began working on tracknotes 
 
 function reaperDoFile(file) local info = debug.getinfo(1,'S'); script_path = info.source:match[[^@?(.*[\/])[^\/]-$]]; dofile(script_path .. file); end
 reaperDoFile('ui.lua')
@@ -91,118 +92,119 @@ local refreshRate = 10
 -----------------------------------
 
 function main()
-	-- Draw the UI
-	--fill_background()
-	gfx.clear = 3092271
-	draw_elements()
+    -- Draw the UI
+    --fill_background()
+    gfx.clear = 3092271
+    draw_elements()
 
-	-- Handle alternate views
-	if c.context == 'TEXTEDITOR' then 
-		text_editor_display()
-		if btn_editNotes.leftClick  then
-				save_track_notes(reaper.GetSelectedTrack(0, 0))
-				c.context = 'SELECTTRACKS'
-		elseif btn_cancel.leftClick then 
-			c.subcontext = 'NONE'
-			c.context = 'SELECTTRACKS'
+    -- Handle alternate views
+    if c.context == 'TEXTEDITOR' then 
+	text_editor_display()
+	if btn_editNotes.leftClick  then
+	    save_track_notes(reaper.GetSelectedTrack(0, 0))
+	    c.context = 'SELECTTRACKS'
+	elseif btn_cancel.leftClick then 
+	    c.subcontext = 'NONE'
+	    c.context = 'SELECTTRACKS'
 
-		end
 	end
+    end
 
-	-- Handle button clicks
-	if btn_editNotes.leftClick and c.subcontext == 'INSPECTTRACK' then
-		local track = reaper.GetSelectedTrack(0, 0)
-		local ret, trackName = reaper.GetTrackName(track)
-		load_track_notes(track)
-		c.context = 'TEXTEDITOR'
-		c.subcontext = '**yTrack Notes: ** '.. trackName
-	end
+    -- Handle button clicks
+    if btn_editNotes.leftClick and c.subcontext == 'INSPECTTRACK' then
+	local track = reaper.GetSelectedTrack(0, 0)
+	local ret, trackName = reaper.GetTrackName(track)
+	load_track_notes(track)
+	c.context = 'TEXTEDITOR'
+	c.subcontext = '**yTrack Notes: ** '.. trackName
+    end
 
-	-- Handdle keyboard input
-	local char = gfx.getchar()
-	-- Exit on ESC
-	if exitOnCommand then 
-		reaper.atexit(exit)
-		return
-	elseif cmd.txt:find('/ns') then
-		reaper.atexit(exitnosave)
+    -- Handdle keyboard input
+    local char = gfx.getchar()
+    -- Exit on ESC
+    if exitOnCommand then 
+	reaper.atexit(exit)
+	return
+    elseif cmd.txt:find('/ns') then
+	reaper.atexit(exitnosave)
 
 	-- Otherwise, handle input and defer 
-	else
+    else
 
-		-- If the text editor is active then it steals keystrokes
-		if editor.active then 
-			editor:Change(char)
-			
-
-		-- if "/" then activate cmd
-		elseif char == 47 
-			and cmd.active == false then cmd.active = true 
-		--Undo/redo
-		elseif char == 26 
-			and gfx.mouse_cap == 12 then 
-				reaper.Main_OnCommand(40030, 0)
-		elseif char == 26 
-			then reaper.Main_OnCommand(40029, 0)
-		
-		-- if ctrl+backspace or the user clears out the cmd then clear text
-		elseif (char == 8 and gfx.mouse_cap == 04) 
-			or (cmd.cpos < 0 and c.engaged) then 
-				cmd.txt = ""
-				c:Reset()
-		--if up arrow
-		elseif char == 30064 then 
-			c:PrevCLI()
-		--if down arrow	
-		elseif char == 1685026670 then
-			c:NextCLI()
-
-		elseif cmd.txt:find('/dbg') then
-			cmd.txt = cmd.txt:gsub('/dbg', '')
-			cmd.cpos = string.len(cmd.txt)
-			dbg(false)
+	-- If the text editor is active then it steals keystrokes
+	if editor.active then 
+	    editor:Change(char)
 
 
-		elseif char ~= 0 then --user is typing
-			if not reaper.JS_Window_Find( 'ReaCon', true ) then 
-				reaper.atexit(exit)
-			return end
+	    -- if "/" then activate cmd
+	elseif char == 47 
+	    and cmd.active == false then cmd.active = true 
+	    --Undo/redo
+	elseif char == 26 
+	    and gfx.mouse_cap == 12 then 
+	    reaper.Main_OnCommand(40030, 0)
+	elseif char == 26 
+	    then reaper.Main_OnCommand(40029, 0)
+
+	    -- if ctrl+backspace or the user clears out the cmd then clear text
+	elseif (char == 8 and gfx.mouse_cap == 04) 
+	    or (cmd.cpos < 0 and c.engaged) then 
+	    cmd.txt = ""
+	    c:Reset()
+	    --if up arrow
+	elseif char == 30064 then 
+	    c:PrevCLI()
+	    --if down arrow	
+	elseif char == 1685026670 then
+	    c:NextCLI()
+
+	elseif cmd.txt:find('/dbg') then
+	    cmd.txt = cmd.txt:gsub('/dbg', '')
+	    cmd.cpos = string.len(cmd.txt)
+	    dbg(false)
 
 
-			--if the user presses ctrl+enter then exit after commit
-			if gfx.mouse_cap == 04 
-				and char == 13 then 
-					exitOnCommand = true
-			elseif char == 8 and cmd.cpos <= 1 then
-				c:Reset()
-			end
+	elseif char ~= 0 then --user is typing
+	    if not reaper.JS_Window_Find( 'ReaCon', true ) then 
+		reaper.atexit(exit)
+	    return end
 
-			-- Send characters to the textfield
-			cmd:Change(char)
-			-- Parse the CLI
-			c:Parse(cmd.txt)
-			c:update_cli()
-			update_display()
-			-- dbg(true)
-			--log(c.context)
-		
-		end
-		if cmd.leftClick then cmd.active = true end
-		reaper.defer(main)
+
+	    --if the user presses ctrl+enter then exit after commit
+	    if gfx.mouse_cap == 04 
+		and char == 13 then 
+		exitOnCommand = true
+	    elseif char == 8 and cmd.cpos <= 1 then
+		c:Reset()
+	    end
+
+	    -- Send characters to the textfield
+	    cmd:Change(char)
+	    -- Parse the CLI
+	    c:Parse(cmd.txt)
+	    c:update_cli()
+	    update_display()
+	    -- dbg(true)
+	    --log(c.context)
+	    
+
 	end
+	if cmd.leftClick then cmd.active = true end
+	reaper.defer(main)
+    end
 
-	-- Handle UI refresh
-	refreshRate = refresh(refreshRate)
-	if reaper.JS_Window_GetFocus() == win then
-		if wasUnfocused then 
-			reaper.JS_Window_SetOpacity( win, 'ALPHA',  1) 
-			wasUnfocused = false
-		end
-	else
-		reaper.JS_Window_SetOpacity(win, 'ALPHA', .84)
-		refreshRate = 50
-		wasUnfocused = true
+    -- Handle UI refresh
+    refreshRate = refresh(refreshRate)
+    if reaper.JS_Window_GetFocus() == win then
+	if wasUnfocused then 
+	    reaper.JS_Window_SetOpacity( win, 'ALPHA',  1) 
+	    wasUnfocused = false
 	end
+    else
+	reaper.JS_Window_SetOpacity(win, 'ALPHA', .84)
+	refreshRate = 50
+	wasUnfocused = true
+    end
 end
 main()
 reaper.atexit(exit)
