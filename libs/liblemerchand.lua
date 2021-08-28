@@ -11,14 +11,13 @@
 --
 --     * Luca Anzalone - luatable - https://github.com/Luca96/lua-table
 --
-local std = {}
-std.table = {}
+local std      =   {}
+local class    =   require('middleclass')
+local format   =   string.format
+std.table      =   {}
+local r        =   reaper
+local last     =   {}
 
-local class = require('middleclass')
-local format = string.format
-local r = reaper
-
-local last = {}
 last.func, last.linenum = nil, nil
 
 function std.dbg(str, clear, ...)

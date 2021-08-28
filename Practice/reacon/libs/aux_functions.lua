@@ -1,8 +1,10 @@
-local r   = reaper
-local std = require('liblemerchand')
-local tbl = std.table
-local dbg = std.dbg
-local format = string.format
+local r        =   reaper
+local std      =   require('liblemerchand')
+local tbl      =   std.table
+local dbg      =   std.dbg
+local format   =   string.format
+
+function Adjust_ms_for_cycles(n) return n * .033 end
 
 function Create_manifest()
     local manifest = {}
@@ -15,12 +17,26 @@ function Create_manifest()
     return manifest
 end
 
+-- Why use 're?' local r = reaper, recall?
+function Convert_native_to_hex(track_color)
+    local re, g, b = r.ColorFromNative(track_color)
+    return RGB_to_HEX(re, g, b, 255)
+end
+
+function RGB_to_HEX(re, g, b, a)
+    local red     =   re * 256 * 256 * 256
+    local green   =   g * 256 * 256
+    local blue    =   b * 256
+
+    return red + green + blue + a
+end
+
 function Get_track_info(track)
     local entry = {}
 
     _, entry.name     =   r.GetSetMediaTrackInfo_String(track, 'P_NAME', '', false )
     entry.number      =   math.floor(r.GetMediaTrackInfo_Value(track, 'IP_TRACKNUMBER') - 1)
-    entry.color       =   r.GetMediaTrackInfo_Value(track, 'I_CUSTOMCOLOR')
+    entry.color       =   r.GetTrackColor(track)
     entry.input       =   r.GetMediaTrackInfo_Value(track, 'I_RECINPUT')
     entry.auto_mode   =   r.GetMediaTrackInfo_Value(track, 'I_AUTOMODE')
     entry.pan         =   r.GetMediaTrackInfo_Value(track, 'D_PAN')
@@ -28,7 +44,7 @@ function Get_track_info(track)
 
     -- BOOLEANS
     if r.GetMediaTrackInfo_Value(track, 'B_MUTE') == 1 then
-	entry.muted = true
+	entry.muted  = true
     else entry.muted = false
     end
     if r.GetMediaTrackInfo_Value(track, 'I_SOLO') == 1 then
@@ -38,39 +54,39 @@ function Get_track_info(track)
     end
     if r.GetMediaTrackInfo_Value(track, 'I_RECARM') == 1 then
 	entry.armed  = true
-    else entry.armed  = false
+    else entry.armed = false
     end
     if r.GetMediaTrackInfo_Value(track, 'B_PHASE') == 1 then
-	entry.phase_inverted = true
+	entry.phase_inverted  = true
     else entry.phase_inverted = false
     end
     if r.GetMediaTrackInfo_Value(track, 'I_FXEN') == 1 then
 	entry.fx_enabled  = true
-    else entry.fx_enabled  = false
+    else entry.fx_enabled = false
     end
     if r.GetMediaTrackInfo_Value(track, 'I_RECMON') == 1 then
-	entry.monitored   = true
-    else entry.monitored   = false
+	entry.monitored  = true
+    else entry.monitored = false
     end
     if r.GetMediaTrackInfo_Value(track, 'I_FOLDERDEPTH') == 1 then
-	entry.is_a_parent = true
+	entry.is_a_parent  = true
     else entry.is_a_parent = false
     end
     -- XXX: Avoid devestation by way of Master Track
     if entry.number == -1 then
 	entry.in_mixer = nil
-	entry.in_tcp = nil
+	entry.in_tcp   = nil
     else
 	if r.GetMediaTrackInfo_Value(track, 'B_SHOWINMIXER') == 1 then
-	    entry.in_mixer = true
+	    entry.in_mixer  = true
 	else entry.in_mixer = false
 	end
 	if r.GetMediaTrackInfo_Value(track, 'B_SHOWINTCP') == 1 then
-	    entry.in_tcp = true
+	    entry.in_tcp  = true
 	else entry.in_tcp = false
 	end
 	if r.GetMediaTrackInfo_Value(track, 'I_PLAY_OFFSET') == 1 then
-	    entry.offset = true
+	    entry.offset  = true
 	    entry.offset  = r.GetMediaTrackInfo_Value(track, 'I_PLAY_OFFSET')
 	else entry.offset = false
 	end
@@ -79,8 +95,8 @@ function Get_track_info(track)
     return entry
 end
 
-local backspace = 8  ; local tab  = 9  ; local enter   =  13 ; local esc     =  27
-local space     = 32 ; local home = 36 ; local end_    =  35
+local backspace  =  8   ;  local tab   =  9   ;  local enter  =  13  ;  local esc  =  27
+local space      =  32  ;  local home  =  36  ;  local end_   =  35
 
 local maxkey =  512
 local minkey =  20
@@ -134,6 +150,23 @@ function Find_keybind_match(mods, char, kb)
     end
 end
 
+function Find_command(change, commands_list)
+    dbg('Searching for commands...')
+    for _, v in pairs(commands_list) do
+	if tbl.has_value(v.triggers, change) then 
+	    dbg('...found %s!', false, change)
+	return v.commands end
+    end
+    dbg('None found!')
+    return false
+end
+
+function Execute_keybinding(keybind, command_list, win)
+    for k, v in pairs(keybind) do 
+	local commands = Find_command(v, command_list)
+	Execute_commands(commands, win)
+    end
+end
 
 function Execute_commands(commands, win)
     local succeeded, _ = pcall(commands.func, win, table.unpack(commands.args))
@@ -149,7 +182,7 @@ end
 function Fill_out_kb_mods(kb)
     local modkeys = {alt = true, ctrl = true, shift = true, meta = true}
     for _, v in pairs(kb) do
-	for kk, vv in pairs(modkeys)  do
+	for kk, _ in pairs(modkeys)  do
 	    if not v.modifier[kk] then v.modifier[kk] = false end
 	end
     end

@@ -14,11 +14,21 @@ local commands = {
 
     -- Show the trackView
     {
-	name = 'ShowTrackView',
+	name = 'ShowTrackview',
 	description = 'Switches to the trackview.',
 	triggers    = {'showTrackview' },
 	commands    = { func = af.showTrackview, args = {} }
-    }
+    },
+    {
+	name = 'Show Log',
+	triggers    = {'showLog', 'showClog'},
+	commands    = {func = af.showClog, args = {} }
+    },
+    {
+	name = 'Edit Settings.',
+	triggers    = {'e SETTINGS'},
+	commands    = { func = af.openExternal, args = {} }
+    },
 }
 
 return commands

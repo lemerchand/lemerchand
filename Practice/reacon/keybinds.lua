@@ -5,22 +5,22 @@ local af = require('afuncs')
 
 local Keybinds = {
     {
-	name = 'showClog',
+	name = 'showLog',
 	modifier = { ctrl = true },
 	key = 'l',
-	commands = { func = af.showClog, args = {} },
+	commands = { 'showLog'},
     },
     {
 	name = 'showTrackView',
 	modifier = {alt = true, ctrl = true},
 	key = 't',
-	commands = { func = af.showTrackview, args = {} },
+	commands = { 'showTrackview' },
     },
     {
-	name = 'Quit',
+	name = 'exit',
 	modifier = {},
 	key = esc,
-	commands = { func = af.quit, args = {} },
+	commands = { 'exit' },
     }
 }
 

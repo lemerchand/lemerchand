@@ -1,14 +1,14 @@
-local class = require('middleclass')
-local r = reaper
-local format = string.format
-local std = require('liblemerchand')
-local tbl = std.table
-local dbg = std.dbg
+local class        =   require('middleclass')
+local r            =   reaper
+local format       =   string.format
+local std          =   require('liblemerchand')
+local tbl          =   std.table
+local dbg          =   std.dbg
 --  _____              __            __
 -- / ___/__  ___  ___ / /____ ____  / /____
 --/ /__/ _ \/ _ \(_-</ __/ _ `/ _ \/ __(_-<
 --\___/\___/_//_/___/\__/\_,_/_//_/\__/___/
-local PADX, PADY = 16, 28
+local PADX, PADY   =   16, 28
 
 --   ___                 __  ______  _______
 --  / _ )___ ____ ___   / / / /  _/ / ___/ /__ ____ ___
@@ -33,10 +33,10 @@ TextDisplay = class('TextDisplay', BaseUIClass)
 
 function TextDisplay:initialize(name, text, width, height)
     BaseUIClass.initialize(self, name)
-    self.text   = text
-    self.height = height
-    self.width  = width
-    self.flags  = r.ImGui_InputTextFlags_ReadOnly()
+    self.text     =   text
+    self.height   =   height
+    self.width    =   width
+    self.flags    =   r.ImGui_InputTextFlags_ReadOnly()
 end
 
 function TextDisplay:Draw(text)
@@ -72,11 +72,11 @@ InputBox = class('InputBox', BaseUIClass)
 
 function InputBox:initialize(name, text, width, height)
     BaseUIClass.initialize(self, name)
-    self.text	 = text
-    self.height  = height
-    self.width	 = width
-    self.entered = false
-    self.flags	 =  r.ImGui_InputTextFlags_EnterReturnsTrue()
+    self.text      =   text
+    self.height    =   height
+    self.width     =   width
+    self.entered   =   false
+    self.flags     =   r.ImGui_InputTextFlags_EnterReturnsTrue()
 end
 
 function InputBox:Draw()
@@ -99,16 +99,7 @@ function InputBox:Draw()
     else return nil end
 end
 
-function InputBox:Find_command(change, commands_list)
-    dbg('Searching for commands...')
-    for _, v in pairs(commands_list) do
-	if tbl.has_value(v.triggers, change) then 
-	    dbg('...found %s!', false, change)
-	return v.commands end
-    end
-    dbg('None found!')
-    return false
-end
+
 
 -- ______             __     ______     __   __
 --/_  __/______ _____/ /__  /_  __/__ _/ /  / /__
@@ -120,10 +111,10 @@ TrackView = class('TrackView', BaseUIClass)
 
 function TrackView:initialize(name, width, height)
     BaseUIClass.initialize(self, name)
-    self.width  =width
-    self.height = height
-    self.flags = r.ImGui_TableFlags_RowBg() | r.ImGui_TableFlags_Resizable() |r.ImGui_TableFlags_Hideable() | r.ImGui_TableColumnFlags_WidthStretch()
-    self.col_headings = { '#', 'Name', 'Pan', '', ''}
+    self.width          =   width
+    self.height         =   height
+    self.flags          =   r.ImGui_TableFlags_RowBg() | r.ImGui_TableFlags_Resizable() |r.ImGui_TableFlags_Hideable() | r.ImGui_TableColumnFlags_WidthStretch()
+    self.col_headings   =   { '#', 'Name', 'Pan', '', ''}
 end
 
 function TrackView:Draw(list)
@@ -161,12 +152,13 @@ function TrackView:Draw(list)
 		ctx,
 		format('##%s', track.number),
 		track.name,
-		r.ImGui_InputTextFlags_AutoSelectAll() | r.ImGui_InputTextFlags_EnterReturnsTrue()
+		r.ImGui_InputTextFlags_AutoSelectAll() --| r.ImGui_InputTextFlags_EnterReturnsTrue()
 		)
 
-	if nameChanged then change = {track=track.number, attr='P_NAME', new_value=name} end
+	if nameChanged then change = {track=track.number, name = track.name, attr='P_NAME', new_value=name} end
 
 	r.ImGui_TableSetColumnIndex(ctx, 2)
+	r.ImGui_PushAllowKeyboardFocus(ctx, false)
 	local panChanged, pan = reaper.ImGui_SliderInt(
 		ctx,
 		format('##%span', track.number),
@@ -174,15 +166,16 @@ function TrackView:Draw(list)
 		-100,
 		100
 		)
+	r.ImGui_PopAllowKeyboardFocus(ctx)
 
-	if panChanged then change = {track=track.number, attr='D_PAN', new_value=pan * .01} end
+	if panChanged then change = {track=track.number, name = track.name, attr='D_PAN', new_value=pan * .01} end
 
 	r.ImGui_TableSetColumnIndex(ctx, 3)
 	if track.color then
 	    local colorChanged, color  = r.ImGui_ColorButton(
 		    ctx,
 		    format('##%scolor', track.number),
-		    r.ImGui_ColorConvertNative(track.color)
+		    Convert_native_to_hex(track.color)
 		    )
 	end
     end
@@ -218,10 +211,10 @@ Clog = class('Clog', BaseUIClass)
 
 function Clog:initialize(name, text, width, height)
     BaseUIClass.initialize(self, name)
-    self.text   = text
-    self.height = height
-    self.width  = width
-    self.flags  = r.ImGui_InputTextFlags_ReadOnly()
+    self.text     =   text
+    self.height   =   height
+    self.width    =   width
+    self.flags    =   r.ImGui_InputTextFlags_ReadOnly()
 end
 
 function Clog:Draw(dummy)
