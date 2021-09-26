@@ -113,6 +113,12 @@ local function main()
 	    dbg('Text entered...')
 	    Execute_commands(commands, settings.win)
 	end
+    else
+	local prefix = Find_prefix(prompt.text, command_list)
+	if prefix then
+	    settings.win.context = prefix.context
+	end
+
     end
 
     -- Prepare display

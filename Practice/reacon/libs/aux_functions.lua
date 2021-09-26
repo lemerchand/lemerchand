@@ -161,6 +161,13 @@ function Find_command(change, commands_list)
     return false
 end
 
+function Find_prefix(text, command_list)
+    for _, v in pairs(command_list) do
+	if tbl.has_key(v.triggers, text) then return v.context end
+    end
+    return false
+end
+
 function Execute_keybinding(keybind, command_list, win)
     for k, v in pairs(keybind) do 
 	local commands = Find_command(v, command_list)

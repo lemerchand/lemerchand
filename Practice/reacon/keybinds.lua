@@ -8,7 +8,7 @@ local Keybinds = {
 	name = 'showLog',
 	modifier = { ctrl = true },
 	key = 'l',
-	commands = { 'showLog'},
+	commands = { 'showLog' },
     },
     {
 	name = 'showTrackView',
